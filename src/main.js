@@ -17,10 +17,13 @@ function deg(value) {
 function updateReadouts() {
   qs('tiltValue').textContent = deg(state.tilt);
   qs('distanceValue').textContent = state.distance.toFixed(1);
+  qs('detectorHeightValue').textContent = state.detectorHeight.toFixed(2);
   qs('voltageValue').textContent = `${state.voltage} kV`;
   qs('rxValue').textContent = deg(state.rx);
   qs('ryValue').textContent = deg(state.ry);
   qs('rzValue').textContent = deg(state.rz);
+  qs('coneScaleValue').textContent = `${state.coneScale.toFixed(1)}x`;
+  qs('planeCountValue').textContent = `${state.planeCount}`;
   qs('stageValue').textContent = `${state.stage} / 6`;
 
   const lambda = electronWavelengthPm(state.voltage);
@@ -31,7 +34,7 @@ function updateReadouts() {
   qs('modeValue').textContent = state.stage === 6 ? 'All visible' : `Stage ${state.stage}`;
 
   const stage = stages[state.stage - 1];
-  qs('explainTitle').textContent = stage.title;
+  qs('explainTitle').textContent = stage.title.replace(/^\d+\.\s*/, '');
   qs('explainText').textContent = stage.text;
   qs('patternCaption').textContent = detectorCaption();
   qs('playStage').textContent = state.playing ? 'Pause' : 'Play';
@@ -58,8 +61,8 @@ function bindCheck(id, key) {
   });
 }
 
-['tilt', 'distance', 'voltage', 'rx', 'ry', 'rz', 'stage'].forEach((id) => bindRange(id, id, Number));
-['showCones', 'showPlanes', 'showLabels', 'showNoise'].forEach((id) => bindCheck(id, id));
+['tilt', 'distance', 'detectorHeight', 'voltage', 'rx', 'ry', 'rz', 'coneScale', 'planeCount', 'stage'].forEach((id) => bindRange(id, id, Number));
+['showCones', 'showPlanes', 'showIntersections', 'showLabels', 'showNoise'].forEach((id) => bindCheck(id, id));
 
 qs('nextStage').addEventListener('click', () => {
   state.stage = Math.min(6, state.stage + 1);

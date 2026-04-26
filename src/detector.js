@@ -150,5 +150,5 @@ export function detectorCaption() {
   const lambda = electronWavelengthPm(state.voltage);
   const theta = braggThetaDeg(state.voltage, planes[0].d);
   const visualTheta = visualThetaDeg(state.voltage, planes[0].d);
-  return `At ${state.voltage} kV, lambda is approximately ${lambda.toFixed(2)} pm. For ${planes[0].hkl}, physical theta is ${theta.toFixed(2)} deg; cone separation is visually magnified to ${visualTheta.toFixed(1)} deg so the upper/lower cone pair is readable.`;
+  return `At ${state.voltage} kV, lambda is approximately ${lambda.toFixed(2)} pm. For ${planes[0].hkl}, physical theta is ${theta.toFixed(2)} deg; the teaching cone angle is ${visualTheta.toFixed(1)} deg using the ${state.coneScale.toFixed(1)}x magnifier so the detector cuts are readable.`;
 }

@@ -3,13 +3,17 @@ import * as THREE from 'three';
 export const state = {
   stage: 6,
   tilt: 70,
-  distance: 3.0,
+  distance: 2.9,
+  detectorHeight: 1.3,
   voltage: 20,
   rx: 0,
   ry: 0,
   rz: 0,
+  coneScale: 6,
+  planeCount: 5,
   showCones: true,
   showPlanes: true,
+  showIntersections: true,
   showLabels: true,
   showNoise: true,
   playing: false,
@@ -63,7 +67,10 @@ export function braggThetaDeg(kV, dNm) {
 }
 
 export function visualThetaDeg(kV, dNm) {
-  return THREE.MathUtils.clamp(braggThetaDeg(kV, dNm) * 6, 5, 9);
+  // EBSD Bragg angles are only a few degrees, which is too subtle for a
+  // classroom 3D schematic. The slider-controlled scale keeps the mapping
+  // honest while letting instructors enlarge the cone opening for discussion.
+  return THREE.MathUtils.clamp(braggThetaDeg(kV, dNm) * state.coneScale, 3.5, 12);
 }
 
 export function orientationQuat() {
@@ -81,8 +88,9 @@ export function orientedNormal(normal) {
 }
 
 export function activePlanes() {
-  if (state.stage >= 6) return planes;
-  if (state.stage >= 4) return planes.slice(0, 3);
-  if (state.stage >= 3) return planes.slice(0, 2);
+  const requestedPlaneCount = THREE.MathUtils.clamp(Math.round(state.planeCount), 1, planes.length);
+  if (state.stage >= 6) return planes.slice(0, requestedPlaneCount);
+  if (state.stage >= 4) return planes.slice(0, Math.min(3, requestedPlaneCount));
+  if (state.stage >= 3) return planes.slice(0, Math.min(2, requestedPlaneCount));
   return [];
 }
