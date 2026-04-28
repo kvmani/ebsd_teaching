@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EBSD Kikuchi Pattern Formation</title>
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="topbar">
+        <div class="title">
+          <h1>EBSD Kikuchi Pattern Formation</h1>
+          <p>Interactive 3D teaching aid: beam -> interaction volume -> Bragg cones -> detector bands</p>
+        </div>
+        <div class="notice"><span class="status-dot"></span>Conceptual schematic, not a validated physics simulation</div>
+      </header>
+
+      <main class="workspace">
+        <section class="panel scene-panel" aria-label="SEM and EBSD geometry">
+          <div class="panel-title">
+            <strong>SEM / EBSD Geometry</strong>
+            <span>Drag to orbit, scroll to zoom</span>
+          </div>
+          <div class="annotation" id="annBeam">Primary SEM electrons</div>
+          <div class="annotation" id="annSample">Sample surface: 70 deg from -X axis</div>
+          <div class="annotation" id="annDetector">EBSD detector</div>
+          <canvas id="scene"></canvas>
+        </section>
+
+        <section class="panel detector-panel" aria-label="Live detector pattern">
+          <div class="panel-title">
+            <strong>Live Detector Pattern</strong>
+            <span>Kikuchi bands from cone intersections</span>
+          </div>
+          <div class="detector-holder">
+            <canvas id="detector" width="900" height="900"></canvas>
+          </div>
+          <p class="pattern-caption" id="patternCaption"></p>
+        </section>
+
+        <aside class="panel controls" aria-label="Simulation controls">
+          <div class="control-intro">
+            <h2>Controls</h2>
+            <p>Use guided mode for lectures, or adjust geometry and orientation to show how schematic EBSD bands respond.</p>
+          </div>
+
+          <section class="control-group">
+            <h3>Guided Explanation</h3>
+            <div class="buttons">
+              <button id="prevStage" type="button">Previous</button>
+              <button id="nextStage" type="button">Next</button>
+              <button id="playStage" class="wide" type="button">Play</button>
+            </div>
+            <label class="slider-row">
+              <span>Stage <output class="value" id="stageValue">6 / 6</output></span>
+              <input id="stage" type="range" min="1" max="6" step="1" value="6" />
+            </label>
+          </section>
+
+          <section class="control-group">
+            <h3>SEM / EBSD Geometry</h3>
+            <label class="slider-row">
+              <span>Sample tilt <output class="value" id="tiltValue">70 deg</output></span>
+              <input id="tilt" type="range" min="0" max="80" step="1" value="70" />
+            </label>
+            <label class="slider-row">
+              <span>Detector distance <output class="value" id="distanceValue">2.9</output></span>
+              <input id="distance" type="range" min="1.8" max="4.6" step="0.1" value="2.9" />
+            </label>
+            <label class="slider-row">
+              <span>Detector height <output class="value" id="detectorHeightValue">1.30</output></span>
+              <input id="detectorHeight" type="range" min="0.4" max="2.4" step="0.05" value="1.3" />
+            </label>
+            <label class="slider-row">
+              <span>Accelerating voltage <output class="value" id="voltageValue">20 kV</output></span>
+              <input id="voltage" type="range" min="5" max="30" step="1" value="20" />
+            </label>
+          </section>
+
+          <section class="control-group">
+            <h3>Crystal Orientation</h3>
+            <label class="slider-row">
+              <span>Rotate X <output class="value" id="rxValue">0 deg</output></span>
+              <input id="rx" type="range" min="-45" max="45" step="1" value="0" />
+            </label>
+            <label class="slider-row">
+              <span>Rotate Y <output class="value" id="ryValue">0 deg</output></span>
+              <input id="ry" type="range" min="-45" max="45" step="1" value="0" />
+            </label>
+            <label class="slider-row">
+              <span>Rotate Z <output class="value" id="rzValue">0 deg</output></span>
+              <input id="rz" type="range" min="-70" max="70" step="1" value="0" />
+            </label>
+          </section>
+
+          <section class="control-group">
+            <h3>Teaching Emphasis</h3>
+            <label class="slider-row">
+              <span>Cone angle magnifier <output class="value" id="coneScaleValue">6.0x</output></span>
+              <input id="coneScale" type="range" min="3" max="9" step="0.5" value="6" />
+            </label>
+            <label class="slider-row">
+              <span>Plane families <output class="value" id="planeCountValue">4</output></span>
+              <input id="planeCount" type="range" min="1" max="5" step="1" value="4" />
+            </label>
+          </section>
+
+          <section class="control-group">
+            <h3>Display</h3>
+            <div class="checks">
+              <label><input id="showCones" type="checkbox" checked /> Cones</label>
+              <label><input id="showPlanes" type="checkbox" checked /> Planes</label>
+              <label><input id="showIntersections" type="checkbox" checked /> Cone cuts</label>
+              <label><input id="showLabels" type="checkbox" checked /> hkl labels</label>
+              <label><input id="showNoise" type="checkbox" checked /> Detector noise</label>
+            </div>
+          </section>
+
+          <section class="control-group">
+            <h3>Readout</h3>
+            <div class="readout">
+              <div class="metric"><b id="lambdaValue">8.59 pm</b><span>electron wavelength</span></div>
+              <div class="metric"><b id="thetaValue">1.23 deg</b><span>example Bragg angle</span></div>
+              <div class="metric"><b id="bandValue">2.46 deg</b><span>approx. band width</span></div>
+              <div class="metric"><b id="modeValue">All visible</b><span>current stage</span></div>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="lesson">
+        <div class="legend" aria-label="Color legend">
+          <span class="pill beam">blue: primary beam</span>
+          <span class="pill volume">gold: interaction volume</span>
+          <span class="pill cones">green/cyan/pink: Bragg cones</span>
+          <span class="pill detector">right panel: detector pattern</span>
+        </div>
+        <div class="explain">
+          <strong id="explainTitle"></strong>
+          <span id="explainText"></span>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
