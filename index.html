@@ -15,7 +15,12 @@
         <div class="notice"><span class="status-dot"></span>Conceptual schematic, not a validated physics simulation</div>
       </header>
 
-      <main class="workspace">
+      <nav class="view-tabs" aria-label="Simulation views">
+        <button class="tab-button active" id="tabGeometry" type="button" aria-controls="geometryView" aria-selected="true">Geometry + Pattern</button>
+        <button class="tab-button" id="tabAcquisition" type="button" aria-controls="acquisitionView" aria-selected="false">Live Scan Acquisition</button>
+      </nav>
+
+      <main class="workspace view-pane active" id="geometryView">
         <section class="panel scene-panel" aria-label="SEM and EBSD geometry">
           <div class="panel-title">
             <strong>SEM / EBSD Geometry</strong>
@@ -128,8 +133,146 @@
         </aside>
       </main>
 
+      <main class="acquisition-workspace view-pane" id="acquisitionView">
+        <section class="panel scan-panel" aria-label="Live EBSD scan acquisition">
+          <div class="panel-title">
+            <strong>Live EBSD Scan Acquisition</strong>
+            <span>Raster scan: each pixel needs a usable diffraction pattern</span>
+          </div>
+          <canvas id="scanMap" width="720" height="520"></canvas>
+          <div class="scan-overlay">
+            <div><b id="scanQuality">82%</b><span>pattern quality</span></div>
+            <div><b id="scanResolution">360 x 260</b><span>effective pixels</span></div>
+            <div><b id="scanSpeed">35.7 px/ms</b><span>relative speed</span></div>
+            <div><b id="scanWarning">stable scan</b><span>current trade-off</span></div>
+            <div><b id="scanProgress">0%</b><span>raster progress</span></div>
+            <div><b id="scanPixel">0, 0</b><span>current pixel</span></div>
+            <div><b id="scanDwell">56 ms</b><span>effective dwell</span></div>
+            <div><b id="scanMode">orientation</b><span>map view</span></div>
+          </div>
+        </section>
+
+        <section class="panel pattern-lab" aria-label="Acquired EBSD pattern preview">
+          <div class="panel-title">
+            <strong>Pattern at Current Pixel</strong>
+            <span>Noise, clipping, and band sharpness change the indexability</span>
+          </div>
+          <canvas id="patternPreview" width="420" height="420"></canvas>
+          <div class="pattern-status">
+            <span>Linked raster pixel <b id="patternPixel">0, 0</b></span>
+            <span>Local grain <b id="patternGrain">grain 1</b></span>
+          </div>
+          <div class="parameter-story" id="parameterStory">
+            Increase exposure or averaging to reduce noise. Increase gain only until bands are bright enough; too much gain clips bright pixels.
+          </div>
+        </section>
+
+        <aside class="panel controls acquisition-controls" aria-label="Acquisition controls">
+          <div class="control-intro">
+            <h2>Acquisition Controls</h2>
+            <p>Change one parameter at a time and watch the map, pattern, and confidence readouts respond like a live EBSD acquisition.</p>
+          </div>
+
+          <section class="coach-panel" aria-label="Acquisition coach">
+            <div>
+              <span class="coach-label">Acquisition coach</span>
+              <strong id="coachTitle">Balanced learning setup</strong>
+              <p id="coachText">The current settings should produce recognizable bands while keeping the scan lively enough to watch.</p>
+            </div>
+            <div class="coach-bars">
+              <div><span>Signal</span><b id="barSignal"></b></div>
+              <div><span>Detail</span><b id="barDetail"></b></div>
+              <div><span>Speed</span><b id="barSpeed"></b></div>
+              <div><span>Risk</span><b id="barRisk"></b></div>
+            </div>
+          </section>
+
+          <section class="control-group">
+            <h3>Detector Signal</h3>
+            <label class="slider-row">
+              <span>Gain <output class="value" id="gainValue">1.2x</output></span>
+              <input id="gain" type="range" min="0.5" max="3.0" step="0.1" value="1.2" />
+            </label>
+            <label class="slider-row">
+              <span>Exposure time <output class="value" id="exposureValue">28 ms</output></span>
+              <input id="exposureMs" type="range" min="4" max="120" step="2" value="28" />
+            </label>
+            <label class="slider-row">
+              <span>Beam current <output class="value" id="beamCurrentValue">55%</output></span>
+              <input id="beamCurrent" type="range" min="15" max="100" step="5" value="55" />
+            </label>
+          </section>
+
+          <section class="control-group">
+            <h3>Sampling</h3>
+            <label class="slider-row">
+              <span>Binning <output class="value" id="binningValue">2 x 2</output></span>
+              <input id="binning" type="range" min="1" max="8" step="1" value="2" />
+            </label>
+            <label class="slider-row">
+              <span>Frame averaging <output class="value" id="frameAverageValue">2 frames</output></span>
+              <input id="frameAverage" type="range" min="1" max="8" step="1" value="2" />
+            </label>
+            <label class="slider-row">
+              <span>Scan speed <output class="value" id="scanSpeedValue">1.0x</output></span>
+              <input id="scanSpeedControl" type="range" min="0.4" max="2.0" step="0.1" value="1.0" />
+            </label>
+            <label class="slider-row">
+              <span>Stage drift <output class="value" id="driftValue">0%</output></span>
+              <input id="drift" type="range" min="0" max="70" step="5" value="0" />
+            </label>
+          </section>
+
+          <section class="control-group">
+            <h3>Indexing + Views</h3>
+            <label class="slider-row">
+              <span>Band detection <output class="value" id="bandDetectionValue">65%</output></span>
+              <input id="bandDetection" type="range" min="20" max="100" step="5" value="65" />
+            </label>
+            <label class="slider-row">
+              <span>Index threshold <output class="value" id="indexingThresholdValue">42%</output></span>
+              <input id="indexingThreshold" type="range" min="20" max="85" step="5" value="42" />
+            </label>
+            <div class="map-mode-grid" role="group" aria-label="Map view mode">
+              <button class="mode-button active" id="modeOrientation" type="button">Orientation</button>
+              <button class="mode-button" id="modeQuality" type="button">Pattern quality</button>
+              <button class="mode-button" id="modeConfidence" type="button">Index confidence</button>
+            </div>
+          </section>
+
+          <section class="control-group">
+            <h3>Presets + Display</h3>
+            <div class="buttons preset-buttons">
+              <button id="presetFast" type="button">Fast survey</button>
+              <button id="presetBalanced" type="button">Balanced</button>
+              <button id="presetHighQuality" type="button">High quality</button>
+              <button id="presetBadSetup" type="button">Bad setup</button>
+              <button id="resetScan" type="button">Restart scan</button>
+            </div>
+            <div class="checks">
+              <label><input id="backgroundCorrection" type="checkbox" checked /> Background correction</label>
+              <label><input id="showIndexing" type="checkbox" checked /> Index marks</label>
+              <label><input id="showScanLine" type="checkbox" checked /> Scan line</label>
+              <label><input id="liveAcquisition" type="checkbox" checked /> Live scan</label>
+            </div>
+          </section>
+
+          <section class="control-group">
+            <h3>What Students Should Notice</h3>
+            <div class="lesson-list">
+              <p><b>Gain</b> brightens weak patterns, but excessive gain saturates bands and hides detail.</p>
+              <p><b>Binning</b> combines camera pixels: cleaner signal, lower spatial detail.</p>
+              <p><b>Exposure</b> collects more electrons per pixel: cleaner indexing, slower scan.</p>
+              <p><b>Averaging</b> suppresses random noise, but the sample spends longer at each point.</p>
+              <p><b>Drift</b> shifts the raster during acquisition, bending boundaries and lowering confidence.</p>
+              <p><b>Indexing</b> depends on detecting enough bands above a confidence threshold.</p>
+            </div>
+          </section>
+        </aside>
+      </main>
+
       <footer class="lesson">
-        <div class="legend" aria-label="Color legend">
+        <div class="legend" id="geometryLegend" aria-label="Color legend">
           <span class="pill beam">blue: primary beam</span>
           <span class="pill volume">gold: interaction volume</span>
           <span class="pill cones">green/cyan/pink: Bragg cones</span>

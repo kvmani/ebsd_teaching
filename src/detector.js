@@ -116,18 +116,23 @@ export class DetectorRenderer {
       y0 + ny * width * 2.2
     );
     gradient.addColorStop(0.0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(0.28, `${pl.band}0.05)`);
-    gradient.addColorStop(0.38, 'rgba(0,0,0,0.45)');
-    gradient.addColorStop(0.5, `${pl.band}0.32)`);
-    gradient.addColorStop(0.62, 'rgba(255,255,255,0.14)');
-    gradient.addColorStop(0.72, 'rgba(0,0,0,0.35)');
+    gradient.addColorStop(0.24, 'rgba(255,255,255,0.025)');
+    gradient.addColorStop(0.37, 'rgba(0,0,0,0.18)');
+    gradient.addColorStop(0.5, 'rgba(225,235,232,0.11)');
+    gradient.addColorStop(0.63, 'rgba(255,255,255,0.055)');
+    gradient.addColorStop(0.78, 'rgba(0,0,0,0.14)');
     gradient.addColorStop(1.0, 'rgba(0,0,0,0)');
 
     ctx.save();
     ctx.translate(x0, y0);
     ctx.rotate(angle);
     ctx.fillStyle = gradient;
-    ctx.fillRect(-canvas.width * 1.4, -width * 2.2, canvas.width * 2.8, width * 4.4);
+    // Real EBSD bands appear as diffuse bright/dark detector contrast, not
+    // solid colored tubes. The colored strokes below keep the teaching link
+    // to each plane family, while this grayscale envelope stays subtle.
+    ctx.globalAlpha = 0.52;
+    ctx.fillRect(-canvas.width * 1.4, -width * 3.2, canvas.width * 2.8, width * 6.4);
+    ctx.globalAlpha = 1;
     ctx.strokeStyle = `${pl.band}0.74)`;
     ctx.lineWidth = Math.max(1.5, canvas.width / 500);
     ctx.beginPath();
@@ -150,5 +155,5 @@ export function detectorCaption() {
   const lambda = electronWavelengthPm(state.voltage);
   const theta = braggThetaDeg(state.voltage, planes[0].d);
   const visualTheta = visualThetaDeg(state.voltage, planes[0].d);
-  return `At ${state.voltage} kV, lambda is approximately ${lambda.toFixed(2)} pm. For ${planes[0].hkl}, physical theta is ${theta.toFixed(2)} deg; the teaching cone angle is ${visualTheta.toFixed(1)} deg using the ${state.coneScale.toFixed(1)}x magnifier so the detector cuts are readable.`;
+  return `Each pair of thin colored lines marks the two cone-cut band edges for one lattice-plane family. At ${state.voltage} kV, lambda is approximately ${lambda.toFixed(2)} pm; for ${planes[0].hkl}, physical theta is ${theta.toFixed(2)} deg and the teaching cone angle is ${visualTheta.toFixed(1)} deg.`;
 }

@@ -5,16 +5,17 @@ import { activePlanes, braggThetaDeg, orientationQuat, orientedNormal, planes, s
 const INTERACTION_POINT = new THREE.Vector3(0, 0.25, 0);
 const LOCAL_UP = new THREE.Vector3(0, 1, 0);
 const LOCAL_Z = new THREE.Vector3(0, 0, 1);
-const DETECTOR_SIZE = 2.25;
+const DETECTOR_WIDTH = 4.25;
+const DETECTOR_HEIGHT = 3.05;
 const DETECTOR_THICKNESS = 0.14;
 const SAMPLE_SURFACE_LENGTH = 2.0;
 const SAMPLE_TEACHING_YAW_DEG = 24;
 
-function coneColorVariant(baseColorHex, isUpperCone) {
+function coneColorVariant(baseColorHex, useBrightTeachingVariant) {
   const color = new THREE.Color(baseColorHex);
-  // The upper/lower cones are intentionally separated in tone so students can
-  // track the mirrored cone pair more easily in the teaching view.
-  return isUpperCone ? color.offsetHSL(0, 0.06, 0.12) : color.offsetHSL(0, -0.03, -0.16);
+  // A slight tone lift keeps translucent teaching cones readable against the
+  // dark scene while preserving each plane family's color identity.
+  return useBrightTeachingVariant ? color.offsetHSL(0, 0.06, 0.12) : color.offsetHSL(0, -0.03, -0.16);
 }
 
 export class EbsdScene {
@@ -197,7 +198,7 @@ export class EbsdScene {
 
   buildDetector() {
     this.detectorBody = new THREE.Mesh(
-      new THREE.BoxGeometry(DETECTOR_SIZE, DETECTOR_SIZE, DETECTOR_THICKNESS),
+      new THREE.BoxGeometry(DETECTOR_WIDTH, DETECTOR_HEIGHT, DETECTOR_THICKNESS),
       new THREE.MeshStandardMaterial({
         color: 0x1b2427,
         metalness: 0.28,
@@ -214,7 +215,7 @@ export class EbsdScene {
     this.detectorGroup.add(this.detectorBody);
 
     this.detectorScreen = new THREE.Mesh(
-      new THREE.PlaneGeometry(DETECTOR_SIZE, DETECTOR_SIZE),
+      new THREE.PlaneGeometry(DETECTOR_WIDTH, DETECTOR_HEIGHT),
       new THREE.MeshPhysicalMaterial({
         color: 0x26343a,
         metalness: 0.18,
@@ -231,14 +232,16 @@ export class EbsdScene {
     );
     this.detectorScreen.position.z = 0.004;
     this.detectorGroup.add(this.detectorScreen);
-    const grid = new THREE.GridHelper(DETECTOR_SIZE, 8, 0x6edee9, 0x4d5f59);
+    const grid = new THREE.GridHelper(Math.max(DETECTOR_WIDTH, DETECTOR_HEIGHT), 10, 0x6edee9, 0x4d5f59);
+    grid.scale.x = DETECTOR_WIDTH / Math.max(DETECTOR_WIDTH, DETECTOR_HEIGHT);
+    grid.scale.z = DETECTOR_HEIGHT / Math.max(DETECTOR_WIDTH, DETECTOR_HEIGHT);
     grid.rotation.x = Math.PI / 2;
     grid.position.z = 0.018;
     grid.material.transparent = true;
     grid.material.opacity = 0.28;
     this.detectorGroup.add(grid);
     const slabEdges = new THREE.LineSegments(
-      new THREE.EdgesGeometry(new THREE.BoxGeometry(DETECTOR_SIZE, DETECTOR_SIZE, DETECTOR_THICKNESS)),
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(DETECTOR_WIDTH, DETECTOR_HEIGHT, DETECTOR_THICKNESS)),
       new THREE.LineBasicMaterial({ color: 0xd6f5f5, transparent: true, opacity: 0.82 })
     );
     slabEdges.position.z = -DETECTOR_THICKNESS / 2;
@@ -368,17 +371,23 @@ export class EbsdScene {
   }
 
   updateDetectorPose() {
-    // Place the detector downrange from the tilted sample, with a smaller
-    // sideways offset that reads as horizontal separation in the default camera.
-    // This keeps the detector surface facing the sample rather than becoming a
-    // detached presentation board.
-    const detectorX = 2.8 + state.distance * 0.45;
-    const detectorZ = 0.7 + state.distance * 0.72;
-    this.detectorGroup.position.set(detectorX, state.detectorHeight + 0.1, detectorZ);
-
     const interactionWorld = this.sampleGroup.localToWorld(INTERACTION_POINT.clone());
-    this.detectorGroup.lookAt(interactionWorld.clone().add(new THREE.Vector3(0.02, 0.08, 0.0)));
-    this.detectorGroup.rotateX(THREE.MathUtils.degToRad(-3));
+    const sampleSurfaceNormalWorld = LOCAL_UP.clone()
+      .applyQuaternion(this.sampleGroup.getWorldQuaternion(new THREE.Quaternion()))
+      .normalize();
+
+    // Teaching alignment: keep the EBSD detector plane parallel to the sample
+    // surface, so their normals share one axis. The detector front normal
+    // points back toward the sample, making the two surfaces face each other.
+    const detectorNormalWorld = sampleSurfaceNormalWorld.clone().multiplyScalar(-1);
+    const detectorDistance = 1.25 + state.distance * 0.58;
+    const heightOffset = LOCAL_UP.clone().multiplyScalar((state.detectorHeight - 1.3) * 0.42);
+    this.detectorGroup.position.copy(
+      interactionWorld.clone()
+        .add(sampleSurfaceNormalWorld.clone().multiplyScalar(detectorDistance))
+        .add(heightOffset)
+    );
+    this.detectorGroup.quaternion.copy(new THREE.Quaternion().setFromUnitVectors(LOCAL_Z, detectorNormalWorld));
   }
 
   updateTiltGuide(tiltRad) {
@@ -592,8 +601,9 @@ export class EbsdScene {
   }
 
   addDetectorTrace(unitNormal, lineDir, offset, color) {
-    const halfSize = DETECTOR_SIZE / 2;
-    const clippedLine = this.clipLineToDetector(unitNormal, lineDir, offset, halfSize - 0.08);
+    const halfWidth = DETECTOR_WIDTH / 2 - 0.08;
+    const halfHeight = DETECTOR_HEIGHT / 2 - 0.08;
+    const clippedLine = this.clipLineToDetector(unitNormal, lineDir, offset, halfWidth, halfHeight);
     if (!clippedLine) return;
     const { a, b } = clippedLine;
     const bandWidth = 0.028;
@@ -616,23 +626,23 @@ export class EbsdScene {
     this.traceGroup.add(new THREE.Line(lineGeom, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.96 })));
   }
 
-  clipLineToDetector(unitNormal, lineDir, offset, halfSize) {
+  clipLineToDetector(unitNormal, lineDir, offset, halfWidth, halfHeight) {
     const center = unitNormal.clone().multiplyScalar(offset);
     const candidates = [];
 
     if (Math.abs(lineDir.x) > 0.0001) {
-      [-halfSize, halfSize].forEach((x) => {
+      [-halfWidth, halfWidth].forEach((x) => {
         const t = (x - center.x) / lineDir.x;
         const y = center.y + lineDir.y * t;
-        if (y >= -halfSize && y <= halfSize) candidates.push({ t, point: new THREE.Vector2(x, y) });
+        if (y >= -halfHeight && y <= halfHeight) candidates.push({ t, point: new THREE.Vector2(x, y) });
       });
     }
 
     if (Math.abs(lineDir.y) > 0.0001) {
-      [-halfSize, halfSize].forEach((y) => {
+      [-halfHeight, halfHeight].forEach((y) => {
         const t = (y - center.y) / lineDir.y;
         const x = center.x + lineDir.x * t;
-        if (x >= -halfSize && x <= halfSize) candidates.push({ t, point: new THREE.Vector2(x, y) });
+        if (x >= -halfWidth && x <= halfWidth) candidates.push({ t, point: new THREE.Vector2(x, y) });
       });
     }
 

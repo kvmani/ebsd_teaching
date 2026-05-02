@@ -17,7 +17,23 @@ export const state = {
   showLabels: true,
   showNoise: true,
   playing: false,
-  time: 0
+  time: 0,
+  acquisition: {
+    gain: 1.2,
+    binning: 2,
+    exposureMs: 28,
+    beamCurrent: 55,
+    frameAverage: 2,
+    scanSpeed: 1.0,
+    drift: 0,
+    bandDetection: 65,
+    indexingThreshold: 42,
+    mapMode: 'orientation',
+    backgroundCorrection: true,
+    showIndexing: true,
+    showScanLine: true,
+    live: true
+  }
 };
 
 export const stages = [
@@ -35,11 +51,11 @@ export const stages = [
   },
   {
     title: '4. Bragg / Kossel Cones',
-    text: 'Each active plane now emits a cone pair from the beam impact point. The plane is the mirror plane: one very wide cone lies above it and the matching cone lies below it.'
+    text: 'Each active plane family now emits a schematic double-ended Bragg/Kossel cone system from the beam impact point. The cone is deliberately simplified so students can see the family direction clearly.'
   },
   {
     title: '5. Detector Cone Intersections',
-    text: 'The detector cuts only part of each wide cone surface. Those two partial cuts, one from the upper cone and one from the lower cone, define the Kikuchi band edges.'
+    text: 'The detector cuts the cone surface. The two nearby cut edges define the visible Kikuchi band edges on the detector screen.'
   },
   {
     title: '6. Full EBSD Pattern Formation',
