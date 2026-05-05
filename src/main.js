@@ -87,10 +87,12 @@ function updateAcquisitionReadouts() {
   qs('scanWarning').textContent = metrics.warning;
   qs('scanProgress').textContent = metrics.progress;
   qs('scanPixel').textContent = metrics.pixel;
-  qs('patternPixel').textContent = metrics.pixel;
+  qs('patternPixel').textContent = metrics.patternPixel;
   qs('patternGrain').textContent = metrics.grain;
+  qs('patternSource').textContent = metrics.patternSource;
   qs('scanDwell').textContent = metrics.dwell;
   qs('scanMode').textContent = state.acquisition.mapMode;
+  qs('liveAcquisition').checked = state.acquisition.live;
   qs('parameterStory').textContent = acquisitionStory();
   updateCoach(metrics);
   updateMapModeButtons();
@@ -147,13 +149,13 @@ function acquisitionStory() {
     return 'Stage drift is intentionally high here. Watch the raster bend the grain boundaries: the pattern at each point may be good, but the scan no longer represents the true position cleanly.';
   }
   if (state.acquisition.bandDetection < 35) {
-    return 'Band detection is too conservative. The simulated indexing step misses weak Kikuchi bands, so otherwise usable pixels may fail to index.';
+    return 'Band detection is too conservative. The Hough-style band center overlay misses weak Kikuchi bands, so otherwise usable pixels may fail to index.';
   }
   if (state.acquisition.indexingThreshold > acquisition.metrics().quality) {
     return 'The indexing threshold is stricter than the current pattern quality. Students should see more unindexed pixels until signal or band detection improves.';
   }
   if (!state.acquisition.backgroundCorrection) {
-    return 'Without background correction, diffuse intensity competes with the Kikuchi bands. Students should see why EBSD software removes smooth background before indexing.';
+    return 'Without background correction, diffuse intensity competes with the real Kikuchi image. Students should see why EBSD software removes smooth background before indexing.';
   }
   if (state.acquisition.gain > 2.2 && state.acquisition.beamCurrent > 65) {
     return 'High gain can make bands look bright, but the brightest pixels saturate. Students should notice that clipping destroys band detail instead of improving indexing.';
@@ -167,7 +169,7 @@ function acquisitionStory() {
   if (state.acquisition.frameAverage >= 5) {
     return 'Frame averaging cleans random noise by repeating measurements. It is excellent for weak patterns, but the scan takes longer.';
   }
-  return 'This is a balanced setup: enough exposure for recognizable bands, moderate binning for signal, and gain below the clipping region.';
+  return 'This is a balanced setup: a real Kikuchi image is visible, the band-center overlay is readable, and gain stays below the clipping region.';
 }
 
 function bindAcquisitionRange(id, key, parse = Number) {
@@ -199,8 +201,16 @@ function setAcquisitionPreset(values) {
   qs('bandDetection').value = state.acquisition.bandDetection;
   qs('indexingThreshold').value = state.acquisition.indexingThreshold;
   qs('backgroundCorrection').checked = state.acquisition.backgroundCorrection;
+  qs('liveAcquisition').checked = state.acquisition.live;
   acquisition.reset();
   acquisition.drawPatternPreview();
+  updateAcquisitionReadouts();
+}
+
+function setLiveAcquisition(isLive) {
+  state.acquisition.live = isLive;
+  qs('liveAcquisition').checked = isLive;
+  if (isLive) acquisition.drawPatternPreview();
   updateAcquisitionReadouts();
 }
 
@@ -253,11 +263,13 @@ bindAcquisitionRange('indexingThreshold', 'indexingThreshold', Number);
 bindAcquisitionCheck('backgroundCorrection', 'backgroundCorrection');
 bindAcquisitionCheck('showIndexing', 'showIndexing');
 bindAcquisitionCheck('showScanLine', 'showScanLine');
-bindAcquisitionCheck('liveAcquisition', 'live');
+qs('liveAcquisition').addEventListener('change', (event) => setLiveAcquisition(event.target.checked));
 
 qs('tabGeometry').addEventListener('click', () => setActiveView('geometry'));
 qs('tabAcquisition').addEventListener('click', () => setActiveView('acquisition'));
 qs('resetScan').addEventListener('click', () => acquisition.reset());
+qs('scanMap').addEventListener('click', () => setLiveAcquisition(!state.acquisition.live));
+qs('patternPreview').addEventListener('click', () => setLiveAcquisition(!state.acquisition.live));
 qs('presetFast').addEventListener('click', () => setAcquisitionPreset({ gain: 1.8, binning: 4, exposureMs: 10, beamCurrent: 70, frameAverage: 1, scanSpeed: 1.8, drift: 8, bandDetection: 72, indexingThreshold: 36, backgroundCorrection: true }));
 qs('presetBalanced').addEventListener('click', () => setAcquisitionPreset({ gain: 1.2, binning: 2, exposureMs: 28, beamCurrent: 55, frameAverage: 2, scanSpeed: 1.0, drift: 0, bandDetection: 65, indexingThreshold: 42, backgroundCorrection: true }));
 qs('presetHighQuality').addEventListener('click', () => setAcquisitionPreset({ gain: 1.0, binning: 2, exposureMs: 80, beamCurrent: 60, frameAverage: 5, scanSpeed: 0.55, drift: 5, bandDetection: 58, indexingThreshold: 55, backgroundCorrection: true }));

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
+    "bands": "python scripts/generate_kikuchipy_bands.py",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1"
   },

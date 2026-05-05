@@ -1,0 +1,187 @@
+{
+  "method": "KikuchiPy/PyEBSDIndex offline Radon band detection",
+  "notes": "Generated with pyebsdindex.band_detect.BandDetect, the Hough/Radon band detector used by KikuchiPy's Hough indexing workflow.",
+  "patterns": [
+    {
+      "src": "/patterns/ebsd-si-001.png",
+      "name": "Si (001), 20 kV",
+      "credit": "Wikimedia Commons, FuzzyMagma, CC0",
+      "bandCenters": [
+        {
+          "x0": 0.0,
+          "y0": 0.5222,
+          "x1": 1.0,
+          "y1": 0.5222,
+          "thetaDeg": 90.0,
+          "rhoPx": 9.333,
+          "score": 2.144318,
+          "normalizedScore": 0.00164297
+        },
+        {
+          "x0": 1.0,
+          "y0": 0.5173,
+          "x1": 0.6102,
+          "y1": 0.0,
+          "thetaDeg": 143.0,
+          "rhoPx": -163.333,
+          "score": 1.881887,
+          "normalizedScore": 0.0014419
+        },
+        {
+          "x0": 0.0,
+          "y0": 0.9353,
+          "x1": 1.0,
+          "y1": 0.0348,
+          "thetaDeg": 48.0,
+          "rhoPx": -4.667,
+          "score": 1.83421,
+          "normalizedScore": 0.00140537
+        },
+        {
+          "x0": 0.0,
+          "y0": 0.1242,
+          "x1": 1.0,
+          "y1": 0.9935,
+          "thetaDeg": 131.0,
+          "rhoPx": 18.667,
+          "score": 1.798242,
+          "normalizedScore": 0.00137781
+        },
+        {
+          "x0": 1.0,
+          "y0": 0.471,
+          "x1": 0.2157,
+          "y1": 1.0,
+          "thetaDeg": 56.0,
+          "rhoPx": 107.333,
+          "score": 1.548399,
+          "normalizedScore": 0.00118638
+        }
+      ]
+    },
+    {
+      "src": "/patterns/ebsd-nist.jpg",
+      "name": "NIST EBSD pattern",
+      "credit": "NIST / Wikimedia Commons, public domain",
+      "bandCenters": [
+        {
+          "x0": 0.0,
+          "y0": 0.6263,
+          "x1": 1.0,
+          "y1": 0.5739,
+          "thetaDeg": 87.0,
+          "rhoPx": 42.0,
+          "score": 1.969217,
+          "normalizedScore": 0.00227844
+        },
+        {
+          "x0": 1.0,
+          "y0": 0.5015,
+          "x1": 0.5351,
+          "y1": 1.0,
+          "thetaDeg": 43.0,
+          "rhoPx": 154.0,
+          "score": 1.857327,
+          "normalizedScore": 0.00214898
+        },
+        {
+          "x0": 0.0,
+          "y0": 0.6126,
+          "x1": 1.0,
+          "y1": 0.8435,
+          "thetaDeg": 103.0,
+          "rhoPx": 93.333,
+          "score": 1.813046,
+          "normalizedScore": 0.00209775
+        },
+        {
+          "x0": 0.0,
+          "y0": 0.314,
+          "x1": 1.0,
+          "y1": 0.8913,
+          "thetaDeg": 120.0,
+          "rhoPx": 37.333,
+          "score": 1.788406,
+          "normalizedScore": 0.00206924
+        },
+        {
+          "x0": 1.0,
+          "y0": 0.9614,
+          "x1": 0.3015,
+          "y1": 0.0,
+          "thetaDeg": 144.0,
+          "rhoPx": -56.0,
+          "score": 1.68281,
+          "normalizedScore": 0.00194706
+        }
+      ]
+    },
+    {
+      "src": "/patterns/ebsd-si-square.png",
+      "name": "Si EBSD detail",
+      "credit": "Wikimedia Commons, FuzzyMagma, CC0",
+      "bandCenters": [
+        {
+          "x0": 0.0,
+          "y0": 0.6219,
+          "x1": 0.6549,
+          "y1": 1.0,
+          "thetaDeg": 120.0,
+          "rhoPx": 149.333,
+          "score": 2.306992,
+          "normalizedScore": 0.00224034
+        },
+        {
+          "x0": 1.0,
+          "y0": 0.6091,
+          "x1": 0.3229,
+          "y1": 1.0,
+          "thetaDeg": 60.0,
+          "rhoPx": 144.667,
+          "score": 2.109774,
+          "normalizedScore": 0.00204882
+        },
+        {
+          "x0": 1.0,
+          "y0": 0.4827,
+          "x1": 0.6102,
+          "y1": 1.0,
+          "thetaDeg": 37.0,
+          "rhoPx": 163.333,
+          "score": 1.466872,
+          "normalizedScore": 0.00142449
+        },
+        {
+          "x0": 0.0,
+          "y0": 0.8629,
+          "x1": 1.0,
+          "y1": 0.1093,
+          "thetaDeg": 53.0,
+          "rhoPx": -4.667,
+          "score": 1.456122,
+          "normalizedScore": 0.00141406
+        },
+        {
+          "x0": 0.0,
+          "y0": 0.4889,
+          "x1": 1.0,
+          "y1": 0.4889,
+          "thetaDeg": 90.0,
+          "rhoPx": -4.667,
+          "score": 1.364754,
+          "normalizedScore": 0.00132533
+        },
+        {
+          "x0": 0.7086,
+          "y0": 0.0,
+          "x1": 0.2423,
+          "y1": 1.0,
+          "thetaDeg": 25.0,
+          "rhoPx": -9.333,
+          "score": 1.286216,
+          "normalizedScore": 0.00124906
+        }
+      ]
+    }
+  ]
+}

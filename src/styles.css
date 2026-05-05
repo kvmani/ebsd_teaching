@@ -469,7 +469,7 @@ input[type="range"] {
 
 .scan-panel {
   min-height: 0;
-  padding-top: 54px;
+  padding-top: 76px;
   background:
     radial-gradient(circle at 30% 20%, rgba(98, 215, 240, 0.12), transparent 34%),
     radial-gradient(circle at 80% 72%, rgba(230, 181, 90, 0.1), transparent 38%),
@@ -478,6 +478,7 @@ input[type="range"] {
 
 .scan-panel .panel-title {
   right: 14px;
+  max-width: min(560px, calc(100% - 28px));
   padding: 8px 10px;
   border: 1px solid rgba(220, 235, 228, 0.16);
   border-radius: 8px;
@@ -488,8 +489,9 @@ input[type="range"] {
 #scanMap {
   display: block;
   width: 100%;
-  height: calc(100% - 54px);
+  height: calc(100% - 76px);
   background: #080b0c;
+  cursor: pointer;
 }
 
 .scan-overlay {
@@ -554,12 +556,16 @@ input[type="range"] {
 
 .pattern-status {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
   padding: 0 12px 10px;
 }
 
 .pattern-status span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
   min-height: 34px;
   padding: 8px;
   border: 1px solid var(--line);
@@ -570,9 +576,13 @@ input[type="range"] {
 }
 
 .pattern-status b {
-  float: right;
+  min-width: 0;
   color: var(--gold);
   font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #patternPreview {
@@ -585,6 +595,7 @@ input[type="range"] {
   border-radius: 8px;
   background: #080808;
   box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.75), 0 0 36px rgba(98, 215, 240, 0.13);
+  cursor: pointer;
 }
 
 .parameter-story {
