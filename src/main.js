@@ -1,5 +1,7 @@
 import './styles.css';
 import { AcquisitionRenderer } from './acquisition.js';
+import { formulaReference } from './data/formulas.js';
+import { learningModules } from './data/learningModules.js';
 import { DetectorRenderer, detectorCaption } from './detector.js';
 import { LearningPath } from './learningPath.js';
 import { EbsdScene } from './scene.js';
@@ -84,6 +86,15 @@ function bindCheck(id, key) {
 ['showCones', 'showPlanes', 'showIntersections', 'showLabels', 'showNoise', 'invertPattern'].forEach((id) => bindCheck(id, id));
 
 function updateAcquisitionReadouts() {
+  const liveLabel = state.acquisition.live ? 'Pause live scan' : 'Resume live scan';
+  const livePressed = String(!state.acquisition.live);
+  qs('scanPauseButton').textContent = liveLabel;
+  qs('patternPauseButton').textContent = liveLabel;
+  qs('scanPauseButton').setAttribute('aria-pressed', livePressed);
+  qs('patternPauseButton').setAttribute('aria-pressed', livePressed);
+  qs('scanMap').classList.toggle('paused', !state.acquisition.live);
+  qs('patternPreview').classList.toggle('paused', !state.acquisition.live);
+
   qs('gainValue').textContent = `${state.acquisition.gain.toFixed(1)}x`;
   qs('binningValue').textContent = `${state.acquisition.binning} x ${state.acquisition.binning}`;
   qs('exposureValue').textContent = `${state.acquisition.exposureMs} ms`;
@@ -225,6 +236,17 @@ function bindAcquisitionCheck(id, key) {
   });
 }
 
+function toggleLiveAcquisition() {
+  state.acquisition.live = !state.acquisition.live;
+  qs('liveAcquisition').checked = state.acquisition.live;
+  acquisition.drawPatternPreview();
+  updateAcquisitionReadouts();
+  qs('explainTitle').textContent = state.acquisition.live ? 'Live scan resumed' : 'Live scan paused';
+  qs('explainText').textContent = state.acquisition.live
+    ? 'The raster is acquiring again. Click the scan map or Kikuchi pattern preview to pause it.'
+    : 'The current pixel and Kikuchi pattern are frozen for discussion. Click the scan map or pattern preview again to resume.';
+}
+
 function setAcquisitionPreset(values) {
   Object.assign(state.acquisition, values);
   qs('gain').value = state.acquisition.gain;
@@ -294,10 +316,29 @@ function setActiveView(view) {
   }
 }
 
-function handleLearningExperiment(action) {
+function showDemoBanner(title, text) {
+  qs('demoBannerTitle').textContent = title;
+  qs('demoBannerText').textContent = text;
+  qs('demoBanner').classList.remove('hidden');
+}
+
+function hideDemoBanner() {
+  qs('demoBanner').classList.add('hidden');
+}
+
+function highlightControls(ids = []) {
+  document.querySelectorAll('.control-highlight').forEach((item) => item.classList.remove('control-highlight'));
+  ids.forEach((id) => qs(id)?.closest('label, .control-group, button')?.classList.add('control-highlight'));
+  window.setTimeout(() => {
+    ids.forEach((id) => qs(id)?.closest('label, .control-group, button')?.classList.remove('control-highlight'));
+  }, 9000);
+}
+
+function handleLearningExperiment(action, context = {}) {
   const showInstruction = (title, text) => {
     qs('explainTitle').textContent = title;
     qs('explainText').textContent = text;
+    showDemoBanner(title, context.instruction || text);
   };
 
   if (action === 'geometry-stage-1') {
@@ -305,6 +346,7 @@ function handleLearningExperiment(action) {
     state.stage = 1;
     qs('stage').value = state.stage;
     updateAll();
+    highlightControls(['stage', 'nextStage']);
     showInstruction('Geometry demo', 'Step through the guided stages and ask what each visual element represents.');
     return;
   }
@@ -313,6 +355,7 @@ function handleLearningExperiment(action) {
     state.stage = 2;
     qs('stage').value = state.stage;
     updateAll();
+    highlightControls(['stage', 'tilt']);
     showInstruction('Interaction volume demo', 'The glowing volume is schematic: it marks where useful near-surface scattering begins.');
     return;
   }
@@ -323,6 +366,7 @@ function handleLearningExperiment(action) {
     qs('stage').value = state.stage;
     qs('coneScale').value = state.coneScale;
     updateAll();
+    highlightControls(['voltage', 'coneScale']);
     showInstruction('Cone formation demo', 'Bragg cones are magnified here so students can see how detector bands originate.');
     return;
   }
@@ -331,6 +375,7 @@ function handleLearningExperiment(action) {
     state.stage = 6;
     qs('stage').value = state.stage;
     updateAll();
+    highlightControls(['rz', 'rx', 'ry']);
     showInstruction('Full pattern demo', 'Rotate crystal Z and watch the band network move across the detector.');
     return;
   }
@@ -339,6 +384,7 @@ function handleLearningExperiment(action) {
     state.stage = 5;
     qs('stage').value = state.stage;
     updateAll();
+    highlightControls(['distance', 'detectorHeight']);
     showInstruction('Detector geometry demo', 'Adjust detector distance and height, then watch cone intersections shift.');
     return;
   }
@@ -356,6 +402,7 @@ function handleLearningExperiment(action) {
     setActiveView('acquisition');
     setAcquisitionPreset(acquisitionActions[action]);
     if (action === 'acquisition-map-views') setMapMode('confidence');
+    highlightControls(['gain', 'exposureMs', 'beamCurrent', 'binning', 'frameAverage', 'indexingThreshold']);
     showInstruction('Acquisition demo', 'The Learning Path applied a local preset. Compare the pattern preview, map, and coach warning.');
   }
 }
@@ -376,6 +423,10 @@ bindAcquisitionCheck('backgroundCorrection', 'backgroundCorrection');
 bindAcquisitionCheck('showIndexing', 'showIndexing');
 bindAcquisitionCheck('showScanLine', 'showScanLine');
 bindAcquisitionCheck('liveAcquisition', 'live');
+qs('scanMap').addEventListener('click', toggleLiveAcquisition);
+qs('patternPreview').addEventListener('click', toggleLiveAcquisition);
+qs('scanPauseButton').addEventListener('click', toggleLiveAcquisition);
+qs('patternPauseButton').addEventListener('click', toggleLiveAcquisition);
 
 ['indexingMode', 'qualityOverlay', 'mapUpdate'].forEach((id) => {
   qs(id).addEventListener('change', (event) => {
@@ -388,7 +439,14 @@ bindAcquisitionCheck('liveAcquisition', 'live');
 
 qs('tabGeometry').addEventListener('click', () => setActiveView('geometry'));
 qs('tabAcquisition').addEventListener('click', () => setActiveView('acquisition'));
-qs('tabLearning').addEventListener('click', () => setActiveView('learning'));
+qs('tabLearning').addEventListener('click', () => {
+  hideDemoBanner();
+  setActiveView('learning');
+});
+qs('returnToLesson').addEventListener('click', () => {
+  hideDemoBanner();
+  setActiveView('learning');
+});
 qs('resetScan').addEventListener('click', () => {
   acquisition.reset();
   updateAcquisitionReadouts();
@@ -447,19 +505,121 @@ document.querySelectorAll('.checkpoint-card [data-answer]').forEach((button) => 
   });
 });
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+function currentLearningModule() {
+  const saved = JSON.parse(localStorage.getItem('ebsdTeachingStudio.learningProgress.v1') || '{}');
+  return learningModules.find((module) => module.id === saved.selectedModuleId) ?? learningModules[0];
+}
+
+function resourceMarkup(action) {
+  const module = currentLearningModule();
+  if (action === 'worksheet-view') {
+    return {
+      title: `Worksheet: ${module.title}`,
+      body: `
+        <section><h2>Learning objectives</h2><ul>${module.learningObjectives.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>
+        <section><h2>Key ideas</h2><ul>${module.keyIdeas.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>
+        <section><h2>Checkpoint questions</h2><ol>${module.quizQuestions.map((q) => `<li>${escapeHtml(q.question)}</li>`).join('')}</ol></section>
+        <section><h2>Activity</h2><p>${escapeHtml(module.miniExperiments[0]?.text || module.whyItMatters)}</p><div class="print-box">Observation:</div><div class="print-box">Reflection:</div></section>
+      `
+    };
+  }
+  if (action === 'lesson-cards-view') {
+    return {
+      title: 'Lesson cards',
+      body: learningModules.map((item) => `
+        <article class="print-card"><h2>${escapeHtml(item.title)}</h2><p>${escapeHtml(item.explanation)}</p><p><b>Misconception:</b> ${escapeHtml(item.misconception)}</p></article>
+      `).join('')
+    };
+  }
+  if (action === 'formula-view') {
+    return {
+      title: 'Formula cheat sheet',
+      body: `
+        <section><h2>Bragg law</h2><p class="formula">${escapeHtml(formulaReference.bragg)}</p></section>
+        <section><h2>Electron wavelength</h2><p class="formula">${escapeHtml(formulaReference.wavelength)}</p></section>
+        <section><h2>Constants and notes</h2><ul>${formulaReference.constants.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul><p>${escapeHtml(formulaReference.notes)}</p></section>
+      `
+    };
+  }
+  if (action === 'practice-view') {
+    return {
+      title: 'Practice questions',
+      body: learningModules.map((item) => `
+        <section><h2>${escapeHtml(item.shortTitle || item.title)}</h2><ol>${item.quizQuestions.map((q) => `<li>${escapeHtml(q.question)}</li>`).join('')}</ol></section>
+      `).join('')
+    };
+  }
+  if (action === 'datasets-view') {
+    return {
+      title: 'Sample datasets and presets',
+      body: `
+        <section><h2>Local synthetic scan presets</h2><ul><li>Fast survey</li><li>Balanced</li><li>High quality</li><li>Bad setup</li><li>Noisy indexing</li><li>Gain clipping</li><li>Drift visible</li></ul></section>
+        <section><h2>Real Kikuchi image folder</h2><p><code>D:\\pythonProjects\\EBSD-Teaching\\public\\kikuchi-patterns</code></p></section>
+      `
+    };
+  }
+  if (action === 'teacher-view') {
+    return {
+      title: 'Teacher demo plan',
+      body: learningModules.map((item, index) => `
+        <section><h2>${index + 1}. ${escapeHtml(item.title)}</h2><p><b>Time:</b> ${escapeHtml(item.estimatedTime)}</p><ul>${item.teacherPrompts.map((prompt) => `<li>${escapeHtml(prompt)}</li>`).join('')}</ul><p><b>Expected observation:</b> ${escapeHtml(item.whyItMatters)}</p></section>
+      `).join('')
+    };
+  }
+  return {
+    title: 'Local-only export placeholder',
+    body: '<p>Export packaging is intentionally a placeholder. Use View and Print for an offline classroom handout workflow.</p>'
+  };
+}
+
+function openResource(action) {
+  const resource = resourceMarkup(action);
+  qs('resourceTitle').textContent = resource.title;
+  qs('resourceContent').innerHTML = resource.body;
+  qs('resourceModal').showModal();
+  qs('explainTitle').textContent = 'Offline resource';
+  qs('explainText').textContent = 'This resource is generated from local Learning Path content. It does not require internet access.';
+}
+
 document.querySelectorAll('[data-resource]').forEach((button) => {
   button.addEventListener('click', () => {
     const action = button.dataset.resource;
     if (action === 'print') {
+      const viewAction = button.closest('article')?.querySelector('[data-resource$="-view"]')?.dataset.resource;
+      if (viewAction) openResource(viewAction);
       window.print();
       return;
     }
-    qs('explainTitle').textContent = 'Offline resource';
-    qs('explainText').textContent = action === 'export-placeholder'
-      ? 'Export is a local-only placeholder for now. Use Print for a simple offline handout workflow.'
-      : 'This resource is generated from local teaching content in the Learning Path. It does not require internet access.';
+    if (action === 'export-placeholder') {
+      openResource(action);
+      return;
+    }
+    openResource(action);
   });
 });
+
+qs('printResource').addEventListener('click', () => window.print());
+qs('resourceExportPlaceholder').addEventListener('click', () => {
+  qs('explainTitle').textContent = 'Local export placeholder';
+  qs('explainText').textContent = 'A packaged export can be added later without cloud services. For now, the print view is the offline handout path.';
+});
+
+const helpKey = 'ebsdTeachingStudio.helpDismissed.v1';
+qs('helpButton').addEventListener('click', () => qs('helpOverlay').showModal());
+qs('dontShowHelpAgain').addEventListener('change', (event) => {
+  localStorage.setItem(helpKey, event.target.checked ? 'true' : 'false');
+});
+if (localStorage.getItem(helpKey) !== 'true') {
+  window.setTimeout(() => qs('helpOverlay').showModal(), 600);
+}
 
 qs('nextStage').addEventListener('click', () => {
   state.stage = Math.min(6, state.stage + 1);

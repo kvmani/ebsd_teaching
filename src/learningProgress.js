@@ -6,10 +6,22 @@ const defaultProgress = {
   inProgressModules: [],
   quizScores: {},
   quizMistakes: {},
+  quizAnswers: {},
   bookmarks: [],
   notes: {},
+  activityObservations: {},
+  completedActivities: [],
+  flashcardStatus: {},
+  flashcardIndex: {},
+  demoReturn: null,
+  weakReviewOpen: false,
+  selectedMapMode: 'ipf',
+  selectedMapRegion: 'grain-a',
+  diagnosticSymptom: 'saturated-pattern',
+  diagnosticFollowup: '',
   selectedMode: 'learn',
-  teacherMode: false
+  teacherMode: false,
+  helpDismissed: false
 };
 
 function safeParse(value) {

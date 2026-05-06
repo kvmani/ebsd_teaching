@@ -23,6 +23,7 @@
           <button id="screenshotButton" type="button" title="Local screenshot placeholder">Screenshot</button>
           <button id="exportButton" type="button" title="Local export placeholder">Export</button>
           <button id="glossaryButton" type="button" title="Open offline glossary placeholder">Glossary</button>
+          <button id="helpButton" type="button" title="Open offline help">Help</button>
           <button id="resetScene" type="button" title="Restore default teaching view">Reset scene</button>
         </div>
       </header>
@@ -32,6 +33,14 @@
         <button class="tab-button" id="tabAcquisition" type="button" aria-controls="acquisitionView" aria-selected="false">Live Scan Acquisition</button>
         <button class="tab-button" id="tabLearning" type="button" aria-controls="learningView" aria-selected="false">Learning Path</button>
       </nav>
+
+      <section id="demoBanner" class="demo-banner hidden" aria-live="polite">
+        <div>
+          <strong id="demoBannerTitle">Learning Path demo</strong>
+          <span id="demoBannerText">Follow the highlighted control, then return to the lesson.</span>
+        </div>
+        <button id="returnToLesson" type="button">Return to lesson</button>
+      </section>
 
       <main class="workspace view-pane active" id="geometryView">
         <section class="panel scene-panel" aria-label="SEM and EBSD geometry">
@@ -206,6 +215,7 @@
             <strong>Live EBSD Scan Acquisition</strong>
             <span>Raster scan: each pixel needs a usable diffraction pattern</span>
           </div>
+          <button id="scanPauseButton" class="live-toggle-pill" type="button" aria-pressed="false">Pause live scan</button>
           <div class="scan-status-strip" aria-label="Live scan state">
             <span><b id="scanStatusPixel">0, 0</b> current pixel</span>
             <span><b id="scanStatusProgress">0%</b> raster progress</span>
@@ -236,6 +246,7 @@
             <strong>Pattern at Current Pixel</strong>
             <span>Noise, clipping, and band sharpness change indexability</span>
           </div>
+          <button id="patternPauseButton" class="live-toggle-pill pattern-toggle" type="button" aria-pressed="false">Pause live scan</button>
           <canvas id="patternPreview" width="420" height="420"></canvas>
           <div class="pattern-status">
             <span>Linked raster pixel <b id="patternPixel">0, 0</b></span>
@@ -441,12 +452,12 @@
         </aside>
 
         <section class="offline-resources" aria-label="Offline resources">
-          <article><span>Worksheet</span><p>Printable classroom prompts stored locally.</p><button data-resource="worksheet-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
-          <article><span>Lesson cards</span><p>Compact EBSD concept cards for revision.</p><button data-resource="lesson-cards-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
-          <article><span>Formula cheat sheet</span><p>Bragg law and wavelength reference.</p><button data-resource="formula-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
-          <article><span>Practice questions</span><p>Local checkpoint questions from the modules.</p><button data-resource="practice-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
-          <article><span>Sample datasets</span><p>Local synthetic acquisition presets.</p><button data-resource="datasets-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
-          <article><span>Teacher demo plan</span><p>Suggested classroom demo order.</p><button data-resource="teacher-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
+          <article><span>Worksheet</span><p>Printable classroom prompts stored locally.</p><button data-resource="worksheet-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
+          <article><span>Lesson cards</span><p>Compact EBSD concept cards for revision.</p><button data-resource="lesson-cards-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
+          <article><span>Formula cheat sheet</span><p>Bragg law and wavelength reference.</p><button data-resource="formula-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
+          <article><span>Practice questions</span><p>Local checkpoint questions from the modules.</p><button data-resource="practice-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
+          <article><span>Sample datasets</span><p>Local synthetic acquisition presets.</p><button data-resource="datasets-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
+          <article><span>Teacher demo plan</span><p>Suggested classroom demo order.</p><button data-resource="teacher-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
         </section>
       </main>
 
@@ -462,6 +473,58 @@
           <span id="explainText"></span>
         </div>
       </footer>
+
+      <dialog id="resourceModal" class="resource-modal">
+        <form method="dialog">
+          <div class="modal-heading">
+            <div>
+              <span>Offline resource</span>
+              <strong id="resourceTitle">Resource</strong>
+            </div>
+            <button id="closeResourceModal" value="close" type="submit" aria-label="Close resource">Close</button>
+          </div>
+          <div id="resourceContent" class="resource-content"></div>
+          <div class="modal-actions">
+            <button id="printResource" type="button">Print</button>
+            <button id="resourceExportPlaceholder" type="button">Export placeholder</button>
+          </div>
+        </form>
+      </dialog>
+
+      <dialog id="helpOverlay" class="help-overlay">
+        <form method="dialog">
+          <div class="modal-heading">
+            <div>
+              <span>Offline help</span>
+              <strong>Using EBSD Teaching Studio</strong>
+            </div>
+            <button value="close" type="submit" aria-label="Close help">Close</button>
+          </div>
+          <div class="help-content">
+            <section>
+              <h2>What this app teaches</h2>
+              <p>EBSD geometry, Kikuchi band formation, indexing concepts, scan acquisition trade-offs, and map interpretation.</p>
+            </section>
+            <section>
+              <h2>How to start</h2>
+              <p>Students should begin in Learning Path, try the linked simulator activities, answer checkpoints, write notes, and mark modules complete.</p>
+            </section>
+            <section>
+              <h2>Teacher use</h2>
+              <p>Turn on Teacher Demo mode for prompts, expected observations, and short classroom sequences.</p>
+            </section>
+            <section>
+              <h2>Offline and conceptual</h2>
+              <p>No cloud services or remote assets are required. This is a conceptual teaching simulator, not validated EBSD physics or indexing software.</p>
+            </section>
+            <section>
+              <h2>Real Kikuchi images</h2>
+              <p>Local images are stored in <code>D:\pythonProjects\EBSD-Teaching\public\kikuchi-patterns</code>. Update <code>src\data\kikuchiPatterns.js</code> after adding more files.</p>
+            </section>
+          </div>
+          <label class="compact-check"><input id="dontShowHelpAgain" type="checkbox" /> Do not show this again automatically</label>
+        </form>
+      </dialog>
     </div>
 
     <script type="module" src="/src/main.js"></script>

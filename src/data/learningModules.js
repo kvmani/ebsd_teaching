@@ -4,8 +4,23 @@ const commonTeacherPrompts = [
   'Ask students to name the simplification used in the simulator.'
 ];
 
-function q(id, type, question, options, answerIndex, feedback) {
-  return { id, type, question, options, answerIndex, feedback };
+function q(id, type, question, options, answerIndex, feedback, extra = {}) {
+  return {
+    id,
+    type,
+    question,
+    options,
+    answerIndex,
+    feedback,
+    wrongAnswerFeedback: extra.wrongAnswerFeedback ?? options.map((option, index) => (
+      index === answerIndex
+        ? feedback
+        : `This option points to ${option.toLowerCase()}, but the checkpoint is asking for the EBSD concept linked to ${feedback.toLowerCase()}`
+    )),
+    hint: extra.hint ?? 'Look for the option that best connects the visual evidence to the EBSD concept, not the brightest or most familiar word.',
+    conceptTag: extra.conceptTag ?? id.split('-')[0],
+    difficulty: extra.difficulty ?? 'basic'
+  };
 }
 
 export const learningModules = [
