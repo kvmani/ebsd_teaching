@@ -3,21 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EBSD Kikuchi Pattern Formation</title>
+    <title>EBSD Teaching Studio</title>
   </head>
   <body>
     <div id="app" class="app">
       <header class="topbar">
-        <div class="title">
-          <h1>EBSD Kikuchi Pattern Formation</h1>
-          <p>Interactive 3D teaching aid: beam -> interaction volume -> Bragg cones -> detector bands</p>
+        <div class="brand-block">
+          <div class="title">
+            <h1>EBSD Teaching Studio</h1>
+            <p>Interactive conceptual simulator for EBSD fundamentals</p>
+          </div>
+          <div class="badges" aria-label="Application status">
+            <span class="badge badge-green">Offline-first</span>
+            <span class="badge badge-amber">Conceptual, not a validated physics simulator</span>
+          </div>
         </div>
-        <div class="notice"><span class="status-dot"></span>Conceptual schematic, not a validated physics simulation</div>
+        <div class="app-actions" aria-label="Local teaching tools">
+          <button id="notesButton" type="button" title="Local notes placeholder">Notes</button>
+          <button id="screenshotButton" type="button" title="Local screenshot placeholder">Screenshot</button>
+          <button id="exportButton" type="button" title="Local export placeholder">Export</button>
+          <button id="glossaryButton" type="button" title="Open offline glossary placeholder">Glossary</button>
+          <button id="resetScene" type="button" title="Restore default teaching view">Reset scene</button>
+        </div>
       </header>
 
       <nav class="view-tabs" aria-label="Simulation views">
         <button class="tab-button active" id="tabGeometry" type="button" aria-controls="geometryView" aria-selected="true">Geometry + Pattern</button>
         <button class="tab-button" id="tabAcquisition" type="button" aria-controls="acquisitionView" aria-selected="false">Live Scan Acquisition</button>
+        <button class="tab-button" id="tabLearning" type="button" aria-controls="learningView" aria-selected="false">Learning Path</button>
       </nav>
 
       <main class="workspace view-pane active" id="geometryView">
@@ -26,9 +39,13 @@
             <strong>SEM / EBSD Geometry</strong>
             <span>Drag to orbit, scroll to zoom</span>
           </div>
-          <div class="annotation" id="annBeam">Primary SEM electrons</div>
+          <div class="annotation numbered-label" id="annColumn"><b>1</b> SEM column</div>
+          <div class="annotation numbered-label" id="annBeam"><b>2</b> Incident electron beam</div>
+          <div class="annotation numbered-label" id="annInteraction"><b>3</b> Interaction volume</div>
+          <div class="annotation numbered-label" id="annPlanes"><b>4</b> Crystal planes {hkl}</div>
+          <div class="annotation numbered-label" id="annCones"><b>5</b> Bragg/Kikuchi cones</div>
+          <div class="annotation numbered-label" id="annDetector"><b>6</b> Detector/phosphor screen</div>
           <div class="annotation" id="annSample">Sample surface: 70 deg from -X axis</div>
-          <div class="annotation" id="annDetector">EBSD detector</div>
           <canvas id="scene"></canvas>
         </section>
 
@@ -37,20 +54,37 @@
             <strong>Live Detector Pattern</strong>
             <span>Kikuchi bands from cone intersections</span>
           </div>
+          <div class="detector-toolbar">
+            <label>
+              <span>Contrast</span>
+              <input id="patternContrast" type="range" min="60" max="160" step="5" value="100" />
+            </label>
+            <label class="compact-check"><input id="invertPattern" type="checkbox" /> Invert</label>
+          </div>
           <div class="detector-holder">
             <canvas id="detector" width="900" height="900"></canvas>
+            <div class="zoom-inset" aria-hidden="true">
+              <span>Zoom inset</span>
+              <canvas id="detectorInset" width="180" height="180"></canvas>
+            </div>
           </div>
           <p class="pattern-caption" id="patternCaption"></p>
+          <p class="simulation-note">Pattern simulated for teaching purposes only.</p>
         </section>
 
         <aside class="panel controls" aria-label="Simulation controls">
           <div class="control-intro">
-            <h2>Controls</h2>
+            <h2>Guided Geometry Lab</h2>
             <p>Use guided mode for lectures, or adjust geometry and orientation to show how schematic EBSD bands respond.</p>
           </div>
 
-          <section class="control-group">
-            <h3>Guided Explanation</h3>
+          <section class="stage-card" aria-label="Guided explanation">
+            <div class="stage-card-top">
+              <span id="stageEyebrow">Stage 6 of 6</span>
+              <strong id="stageTitle">Full EBSD Pattern Formation</strong>
+            </div>
+            <p id="stageExplanation">Multiple plane families produce a network of Kikuchi bands.</p>
+            <div class="progress-track" aria-hidden="true"><b id="stageProgress"></b></div>
             <div class="buttons">
               <button id="prevStage" type="button">Previous</button>
               <button id="nextStage" type="button">Next</button>
@@ -62,8 +96,9 @@
             </label>
           </section>
 
-          <section class="control-group">
-            <h3>SEM / EBSD Geometry</h3>
+          <details class="control-group" open>
+            <summary>Geometry</summary>
+            <p class="control-note">Geometry controls change where diffracted directions meet the detector; they do not make the model physically validated.</p>
             <label class="slider-row">
               <span>Sample tilt <output class="value" id="tiltValue">70 deg</output></span>
               <input id="tilt" type="range" min="0" max="80" step="1" value="70" />
@@ -80,10 +115,11 @@
               <span>Accelerating voltage <output class="value" id="voltageValue">20 kV</output></span>
               <input id="voltage" type="range" min="5" max="30" step="1" value="20" />
             </label>
-          </section>
+          </details>
 
-          <section class="control-group">
-            <h3>Crystal Orientation</h3>
+          <details class="control-group" open>
+            <summary>Crystal Orientation</summary>
+            <p class="control-note">Rotating the crystal moves bands because the lattice-plane normals rotate relative to the detector.</p>
             <label class="slider-row">
               <span>Rotate X <output class="value" id="rxValue">0 deg</output></span>
               <input id="rx" type="range" min="-45" max="45" step="1" value="0" />
@@ -96,32 +132,33 @@
               <span>Rotate Z <output class="value" id="rzValue">0 deg</output></span>
               <input id="rz" type="range" min="-70" max="70" step="1" value="0" />
             </label>
-          </section>
+          </details>
 
-          <section class="control-group">
-            <h3>Teaching Emphasis</h3>
+          <details class="control-group" open>
+            <summary>Teaching Emphasis</summary>
+            <p class="control-note">These sliders exaggerate or simplify visual elements so beginners can see the idea before worrying about exact physics.</p>
             <label class="slider-row">
               <span>Cone angle magnifier <output class="value" id="coneScaleValue">6.0x</output></span>
               <input id="coneScale" type="range" min="3" max="9" step="0.5" value="6" />
             </label>
             <label class="slider-row">
-              <span>Plane families <output class="value" id="planeCountValue">4</output></span>
+              <span>Plane family count <output class="value" id="planeCountValue">4</output></span>
               <input id="planeCount" type="range" min="1" max="5" step="1" value="4" />
             </label>
-          </section>
+          </details>
 
-          <section class="control-group">
-            <h3>Display</h3>
+          <details class="control-group" open>
+            <summary>View Options</summary>
             <div class="checks">
               <label><input id="showCones" type="checkbox" checked /> Cones</label>
               <label><input id="showPlanes" type="checkbox" checked /> Planes</label>
               <label><input id="showIntersections" type="checkbox" checked /> Cone cuts</label>
-              <label><input id="showLabels" type="checkbox" checked /> hkl labels</label>
+              <label><input id="showLabels" type="checkbox" checked /> Labels</label>
               <label><input id="showNoise" type="checkbox" checked /> Detector noise</label>
             </div>
-          </section>
+          </details>
 
-          <section class="control-group">
+          <section class="control-group readout-group">
             <h3>Readout</h3>
             <div class="readout">
               <div class="metric"><b id="lambdaValue">8.59 pm</b><span>electron wavelength</span></div>
@@ -131,6 +168,36 @@
             </div>
           </section>
         </aside>
+
+        <section class="teaching-card-row" aria-label="Geometry teaching cards">
+          <article class="teaching-card">
+            <span>What’s happening right now?</span>
+            <p id="nowCard">Multiple plane families produce a network of Kikuchi bands on the detector.</p>
+          </article>
+          <article class="teaching-card">
+            <span>Common misconception</span>
+            <p>Kikuchi bands are not caused by surface roughness or contamination. They arise from coherent diffraction within the crystal according to Bragg’s law.</p>
+          </article>
+          <article class="teaching-card checkpoint-card">
+            <span>Checkpoint question</span>
+            <p>Which best describes the origin of Kikuchi bands in EBSD?</p>
+            <div class="quiz-options compact">
+              <button type="button" data-answer="wrong">A. Topography</button>
+              <button type="button" data-answer="wrong">B. X-rays</button>
+              <button type="button" data-answer="correct">C. Crystal-plane diffraction</button>
+              <button type="button" data-answer="wrong">D. Surface channeling</button>
+            </div>
+            <b id="geometryQuizFeedback"></b>
+          </article>
+          <article class="teaching-card">
+            <span>Try this experiment</span>
+            <p>Rotate the crystal about Z, then compare the detector bands. The bands move because orientation changes which plane normals satisfy the detector geometry.</p>
+          </article>
+          <article class="teaching-card">
+            <span>Mini glossary</span>
+            <p><b>Bragg angle</b>: angle satisfying nλ = 2d sinθ. <b>Pattern center</b>: projected detector reference point used for indexing.</p>
+          </article>
+        </section>
       </main>
 
       <main class="acquisition-workspace view-pane" id="acquisitionView">
@@ -139,12 +206,24 @@
             <strong>Live EBSD Scan Acquisition</strong>
             <span>Raster scan: each pixel needs a usable diffraction pattern</span>
           </div>
+          <div class="scan-status-strip" aria-label="Live scan state">
+            <span><b id="scanStatusPixel">0, 0</b> current pixel</span>
+            <span><b id="scanStatusProgress">0%</b> raster progress</span>
+            <span><b id="scanStatusState">stable scan</b> indexing state</span>
+          </div>
           <canvas id="scanMap" width="720" height="520"></canvas>
+          <div class="ipf-key" aria-label="IPF color key">
+            <span>Z</span>
+            <i></i>
+            <b>IPF color key</b>
+          </div>
+          <div class="scale-bar" aria-label="Scale bar"><b></b><span id="scaleBarText">10 um</span></div>
           <div class="scan-overlay">
             <div><b id="scanQuality">82%</b><span>pattern quality</span></div>
+            <div><b id="scanIndexRate">78%</b><span>indexing confidence</span></div>
             <div><b id="scanResolution">360 x 260</b><span>effective pixels</span></div>
             <div><b id="scanSpeed">35.7 px/ms</b><span>relative speed</span></div>
-            <div><b id="scanWarning">stable scan</b><span>current trade-off</span></div>
+            <div><b id="scanWarning">stable scan</b><span>indexing state</span></div>
             <div><b id="scanProgress">0%</b><span>raster progress</span></div>
             <div><b id="scanPixel">0, 0</b><span>current pixel</span></div>
             <div><b id="scanDwell">56 ms</b><span>effective dwell</span></div>
@@ -155,16 +234,23 @@
         <section class="panel pattern-lab" aria-label="Acquired EBSD pattern preview">
           <div class="panel-title">
             <strong>Pattern at Current Pixel</strong>
-            <span>Noise, clipping, and band sharpness change the indexability</span>
+            <span>Noise, clipping, and band sharpness change indexability</span>
           </div>
           <canvas id="patternPreview" width="420" height="420"></canvas>
           <div class="pattern-status">
             <span>Linked raster pixel <b id="patternPixel">0, 0</b></span>
             <span>Local grain <b id="patternGrain">grain 1</b></span>
-            <span>Real pattern <b id="patternSource">Si (001), 20 kV</b></span>
+            <span>Pattern label <b id="patternLabel">schematic</b></span>
+            <span>Acquisition state <b id="acquisitionState">stable scan</b></span>
+          </div>
+          <div class="pattern-source" id="patternSource">Pattern source: checking local image library</div>
+          <div class="quality-bars" aria-label="Pattern quality factors">
+            <label><span>Noise</span><b><i id="noiseBar"></i></b><output id="noiseValue">18%</output></label>
+            <label><span>Saturation / clipping</span><b><i id="clippingBar"></i></b><output id="clippingValue">0%</output></label>
+            <label><span>Band sharpness</span><b><i id="sharpnessBar"></i></b><output id="sharpnessValue">82%</output></label>
           </div>
           <div class="parameter-story" id="parameterStory">
-            Increase exposure or averaging to reduce noise. Increase gain only until bands are bright enough; too much gain clips bright pixels.
+            Indexing works when enough sharp bands are visible with good signal and without saturation.
           </div>
         </section>
 
@@ -190,22 +276,28 @@
 
           <section class="control-group">
             <h3>Detector Signal</h3>
+            <p class="control-note">More electrons usually improve signal; too much gain or current clips detail that indexing needs.</p>
             <label class="slider-row">
-              <span>Gain <output class="value" id="gainValue">1.2x</output></span>
-              <input id="gain" type="range" min="0.5" max="3.0" step="0.1" value="1.2" />
+              <span>Beam current <output class="value" id="beamCurrentValue">55%</output></span>
+              <input id="beamCurrent" type="range" min="15" max="100" step="5" value="55" />
             </label>
             <label class="slider-row">
               <span>Exposure time <output class="value" id="exposureValue">28 ms</output></span>
               <input id="exposureMs" type="range" min="4" max="120" step="2" value="28" />
             </label>
             <label class="slider-row">
-              <span>Beam current <output class="value" id="beamCurrentValue">55%</output></span>
-              <input id="beamCurrent" type="range" min="15" max="100" step="5" value="55" />
+              <span>Detector gain <output class="value" id="gainValue">1.2x</output></span>
+              <input id="gain" type="range" min="0.5" max="3.0" step="0.1" value="1.2" />
             </label>
           </section>
 
           <section class="control-group">
             <h3>Sampling</h3>
+            <p class="control-note">Step size, binning, averaging, and scan speed trade spatial detail against signal stability and acquisition time.</p>
+            <label class="slider-row">
+              <span>Step size <output class="value" id="stepSizeValue">0.25 um</output></span>
+              <input id="stepSize" type="range" min="0.05" max="1.00" step="0.05" value="0.25" />
+            </label>
             <label class="slider-row">
               <span>Binning <output class="value" id="binningValue">2 x 2</output></span>
               <input id="binning" type="range" min="1" max="8" step="1" value="2" />
@@ -226,6 +318,15 @@
 
           <section class="control-group">
             <h3>Indexing + Views</h3>
+            <p class="control-note">Band detection and thresholds teach decision quality: stricter settings reject more doubtful pixels.</p>
+            <label class="select-row">
+              <span>Indexing mode</span>
+              <select id="indexingMode">
+                <option value="hough">Hough bands</option>
+                <option value="dictionary">Dictionary match</option>
+                <option value="manual">Manual teaching</option>
+              </select>
+            </label>
             <label class="slider-row">
               <span>Band detection <output class="value" id="bandDetectionValue">65%</output></span>
               <input id="bandDetection" type="range" min="20" max="100" step="5" value="65" />
@@ -234,6 +335,27 @@
               <span>Index threshold <output class="value" id="indexingThresholdValue">42%</output></span>
               <input id="indexingThreshold" type="range" min="20" max="85" step="5" value="42" />
             </label>
+            <label class="select-row">
+              <span>Quality overlay</span>
+              <select id="qualityOverlay">
+                <option value="none">None</option>
+                <option value="unindexed">Unindexed pixels</option>
+                <option value="confidence">Confidence tint</option>
+                <option value="boundaries">Grain boundaries</option>
+              </select>
+            </label>
+            <label class="select-row">
+              <span>Map update</span>
+              <select id="mapUpdate">
+                <option value="live">Live as acquired</option>
+                <option value="line">Line by line</option>
+                <option value="complete">After scan complete</option>
+              </select>
+            </label>
+            <div class="checks">
+              <label><input id="autoIndex" type="checkbox" checked /> Auto-index</label>
+              <label><input id="confirmLowConfidence" type="checkbox" /> Confirm low confidence</label>
+            </div>
             <div class="map-mode-grid" role="group" aria-label="Map view mode">
               <button class="mode-button active" id="modeOrientation" type="button">Orientation</button>
               <button class="mode-button" id="modeQuality" type="button">Pattern quality</button>
@@ -248,36 +370,92 @@
               <button id="presetBalanced" type="button">Balanced</button>
               <button id="presetHighQuality" type="button">High quality</button>
               <button id="presetBadSetup" type="button">Bad setup</button>
-              <button id="resetScan" type="button">Restart scan</button>
+              <button id="resetScan" class="wide" type="button">Restart scan</button>
             </div>
             <div class="checks">
               <label><input id="backgroundCorrection" type="checkbox" checked /> Background correction</label>
-              <label><input id="showIndexing" type="checkbox" checked /> Band centers</label>
+              <label><input id="showIndexing" type="checkbox" checked /> Index marks</label>
               <label><input id="showScanLine" type="checkbox" checked /> Scan line</label>
               <label><input id="liveAcquisition" type="checkbox" checked /> Live scan</label>
             </div>
           </section>
+        </aside>
 
-          <section class="control-group">
-            <h3>What Students Should Notice</h3>
-            <div class="lesson-list">
-              <p><b>Gain</b> brightens weak patterns, but excessive gain saturates bands and hides detail.</p>
-              <p><b>Binning</b> combines camera pixels: cleaner signal, lower spatial detail.</p>
-              <p><b>Exposure</b> collects more electrons per pixel: cleaner indexing, slower scan.</p>
-              <p><b>Averaging</b> suppresses random noise, but the sample spends longer at each point.</p>
-              <p><b>Drift</b> shifts the raster during acquisition, bending boundaries and lowering confidence.</p>
-              <p><b>Indexing</b> depends on detecting enough bands above a confidence threshold.</p>
+        <section class="teaching-card-row acquisition-cards" aria-label="Acquisition teaching cards">
+          <article class="teaching-card">
+            <span>What students should notice</span>
+            <p>Indexing works when enough sharp bands are visible with good signal and without saturation. Improve signal or detail, or reduce speed/drift.</p>
+          </article>
+          <article class="teaching-card">
+            <span>Try this comparison</span>
+            <p>Switch between Fast survey and High quality. Fast scans update quickly but show noisier colors; high quality scans sharpen bands at the cost of time.</p>
+          </article>
+          <article class="teaching-card">
+            <span>Noisy indexing</span>
+            <p><b>Cause:</b> low exposure/current. <b>Observe:</b> unstable colors and weak confidence. <b>Fix:</b> add exposure, beam current, binning, or averaging.</p>
+          </article>
+          <article class="teaching-card">
+            <span>Gain clipping</span>
+            <p><b>Cause:</b> too much gain/current. <b>Observe:</b> bright saturated pixels. <b>Fix:</b> lower gain, then recover signal with exposure if needed.</p>
+          </article>
+          <article class="teaching-card">
+            <span>Coarse pixels / drift</span>
+            <p><b>Cause:</b> high binning or unstable stage. <b>Observe:</b> blocky or warped boundaries. <b>Fix:</b> reduce binning and stabilize before scanning.</p>
+          </article>
+        </section>
+      </main>
+
+      <main class="learning-workspace view-pane" id="learningView">
+        <aside class="panel curriculum-sidebar" aria-label="Learning path modules">
+          <div class="panel-heading">
+            <span>Curriculum</span>
+            <strong>EBSD from first principles to practice</strong>
+          </div>
+          <p class="sidebar-note">Choose a module. All diagrams, quizzes, formulas, and classroom prompts are stored locally.</p>
+          <div id="moduleList" class="module-list"></div>
+          <button id="downloadModules" class="offline-download" type="button">Download all modules for offline use</button>
+        </aside>
+
+        <section class="panel lesson-workspace" aria-label="Selected lesson">
+          <div id="lessonWorkspace"></div>
+        </section>
+
+        <aside class="panel learning-sidebar" aria-label="Glossary and classroom tools">
+          <section class="side-card">
+            <h2>Mini glossary</h2>
+            <div id="miniGlossary"></div>
+          </section>
+          <section class="side-card formula-panel">
+            <h2>Formula & reference</h2>
+            <div id="formulaPanel"></div>
+          </section>
+          <section class="side-card">
+            <h2>Classroom tools</h2>
+            <div class="tool-grid">
+              <button type="button">Notes</button>
+              <button type="button">Bookmarks</button>
+              <button type="button">Saved experiments</button>
+              <label class="teacher-toggle"><input id="teacherMode" type="checkbox" /> Teacher mode</label>
             </div>
           </section>
         </aside>
+
+        <section class="offline-resources" aria-label="Offline resources">
+          <article><span>Worksheet</span><p>Printable classroom prompts stored locally.</p><button data-resource="worksheet-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
+          <article><span>Lesson cards</span><p>Compact EBSD concept cards for revision.</p><button data-resource="lesson-cards-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
+          <article><span>Formula cheat sheet</span><p>Bragg law and wavelength reference.</p><button data-resource="formula-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
+          <article><span>Practice questions</span><p>Local checkpoint questions from the modules.</p><button data-resource="practice-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
+          <article><span>Sample datasets</span><p>Local synthetic acquisition presets.</p><button data-resource="datasets-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
+          <article><span>Teacher demo plan</span><p>Suggested classroom demo order.</p><button data-resource="teacher-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button">Export placeholder</button></article>
+        </section>
       </main>
 
       <footer class="lesson">
         <div class="legend" id="geometryLegend" aria-label="Color legend">
-          <span class="pill beam">blue: primary beam</span>
-          <span class="pill volume">gold: interaction volume</span>
-          <span class="pill cones">green/cyan/pink: Bragg cones</span>
-          <span class="pill detector">right panel: detector pattern</span>
+          <span class="pill beam">cyan: primary beam</span>
+          <span class="pill volume">amber: interaction volume</span>
+          <span class="pill cones">green/cyan/purple: Bragg cones</span>
+          <span class="pill detector">detector panel: Kikuchi pattern</span>
         </div>
         <div class="explain">
           <strong id="explainTitle"></strong>

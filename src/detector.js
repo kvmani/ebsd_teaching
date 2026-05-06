@@ -1,9 +1,11 @@
 import { activePlanes, braggThetaDeg, electronWavelengthPm, orientationQuat, planes, state, visualThetaDeg } from './state.js';
 
 export class DetectorRenderer {
-  constructor(canvas) {
+  constructor(canvas, insetCanvas = null) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d', { willReadFrequently: true });
+    this.insetCanvas = insetCanvas;
+    this.insetContext = insetCanvas?.getContext('2d') ?? null;
     this.cssSize = 900;
   }
 
@@ -44,6 +46,8 @@ export class DetectorRenderer {
 
     if (state.stage < 5) {
       this.drawWaiting(cx, cy);
+      this.postProcess();
+      this.drawInset();
       return;
     }
 
@@ -60,6 +64,36 @@ export class DetectorRenderer {
     });
 
     this.drawPatternCenter(cx, cy);
+    this.postProcess();
+    this.drawInset();
+  }
+
+  postProcess() {
+    if (state.patternContrast === 100 && !state.invertPattern) return;
+    const { canvas, ctx } = this;
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const contrast = state.patternContrast / 100;
+    for (let i = 0; i < img.data.length; i += 4) {
+      for (let channel = 0; channel < 3; channel += 1) {
+        let value = 128 + (img.data[i + channel] - 128) * contrast;
+        if (state.invertPattern) value = 255 - value;
+        img.data[i + channel] = Math.max(0, Math.min(255, value));
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  drawInset() {
+    if (!this.insetCanvas || !this.insetContext) return;
+    const sourceSize = Math.floor(this.canvas.width * 0.28);
+    const sx = Math.floor(this.canvas.width * 0.5 - sourceSize * 0.5);
+    const sy = Math.floor(this.canvas.height * 0.5 - sourceSize * 0.5);
+    const ctx = this.insetContext;
+    ctx.clearRect(0, 0, this.insetCanvas.width, this.insetCanvas.height);
+    ctx.drawImage(this.canvas, sx, sy, sourceSize, sourceSize, 0, 0, this.insetCanvas.width, this.insetCanvas.height);
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(2, 2, this.insetCanvas.width - 4, this.insetCanvas.height - 4);
   }
 
   drawNoise() {

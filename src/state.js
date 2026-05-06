@@ -16,6 +16,8 @@ export const state = {
   showIntersections: true,
   showLabels: true,
   showNoise: true,
+  patternContrast: 100,
+  invertPattern: false,
   playing: false,
   time: 0,
   acquisition: {
@@ -25,9 +27,15 @@ export const state = {
     beamCurrent: 55,
     frameAverage: 2,
     scanSpeed: 1.0,
+    stepSize: 0.25,
     drift: 0,
     bandDetection: 65,
     indexingThreshold: 42,
+    indexingMode: 'hough',
+    qualityOverlay: 'none',
+    mapUpdate: 'live',
+    autoIndex: true,
+    confirmLowConfidence: false,
     mapMode: 'orientation',
     backgroundCorrection: true,
     showIndexing: true,
@@ -38,28 +46,28 @@ export const state = {
 
 export const stages = [
   {
-    title: '1. SEM Beam Incidence',
-    text: 'Primary SEM electrons travel from the pole piece to a strongly tilted crystalline specimen. EBSD commonly uses high specimen tilt so that many backscattered electrons escape toward the detector.'
+    title: '1. Incident electron beam',
+    text: 'Primary SEM electrons travel from the pole piece toward a strongly tilted crystalline specimen. The high tilt helps backscattered electrons escape toward the EBSD detector.'
   },
   {
-    title: '2. Near-Surface Interaction Volume',
-    text: 'After impact, electrons undergo local inelastic scattering in a small near-surface region. The glowing volume and paths are schematic, not a Monte Carlo calculation.'
+    title: '2. Interaction volume',
+    text: 'After impact, electrons scatter in a small near-surface region. The glowing volume is schematic: it shows where useful backscattered electrons originate, not a Monte Carlo calculation.'
   },
   {
-    title: '3. Crystallographic Planes',
-    text: 'Scattered electrons encounter families of lattice planes. Some directions satisfy Bragg diffraction conditions for specific d-spacings.'
+    title: '3. Crystal lattice planes',
+    text: 'Scattered electrons encounter families of crystal planes. Some directions satisfy Bragg diffraction conditions for specific d-spacings and plane orientations.'
   },
   {
-    title: '4. Bragg / Kossel Cones',
-    text: 'Each active plane family now emits a schematic double-ended Bragg/Kossel cone system from the beam impact point. The cone is deliberately simplified so students can see the family direction clearly.'
+    title: '4. Bragg diffraction cones',
+    text: 'Each active plane family emits a schematic Bragg/Kossel cone system from the impact point. The cone angles are magnified so students can see geometry that is physically only a few degrees wide.'
   },
   {
-    title: '5. Detector Cone Intersections',
-    text: 'The detector cuts the cone surface. The two nearby cut edges define the visible Kikuchi band edges on the detector screen.'
+    title: '5. Cone intersection with detector',
+    text: 'The phosphor screen cuts the cone surfaces. The two nearby cut edges define the visible Kikuchi band edges on the detector pattern.'
   },
   {
-    title: '6. Full EBSD Pattern Formation',
-    text: 'Multiple plane families produce a network of Kikuchi bands. Rotating the crystal moves the bands; changing voltage changes electron wavelength and band width subtly.'
+    title: '6. Kikuchi bands and full pattern',
+    text: 'Multiple plane families produce a network of Kikuchi bands. Rotating the crystal moves the bands; changing voltage changes wavelength and band width subtly.'
   }
 ];
 

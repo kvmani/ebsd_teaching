@@ -1,3 +1,4 @@
+import { patternLibrary } from './patternLibrary.js';
 import { state } from './state.js';
 
 const GRAIN_COLORS = [
@@ -8,45 +9,6 @@ const GRAIN_COLORS = [
   [174, 152, 232],
   [244, 154, 98]
 ];
-
-const REAL_KIKUCHI_PATTERNS = [
-  {
-    src: '/patterns/ebsd-si-001.png',
-    name: 'Si (001), 20 kV',
-    credit: 'Wikimedia Commons, FuzzyMagma, CC0',
-    bandCenters: [
-      { x0: 0, y0: 0.54, x1: 1, y1: 0.49 },
-      { x0: 0.06, y0: 0.12, x1: 0.91, y1: 0.9 },
-      { x0: 0.1, y0: 0.88, x1: 0.9, y1: 0.06 }
-    ]
-  },
-  {
-    src: '/patterns/ebsd-nist.jpg',
-    name: 'NIST EBSD pattern',
-    credit: 'NIST / Wikimedia Commons, public domain',
-    bandCenters: [
-      { x0: 0.5, y0: 0, x1: 0.5, y1: 1 },
-      { x0: 0.1, y0: 0, x1: 0.58, y1: 1 }
-    ]
-  },
-  {
-    src: '/patterns/ebsd-si-square.png',
-    name: 'Si EBSD detail',
-    credit: 'Wikimedia Commons, FuzzyMagma, CC0',
-    bandCenters: [
-      { x0: 0, y0: 0.5, x1: 1, y1: 0.48 },
-      { x0: 0.49, y0: 0, x1: 0.49, y1: 1 },
-      { x0: 0.07, y0: 0.12, x1: 0.94, y1: 0.88 }
-    ]
-  }
-];
-
-function clonePatterns(patterns) {
-  return patterns.map((pattern) => ({
-    ...pattern,
-    bandCenters: pattern.bandCenters.map((band) => ({ ...band }))
-  }));
-}
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -76,42 +38,12 @@ export class AcquisitionRenderer {
     this.scanAccumulator = 0;
     this.lastKey = '';
     this.lastPatternBucket = '';
-    this.displayPatternState = null;
-    this.displayPatternPixel = '0, 0';
     this.imageData = this.scanContext.createImageData(this.width, this.height);
     this.baseMap = new Uint8Array(this.width * this.height);
     this.confidenceMap = new Float32Array(this.width * this.height);
-    this.patterns = clonePatterns(REAL_KIKUCHI_PATTERNS);
-    this.patternImages = REAL_KIKUCHI_PATTERNS.map((pattern) => {
-      const image = new Image();
-      image.onload = () => this.drawPatternPreview();
-      image.src = pattern.src;
-      return image;
-    });
-    this.loadDetectedBandCenters();
     this.buildMicrostructure();
     this.clearScan();
-  }
-
-  loadDetectedBandCenters() {
-    fetch('/patterns/kikuchipy-bands.json')
-      .then((response) => (response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`))))
-      .then((data) => {
-        if (!Array.isArray(data.patterns)) return;
-        const generatedPatterns = data.patterns.filter((pattern) => Array.isArray(pattern.bandCenters) && pattern.bandCenters.length > 0);
-        if (generatedPatterns.length !== this.patterns.length) return;
-        this.patterns = generatedPatterns.map((pattern) => ({
-          src: pattern.src,
-          name: pattern.name,
-          credit: pattern.credit,
-          method: data.method,
-          bandCenters: pattern.bandCenters
-        }));
-        this.drawPatternPreview();
-      })
-      .catch(() => {
-        // Keep the hand-tuned teaching fallback if the generated JSON is absent.
-      });
+    patternLibrary.preload().then(() => this.drawPatternPreview());
   }
 
   buildMicrostructure() {
@@ -183,9 +115,13 @@ export class AcquisitionRenderer {
       state.acquisition.exposureMs,
       state.acquisition.beamCurrent,
       state.acquisition.frameAverage,
+      state.acquisition.stepSize,
       state.acquisition.drift,
       state.acquisition.bandDetection,
       state.acquisition.indexingThreshold,
+      state.acquisition.indexingMode,
+      state.acquisition.qualityOverlay,
+      state.acquisition.autoIndex,
       state.acquisition.mapMode,
       state.acquisition.backgroundCorrection
     ].join('|');
@@ -265,9 +201,14 @@ export class AcquisitionRenderer {
     const pq = clamp(confidence * 255, 0, 255);
     const ci = confidence > 0.68 ? [95, 215, 170] : confidence > 0.44 ? [230, 181, 90] : [238, 96, 116];
 
-      let color = indexed ? grainColor : [44, 49, 50];
-      if (state.acquisition.mapMode === 'quality') color = [pq, pq * 0.92, pq * 0.72];
-      if (state.acquisition.mapMode === 'confidence') color = ci;
+    let color = indexed ? grainColor : [44, 49, 50];
+    if (state.acquisition.mapMode === 'quality') color = [pq, pq * 0.92, pq * 0.72];
+    if (state.acquisition.mapMode === 'confidence') color = ci;
+    if (state.acquisition.qualityOverlay === 'unindexed' && !indexed) color = [238, 96, 116];
+    if (state.acquisition.qualityOverlay === 'confidence' && indexed) {
+      color = color.map((channel) => clamp(channel * (0.62 + confidence * 0.55), 0, 255));
+    }
+    if (state.acquisition.qualityOverlay === 'boundaries' && confidence < 0.52) color = [230, 181, 90];
 
     for (let bx = 0; bx < binning && x + bx < this.width; bx += 1) {
       for (let by = 0; by < binning && y + by < this.height; by += 1) {
@@ -313,35 +254,49 @@ export class AcquisitionRenderer {
     const w = this.patternCanvas.width;
     const h = this.patternCanvas.height;
     const current = this.currentPatternState();
-    this.displayPatternState = { ...current };
-    this.displayPatternPixel = `${this.scanX}, ${this.scanY}`;
-    const pattern = this.patterns[current.patternIndex];
-    const patternImage = this.patternImages[current.patternIndex];
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = '#0a0d0e';
-    ctx.fillRect(0, 0, w, h);
-
-    if (patternImage.complete && patternImage.naturalWidth > 0) {
-      this.drawRealPatternImage(patternImage, current);
+    if (current.pattern) {
+      this.drawRealPatternBase(ctx, current, quality, w, h);
     } else {
-      this.drawFallbackPattern(current, quality);
+      this.drawSchematicPatternBase(ctx, current, quality, w, h);
     }
 
     const image = ctx.getImageData(0, 0, w, h);
     const data = image.data;
+    const signal = Math.sqrt((state.acquisition.exposureMs * state.acquisition.beamCurrent) / (28 * 55));
+    const averaging = Math.sqrt(state.acquisition.frameAverage);
+    const noiseScale = clamp(1.15 - quality - signal * 0.12 - averaging * 0.05, 0.04, 0.88);
+    const exposureScale = clamp(0.72 + signal * 0.24, 0.58, 1.25);
+    const background = state.acquisition.backgroundCorrection ? 0.93 : 1.12;
+    const detailLoss = (state.acquisition.binning - 1) * 0.045;
     for (let i = 0; i < data.length; i += 4) {
-      const n = (hashNoise(i, this.frame + this.scanX * 0.03 + this.scanY * 0.07, 4) - 0.5) * (1 - current.confidence) * 110;
-      const background = state.acquisition.backgroundCorrection ? 0.88 : 1.12;
-      const vignette = this.detectorVignette(i / 4, w, h);
-      const scanFlicker = Math.sin(this.frame * 0.7 + this.scanX * 0.03) * 5;
-      data[i] = clamp(data[i] * state.acquisition.gain * background * vignette + n + clipping * 38 + scanFlicker, 0, 255);
-      data[i + 1] = clamp(data[i + 1] * state.acquisition.gain * background * vignette + n + clipping * 38 + scanFlicker, 0, 255);
-      data[i + 2] = clamp(data[i + 2] * state.acquisition.gain * background * vignette + n + clipping * 38 + scanFlicker, 0, 255);
+      const n = (hashNoise(i, this.frame + this.scanX * 0.03 + this.scanY * 0.07, 4) - 0.5) * noiseScale * 150;
+      const clippedBoost = clipping > 0 ? clipping * 44 : 0;
+      for (let channel = 0; channel < 3; channel += 1) {
+        const softened = 128 + (data[i + channel] - 128) * (1 - detailLoss);
+        data[i + channel] = clamp(softened * state.acquisition.gain * background * exposureScale + n + clippedBoost, 0, 255);
+      }
     }
     ctx.putImageData(image, 0, 0);
 
-    if (state.acquisition.showIndexing) {
-      this.drawBandCenterOverlay(pattern, current, quality);
+    if (state.acquisition.showIndexing && current.pattern?.bandCenters?.length) {
+      this.drawPatternBandCenterOverlay(current, quality, w, h);
+    } else if (state.acquisition.showIndexing) {
+      ctx.strokeStyle = `rgba(255, 238, 174, ${0.28 + quality * 0.55})`;
+      ctx.lineWidth = 1;
+      const indexAlpha = current.indexed
+        ? clamp((0.24 + current.confidence * 0.58) * (state.acquisition.bandDetection / 65), 0.12, 0.95)
+        : 0.18;
+      ctx.strokeStyle = `rgba(255, 238, 174, ${indexAlpha})`;
+      const spacing = state.acquisition.bandDetection >= 75 ? 46 : state.acquisition.bandDetection <= 35 ? 72 : 56;
+      for (let x = 42 + current.grainIndex * 3; x < w; x += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 26);
+        ctx.lineTo(x, 38);
+        ctx.moveTo(x - 6, 32);
+        ctx.lineTo(x + 6, 32);
+        ctx.stroke();
+      }
     }
 
     ctx.save();
@@ -353,40 +308,54 @@ export class AcquisitionRenderer {
     ctx.stroke();
     ctx.fillStyle = '#eef7f2';
     ctx.font = '600 12px Segoe UI, Arial, sans-serif';
-    ctx.fillText(`pixel ${this.displayPatternPixel}`, 24, h - 24);
-    ctx.textAlign = 'right';
-    ctx.fillText(pattern.name, w - 18, h - 24);
+    ctx.fillText(`pixel ${this.scanX}, ${this.scanY}`, 24, h - 24);
+    if (current.pattern) {
+      ctx.textAlign = 'right';
+      ctx.fillText(current.pattern.label, w - 18, h - 24);
+    }
     ctx.restore();
   }
 
-  drawRealPatternImage(image, current) {
-    const ctx = this.patternContext;
-    const w = this.patternCanvas.width;
-    const h = this.patternCanvas.height;
-    const crop = Math.min(image.naturalWidth, image.naturalHeight);
-    const sx = (image.naturalWidth - crop) / 2;
-    const sy = (image.naturalHeight - crop) / 2;
-    const transform = this.patternImageTransform(current);
+  drawRealPatternBase(ctx, current, quality, w, h) {
+    const image = current.pattern.image;
+    const imageAspect = image.width / image.height;
+    const canvasAspect = w / h;
+    let sx = 0;
+    let sy = 0;
+    let sw = image.width;
+    let sh = image.height;
+    if (imageAspect > canvasAspect) {
+      sw = image.height * canvasAspect;
+      sx = (image.width - sw) / 2;
+    } else {
+      sh = image.width / canvasAspect;
+      sy = (image.height - sh) / 2;
+    }
 
     ctx.save();
-    ctx.translate(w / 2, h / 2);
-    ctx.rotate(transform.rotation);
-    ctx.scale(transform.scale, transform.scale);
-    ctx.drawImage(image, sx, sy, crop, crop, -w / 2, -h / 2, w, h);
+    const blurPx = Math.max(0, state.acquisition.binning - 1) * 0.42 + (1 - quality) * 0.55;
+    const contrast = state.acquisition.backgroundCorrection ? 1.18 : 0.9;
+    ctx.filter = `grayscale(100%) blur(${blurPx.toFixed(2)}px) contrast(${contrast})`;
+    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, w, h);
     ctx.restore();
+
+    if (state.acquisition.backgroundCorrection) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'overlay';
+      const g = ctx.createRadialGradient(w * 0.5, h * 0.5, 20, w * 0.5, h * 0.5, w * 0.65);
+      g.addColorStop(0, 'rgba(255,255,255,0.08)');
+      g.addColorStop(0.55, 'rgba(0,0,0,0)');
+      g.addColorStop(1, 'rgba(0,0,0,0.22)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    }
   }
 
-  patternImageTransform(current) {
-    return {
-      rotation: (current.grainIndex - 2.5) * 0.055 + Math.sin(this.scanX * 0.018 + this.scanY * 0.013) * 0.018,
-      scale: 1.05 + current.grainIndex * 0.012
-    };
-  }
+  drawSchematicPatternBase(ctx, current, quality, w, h) {
+    ctx.fillStyle = '#0a0d0e';
+    ctx.fillRect(0, 0, w, h);
 
-  drawFallbackPattern(current, quality) {
-    const ctx = this.patternContext;
-    const w = this.patternCanvas.width;
-    const h = this.patternCanvas.height;
     const gradient = ctx.createRadialGradient(w * 0.52, h * 0.46, 8, w * 0.5, h * 0.5, w * 0.58);
     gradient.addColorStop(0, `rgba(${current.color.join(',')}, ${0.18 + current.confidence * 0.42})`);
     gradient.addColorStop(0.42, `rgba(120, 210, 220, ${0.1 + quality * 0.22})`);
@@ -421,50 +390,41 @@ export class AcquisitionRenderer {
     ctx.restore();
   }
 
-  detectorVignette(pixelIndex, width, height) {
-    const x = pixelIndex % width;
-    const y = Math.floor(pixelIndex / width);
-    const dx = (x - width * 0.5) / width;
-    const dy = (y - height * 0.5) / height;
-    return clamp(1.08 - (dx * dx + dy * dy) * 1.9, 0.5, 1.08);
-  }
-
-  drawBandCenterOverlay(pattern, current, quality) {
+  drawPatternBandCenterOverlay(current, quality, w, h) {
     const ctx = this.patternContext;
-    const w = this.patternCanvas.width;
-    const h = this.patternCanvas.height;
-    const detectableCount = Math.round(clamp(state.acquisition.bandDetection / 18, 1, pattern.bandCenters.length));
-    const indexAlpha = current.indexed
-      ? clamp((0.36 + current.confidence * 0.62) * (state.acquisition.bandDetection / 65), 0.32, 0.98)
-      : 0.28;
+    const bands = current.pattern.bandCenters;
+    const detectableCount = Math.round(clamp(state.acquisition.bandDetection / 22, 1, bands.length));
+    const alpha = current.indexed
+      ? clamp((0.32 + current.confidence * 0.58) * (state.acquisition.bandDetection / 65), 0.22, 0.95)
+      : 0.18;
 
     ctx.save();
-    const transform = this.patternImageTransform(current);
-
-    ctx.translate(w / 2, h / 2);
-    ctx.rotate(transform.rotation);
-    ctx.scale(transform.scale, transform.scale);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-
-    // KikuchiPy and PyEBSDIndex perform this from real image data in Python.
-    // In this browser teaching view we draw author-marked Hough-style band
-    // centers in the same transformed coordinate system as the real pattern.
-    pattern.bandCenters.slice(0, detectableCount).forEach((band, i) => {
-      const x0 = (band.x0 - 0.5) * w;
-      const y0 = (band.y0 - 0.5) * h;
-      const x1 = (band.x1 - 0.5) * w;
-      const y1 = (band.y1 - 0.5) * h;
-
-      ctx.shadowColor = 'rgba(255, 238, 174, 0.5)';
-      ctx.shadowBlur = 7;
-      ctx.strokeStyle = `rgba(255, 238, 174, ${indexAlpha})`;
-      ctx.lineWidth = current.indexed ? 1.45 : 1.1;
+    ctx.shadowColor = 'rgba(255, 238, 174, 0.55)';
+    ctx.shadowBlur = 7;
+    ctx.strokeStyle = `rgba(255, 238, 174, ${alpha})`;
+    ctx.lineWidth = current.indexed ? 1.7 : 1.1;
+    bands.slice(0, detectableCount).forEach((band) => {
       ctx.beginPath();
-      ctx.moveTo(x0, y0);
-      ctx.lineTo(x1, y1);
+      ctx.moveTo(band.x0 * w, band.y0 * h);
+      ctx.lineTo(band.x1 * w, band.y1 * h);
       ctx.stroke();
     });
+
+    // Very high sensitivity deliberately adds extra false candidates so
+    // students can see that "more detected bands" is not always better.
+    if (state.acquisition.bandDetection > 88) {
+      ctx.strokeStyle = 'rgba(231, 132, 186, 0.42)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 3; i += 1) {
+        const y = (0.18 + i * 0.22 + hashNoise(i, this.scanX, this.scanY) * 0.08) * h;
+        ctx.beginPath();
+        ctx.moveTo(w * 0.08, y);
+        ctx.lineTo(w * 0.92, y + (i - 1) * h * 0.18);
+        ctx.stroke();
+      }
+    }
     ctx.restore();
   }
 
@@ -476,45 +436,61 @@ export class AcquisitionRenderer {
     const grainIndex = this.baseMap[idx];
     const { quality } = this.qualityModel();
     const confidence = clamp(this.confidenceMap[idx] * quality, 0.04, 0.98);
+    const patternIndex = grainIndex + Math.floor(x / 140) + Math.floor(y / 120);
+    const pattern = patternLibrary.getPatternForIndex(patternIndex);
     return {
       grainIndex,
-      patternIndex: grainIndex % this.patterns.length,
       color: GRAIN_COLORS[grainIndex],
       confidence,
-      indexed: this.isIndexed(confidence)
+      indexed: this.isIndexed(confidence),
+      pattern
     };
   }
 
   isIndexed(confidence) {
+    if (!state.acquisition.autoIndex) return false;
     const detectionHelp = (state.acquisition.bandDetection - 65) * 0.0025;
-    return confidence + detectionHelp >= state.acquisition.indexingThreshold / 100;
+    const modeBoost = state.acquisition.indexingMode === 'dictionary' ? 0.035 : state.acquisition.indexingMode === 'manual' ? -0.08 : 0;
+    const lowConfidencePenalty = state.acquisition.confirmLowConfidence && confidence < 0.55 ? 0.08 : 0;
+    return confidence + detectionHelp + modeBoost - lowConfidencePenalty >= state.acquisition.indexingThreshold / 100;
   }
 
   metrics() {
     const { quality, clipping } = this.qualityModel();
     const current = this.currentPatternState();
-    const displayed = this.displayPatternState || current;
     const dwellMs = state.acquisition.exposureMs * state.acquisition.frameAverage;
     const speed = 1000 / Math.max(1, dwellMs) * state.acquisition.scanSpeed;
     const pixelSize = state.acquisition.binning;
     const progress = ((this.scanY * this.width + this.scanX) / (this.width * this.height)) * 100;
-    const detail = clamp(1 - (pixelSize - 1) / 7 - state.acquisition.drift / 120, 0.05, 1);
+    const stepLoss = clamp((state.acquisition.stepSize - 0.05) / 1.1, 0, 0.75);
+    const detail = clamp(1 - (pixelSize - 1) / 7 - state.acquisition.drift / 120 - stepLoss * 0.28, 0.05, 1);
     const speedScore = clamp(speed / 120, 0.05, 1);
     const falseBandRisk = state.acquisition.bandDetection > 85 ? (state.acquisition.bandDetection - 85) / 80 : 0;
     const thresholdRisk = state.acquisition.indexingThreshold > quality * 100 ? 0.24 : 0;
     const risk = clamp(clipping * 0.7 + (1 - quality) * 0.35 + state.acquisition.drift / 120 + falseBandRisk + thresholdRisk, 0.02, 1);
-    const indexRate = clamp(quality + (state.acquisition.bandDetection - 65) / 160 - (state.acquisition.indexingThreshold - 42) / 120, 0.02, 0.99);
+    const indexModeBoost = state.acquisition.indexingMode === 'dictionary' ? 0.06 : state.acquisition.indexingMode === 'manual' ? -0.18 : 0;
+    const autoIndexPenalty = state.acquisition.autoIndex ? 0 : 0.42;
+    const indexRate = clamp(quality + (state.acquisition.bandDetection - 65) / 160 - (state.acquisition.indexingThreshold - 42) / 120 + indexModeBoost - autoIndexPenalty, 0.02, 0.99);
+    const noise = clamp((1 - quality) * 100 + (state.acquisition.exposureMs < 12 ? 16 : 0), 0, 100);
+    const saturation = clamp(clipping * 100, 0, 100);
+    const sharpness = clamp(quality * 112 - (pixelSize - 1) * 5 - saturation * 0.35, 0, 100);
     return {
       quality: Math.round(quality * 100),
       speed: `${speed.toFixed(1)} px/ms`,
       resolution: `${Math.round(this.width / pixelSize)} x ${Math.round(this.height / pixelSize)}`,
       progress: `${Math.floor(progress)}%`,
       pixel: `${this.scanX}, ${this.scanY}`,
-      patternPixel: this.displayPatternPixel,
-      grain: `grain ${displayed.grainIndex + 1}`,
-      patternSource: this.patterns[displayed.patternIndex].name,
+      grain: current.pattern?.grainLabel ?? `grain ${current.grainIndex + 1}`,
+      patternLabel: current.pattern?.label ?? 'Fallback schematic pattern',
+      patternSource: patternLibrary.sourceLabel(),
       dwell: `${dwellMs} ms`,
       indexRate: `${Math.round(indexRate * 100)}%`,
+      scaleBar: `${Math.max(1, Math.round(state.acquisition.stepSize * 40))} um`,
+      pattern: {
+        noise: Math.round(noise),
+        saturation: Math.round(saturation),
+        sharpness: Math.round(sharpness)
+      },
       scores: {
         signal: Math.round(quality * 100),
         detail: Math.round(detail * 100),
