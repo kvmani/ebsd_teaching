@@ -1,156 +1,149 @@
-# EBSD Teaching Simulation
+# EBSD Teaching Studio
 
-An interactive 3D web-based teaching tool for understanding Electron Backscatter Diffraction (EBSD) principles through schematic simulations.
+An offline-first, browser-based learning studio for teaching Electron Backscatter Diffraction (EBSD) concepts through clear schematic visualization, guided activities, and classroom-ready resources.
 
-## Overview
+This is a conceptual teaching simulator, not validated EBSD software. It is designed to help students reason about geometry, Kikuchi patterns, scan quality, and common acquisition trade-offs. It should not be used for quantitative indexing, phase identification, detector calibration, or research-grade EBSD analysis.
 
-This repository contains a pedagogical simulation that visualizes the core concepts of EBSD:
+## What It Teaches
 
-- **Electron beam interaction** with a tilted crystalline sample
-- **Bragg cone formation** from crystal lattice planes
-- **Kikuchi pattern generation** on an EBSD detector
-- **Dynamic visualization** of how crystal orientation affects detector patterns
-
-The simulation prioritizes **conceptual clarity and educational value** over physical accuracy. It uses schematic geometry and simplified physics to help students intuitively grasp EBSD fundamentals.
+- EBSD geometry: 70° sample tilt, 20° beam-sample-plane angle, detector facing the tilted sample, and the role of the interaction volume.
+- Bragg law, electron wavelength, schematic Kikuchi cone formation, and cone intersections with the detector.
+- Pattern center and detector calibration as conceptual influences on indexing.
+- Hough band detection, indexing confidence, pattern quality, MAD/fit, CI, and common failure modes.
+- Acquisition trade-offs among gain, exposure, binning, beam current, frame averaging, scan speed, step size, drift, and thresholding.
+- IPF maps, confidence maps, pattern quality maps, grain boundaries, unindexed pixels, pseudosymmetry, and phase-selection ambiguity such as Cu/Ni-like FCC cases.
 
 ## Key Features
 
-- **Interactive 3D Scene**: Orbit, zoom, and explore the SEM/EBSD geometry
-- **Live Detector Pattern**: Watch Kikuchi bands form in real-time as you rotate the crystal
-- **Guided Explanation Mode**: 6-stage walkthrough covering electron wavelength, Bragg diffraction, cone geometry, and band formation
-- **Manual Control Mode**: Adjust voltage, sample tilt, crystal orientation, and detector distance
-- **Educational Annotations**: Clear labels for physical concepts at each stage
+- Three preserved studio tabs: Geometry + Pattern, Live Scan Acquisition, and Learning Path.
+- Real local Kikuchi image support from `public/kikuchi-patterns`, with graceful schematic fallback when image assets are missing.
+- Interactive Three.js EBSD geometry with guided stages, sample/detector controls, cone magnification, crystal orientation, labels, detector noise, contrast, and pattern inversion.
+- Live scan acquisition trainer with map modes, pause/resume, reset, warning badges, presets, beginner/advanced controls, diagnosis activity, quality checklist, and named scenario save/restore in localStorage.
+- Learning Path modules with quizzes, hints, flashcards, bookmarks, notes, guided demos, expected observations, and reflection prompts.
+- Top-bar tools for Notes, Screenshot, offline Resource Export, Glossary, Help, and scene reset.
+- Offline HTML/text exports for worksheets, lesson cards, formula sheets, practice questions, preset references, and teacher demo plans.
+
+## Local Kikuchi Images
+
+Place curated teaching images in:
+
+```text
+public/kikuchi-patterns
+```
+
+The app preloads the local pattern catalog and reports whether the current view is using a real local Kikuchi image or the fallback schematic pattern. Keep image files small enough for classroom laptops and document sources in `public/kikuchi-patterns/README.md` when adding new assets.
 
 ## Project Structure
 
-```
+```text
 .
-├── index.html              # Main HTML entry point
-├── package.json            # Dependencies (Three.js, Vite)
-├── src/
-│   ├── main.js            # App initialization and UI event handling
-│   ├── scene.js           # 3D scene rendering (beam, sample, cones, detector)
-│   ├── detector.js        # 2D detector pattern visualization
-│   ├── state.js           # Simulation state and physical constants
-│   └── styles.css         # UI styling
+|-- index.html
+|-- package.json
+|-- public/
+|   `-- kikuchi-patterns/
+|-- src/
+|   |-- acquisition.js
+|   |-- detector.js
+|   |-- learningPath.js
+|   |-- learningProgress.js
+|   |-- main.js
+|   |-- patternLibrary.js
+|   |-- scene.js
+|   |-- state.js
+|   |-- styles.css
+|   `-- data/
+|       |-- formulas.js
+|       |-- glossary.js
+|       |-- kikuchiPatterns.js
+|       `-- learningModules.js
 ```
 
-## Installation & Setup
+## Setup
 
-### Prerequisites
-- Node.js 16+
-- npm or yarn
+Prerequisites:
 
-### Steps
+- Node.js 16 or newer
+- npm
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/ebsd-teaching-simulation.git
-   cd ebsd-teaching-simulation
-   ```
+Install dependencies:
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-   Open your browser to `http://127.0.0.1:5173` (or the address shown in terminal)
+Run the development server:
 
-4. Build for production:
-   ```bash
-   npm run build
-   ```
+```bash
+npm run dev
+```
 
-## Usage
+Open the URL printed by Vite, usually:
 
-### Guided Mode
-Click **Previous/Next** buttons to step through six stages of EBSD formation:
-1. Electron wavelength and Bragg's law
-2. Crystal planes and Bragg angles
-3. Bragg cones from diffraction
-4. Cone intersection with detector plane
-5. Kikuchi band formation
-6. Full pattern with all orientations visible
+```text
+http://127.0.0.1:5173
+```
 
-### Manual Exploration Mode
-Use sliders to control:
-- **Voltage**: Accelerating voltage (affects electron wavelength)
-- **Tilt**: Sample tilt angle relative to detector
-- **Rotation (Rx, Ry, Rz)**: Crystal orientation
-- **Detector Distance**: Distance to EBSD detector
+Build for production:
 
-Watch how the detector pattern changes as you adjust each parameter.
+```bash
+npm run build
+```
 
-## Important Note
+On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd install`, `npm.cmd run dev`, and `npm.cmd run build`.
 
-⚠️ **This is a pedagogical schematic simulation**, not a validated physics simulation. Its purpose is to teach EBSD concepts visually and intuitively. The geometry and calculations are simplified for clarity, not computational accuracy.
+## Classroom Use
 
-## Technology Stack
+1. Start with Geometry + Pattern to show the beam, tilted sample, detector, enlarged teaching cones, and Kikuchi band formation.
+2. Move to Live Scan Acquisition to demonstrate how acquisition parameters influence pattern quality, confidence, unindexed pixels, and map stability.
+3. Use Learning Path for guided modules, quizzes, notes, flashcards, bookmarks, and mini experiments that jump into the relevant tab with presets applied.
+4. Use Resource Export to generate offline handouts or worksheets, and Screenshot to capture the current visible teaching state.
 
-- **Three.js**: 3D visualization
-- **Vite**: Fast build tool and dev server
-- **Vanilla JavaScript**: No framework dependencies
+## Conceptual Simplifications
 
-## Contributing
+- Kikuchi cones are enlarged for teaching clarity and are not a full dynamical electron diffraction model.
+- Detector bands are schematic projections intended to explain how cone intersections become bands.
+- Acquisition quality, confidence, drift, saturation, and threshold effects are qualitative classroom models.
+- IPF maps and grain boundaries are synthetic visuals, not measured microstructure.
+- Hough/dictionary/manual indexing controls are conceptual comparisons, not actual indexing engines.
 
-Contributions are welcome! Please ensure any changes:
-- Maintain pedagogical clarity and simplicity
-- Include clear comments explaining conceptual mappings
-- Preserve the schematic nature (don't add unvalidated physics complexity)
-- Test both guided and manual modes
+## Performance Notes
+
+The production build may report a large Vite chunk warning because Three.js and the learning studio ship together for offline classroom use. This is acceptable for the current app. Future code-splitting may be useful if the studio grows substantially, but it is not necessary for the present teaching workflow.
+
+## Development Guidelines
+
+- Preserve the three-tab structure and existing localStorage behavior.
+- Preserve real local Kikuchi image support and the schematic fallback.
+- Keep new features directly useful for EBSD teaching.
+- Prefer clear pedagogical comments over unvalidated physics complexity.
+- Test geometry controls, acquisition controls, learning progress, notes, glossary, screenshots, exports, and responsive layouts before release.
+
+## Repository
+
+Clone:
+
+```bash
+git clone https://github.com/kvmani/ebsd_teaching.git
+```
+
+Use GitHub Issues or Discussions on the repository for questions, classroom feedback, and future feature requests.
 
 ## License
 
-[Add your chosen license here, e.g., MIT, CC-BY-4.0]
-
-## References
-
-Educational references on EBSD:
-- Electron Backscatter Diffraction (EBSD) principles and crystal orientation mapping
-- Bragg's Law and X-ray/electron diffraction basics
-- SEM sample geometry and tilting conventions
-
-## Contact
-
-[Add contact or discussion info]
-
----
-
-**Last Updated**: April 2026  
-**Educational Purpose**: Understanding EBSD through interactive 3D visualization
+No license file is currently included. Add a license before public redistribution or reuse outside the project owner's intended classroom setting.
 
 ## Audit Report - May 2026
 
-This project is a conceptual teaching simulator, not validated EBSD software. It is designed for offline classroom learning, not research-grade phase indexing, detector calibration, or quantitative EBSD analysis.
+Implemented and verified:
 
-### Implemented learning-studio features
+- Notes, glossary, screenshot, export/resource view, help, reset, progress, bookmarks, local notes, guided demos, presets, warning badges, scenario save/restore, and offline fallback behavior.
+- EBSD teaching modules covering geometry, interaction volume, Bragg law, band formation, pattern center, indexing, confidence, acquisition trade-offs, sample preparation, phase ambiguity, pseudosymmetry, IPF maps, grain boundaries, and troubleshooting.
+- Responsive layout checks for desktop, laptop, tablet, and narrow mobile widths.
 
-- Three-tab studio preserved: Geometry + Pattern, Live Scan Acquisition, and Learning Path.
-- Real local Kikuchi image support preserved under `public/kikuchi-patterns`, with graceful schematic fallback when images are missing.
-- Top-bar Notes modal reads existing Learning Path localStorage notes, observations, and bookmarks, with copy and text export.
-- Top-bar Screenshot exports the active teaching canvas as PNG where possible.
-- Resource View, Print, and Export now generate offline HTML handouts for worksheets, lesson cards, formula sheets, practice questions, preset references, and teacher demo plans.
-- Top-bar Glossary opens a searchable offline EBSD glossary.
-- Learning Path guided demos jump into the relevant tab, apply a preset, and prompt prediction, expected observation, and "what changed?" reflection.
-- Acquisition now includes warning badges, beginner/advanced controls, teaching-default reset, one-click presets, pattern-quality checklist, diagnosis activity, and named scenario save/restore in localStorage.
-- Learning modules include concise advanced-but-safe subcards for calibration, phase selection, pseudosymmetry, FCC Cu/Ni-like ambiguity, binning/exposure/gain, step size, confidence, grain boundaries, and IPF color interpretation.
-
-### Known conceptual simplifications
-
-- Bragg/Kossel cones are schematic and visually magnified so students can see the geometry.
-- Detector pattern generation is a teaching projection, not dynamical electron diffraction.
-- Acquisition quality, confidence, drift, threshold, and map effects are qualitative models.
-- IPF maps and grain boundaries are synthetic teaching visuals, not measured microstructure.
-- Hough/dictionary/manual indexing options are conceptual comparisons, not actual indexing engines.
-
-### Future ideas
+Known future ideas:
 
 - Optional instructor-authored lesson packs.
-- More curated public-domain real Kikuchi images with source notes.
-- A printable lab worksheet sequence by course week.
+- More curated real Kikuchi images with source notes.
+- A printable multi-week lab worksheet sequence.
 - Import/export of complete classroom scenario bundles.
-- A calibration-focused activity using a deliberately wrong pattern center.
+- A calibration activity using an intentionally wrong pattern center.

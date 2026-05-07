@@ -750,7 +750,7 @@ export class LearningPath {
           <ol>
             <li>sin(theta) = 0.0086 / (2 x 0.120)</li>
             <li>sin(theta) = 0.0358</li>
-            <li>theta is about 2.05 deg</li>
+            <li>theta is about 2.05°</li>
           </ol>
           <small>Teaching note: the app magnifies cone angles so beginners can see the geometry.</small>
         </article>
@@ -1258,9 +1258,9 @@ export class LearningPath {
       this.formulaPanel.querySelector('#formulaResult').innerHTML = `
         <b>${wavelengthPm.toFixed(2)} pm (${wavelengthNm.toFixed(4)} nm)</b>
         <span>electron wavelength</span>
-        <b>${thetaDeg.toFixed(2)} deg</b>
+        <b>${thetaDeg.toFixed(2)}°</b>
         <span>Bragg angle theta</span>
-        <b>${conceptualBandWidth.toFixed(2)} deg</b>
+        <b>${conceptualBandWidth.toFixed(2)}°</b>
         <span>conceptual band-width idea</span>
         <p>Higher accelerating voltage gives shorter electron wavelength. Smaller d-spacing increases theta for the same voltage.</p>
       `;

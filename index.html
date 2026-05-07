@@ -54,7 +54,7 @@
           <div class="annotation numbered-label" id="annPlanes"><b>4</b> Crystal planes {hkl}</div>
           <div class="annotation numbered-label" id="annCones"><b>5</b> Bragg/Kikuchi cones</div>
           <div class="annotation numbered-label" id="annDetector"><b>6</b> Detector/phosphor screen</div>
-          <div class="annotation" id="annSample">Sample surface: 70 deg from -X axis</div>
+          <div class="annotation" id="annSample">Sample surface: 70° from -X axis</div>
           <canvas id="scene"></canvas>
         </section>
 
@@ -109,7 +109,7 @@
             <summary>Geometry</summary>
             <p class="control-note">Geometry controls change where diffracted directions meet the detector; they do not make the model physically validated.</p>
             <label class="slider-row">
-              <span>Sample tilt <output class="value" id="tiltValue">70 deg</output></span>
+              <span>Sample tilt <output class="value" id="tiltValue">70°</output></span>
               <input id="tilt" type="range" min="0" max="80" step="1" value="70" />
             </label>
             <label class="slider-row">
@@ -130,15 +130,15 @@
             <summary>Crystal Orientation</summary>
             <p class="control-note">Rotating the crystal moves bands because the lattice-plane normals rotate relative to the detector.</p>
             <label class="slider-row">
-              <span>Rotate X <output class="value" id="rxValue">0 deg</output></span>
+              <span>Rotate X <output class="value" id="rxValue">0°</output></span>
               <input id="rx" type="range" min="-45" max="45" step="1" value="0" />
             </label>
             <label class="slider-row">
-              <span>Rotate Y <output class="value" id="ryValue">0 deg</output></span>
+              <span>Rotate Y <output class="value" id="ryValue">0°</output></span>
               <input id="ry" type="range" min="-45" max="45" step="1" value="0" />
             </label>
             <label class="slider-row">
-              <span>Rotate Z <output class="value" id="rzValue">0 deg</output></span>
+              <span>Rotate Z <output class="value" id="rzValue">0°</output></span>
               <input id="rz" type="range" min="-70" max="70" step="1" value="0" />
             </label>
           </details>
@@ -171,8 +171,8 @@
             <h3>Readout</h3>
             <div class="readout">
               <div class="metric"><b id="lambdaValue">8.59 pm</b><span>electron wavelength</span></div>
-              <div class="metric"><b id="thetaValue">1.23 deg</b><span>example Bragg angle</span></div>
-              <div class="metric"><b id="bandValue">2.46 deg</b><span>approx. band width</span></div>
+              <div class="metric"><b id="thetaValue">1.23°</b><span>example Bragg angle</span></div>
+              <div class="metric"><b id="bandValue">2.46°</b><span>approx. band width</span></div>
               <div class="metric"><b id="modeValue">All visible</b><span>current stage</span></div>
             </div>
           </section>
@@ -186,7 +186,7 @@
             </label>
             <div class="readout mini-readout">
               <div class="metric"><b id="miniLambdaValue">8.59 pm</b><span>from current voltage</span></div>
-              <div class="metric"><b id="miniThetaValue">2.05 deg</b><span>Bragg angle theta</span></div>
+              <div class="metric"><b id="miniThetaValue">2.05°</b><span>Bragg angle theta</span></div>
             </div>
           </section>
         </aside>
@@ -350,10 +350,10 @@
             </label>
           </section>
 
-          <section class="control-group advanced-control">
+          <section class="control-group">
             <h3>Indexing + Views</h3>
-            <p class="control-note">Band detection and thresholds teach decision quality: stricter settings reject more doubtful pixels.</p>
-            <label class="select-row">
+            <p class="control-note advanced-control">Band detection and thresholds teach decision quality: stricter settings reject more doubtful pixels.</p>
+            <label class="select-row advanced-control">
               <span>Indexing mode</span>
               <select id="indexingMode">
                 <option value="hough">Hough bands</option>
@@ -361,15 +361,15 @@
                 <option value="manual">Manual teaching</option>
               </select>
             </label>
-            <label class="slider-row">
+            <label class="slider-row advanced-control">
               <span>Band detection <output class="value" id="bandDetectionValue">65%</output></span>
               <input id="bandDetection" type="range" min="20" max="100" step="5" value="65" />
             </label>
-            <label class="slider-row">
+            <label class="slider-row advanced-control">
               <span>Index threshold <output class="value" id="indexingThresholdValue">42%</output></span>
               <input id="indexingThreshold" type="range" min="20" max="85" step="5" value="42" />
             </label>
-            <label class="select-row">
+            <label class="select-row advanced-control">
               <span>Quality overlay</span>
               <select id="qualityOverlay">
                 <option value="none">None</option>
@@ -378,7 +378,7 @@
                 <option value="boundaries">Grain boundaries</option>
               </select>
             </label>
-            <label class="select-row">
+            <label class="select-row advanced-control">
               <span>Map update</span>
               <select id="mapUpdate">
                 <option value="live">Live as acquired</option>
@@ -386,7 +386,7 @@
                 <option value="complete">After scan complete</option>
               </select>
             </label>
-            <div class="checks">
+            <div class="checks advanced-control">
               <label><input id="autoIndex" type="checkbox" checked /> Auto-index</label>
               <label><input id="confirmLowConfidence" type="checkbox" /> Confirm low confidence</label>
             </div>

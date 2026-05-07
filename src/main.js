@@ -35,12 +35,12 @@ const SATURATED_PATTERN_PRESET = { gain: 2.8, binning: 1, exposureMs: 22, beamCu
 const DRIFT_MAP_PRESET = { gain: 1.1, binning: 2, exposureMs: 42, beamCurrent: 55, frameAverage: 3, scanSpeed: 0.75, stepSize: 0.25, drift: 55, bandDetection: 65, indexingThreshold: 45, indexingMode: 'hough', qualityOverlay: 'boundaries', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
 
 function deg(value) {
-  return `${value} deg`;
+  return `${value}°`;
 }
 
 function updateReadouts() {
   qs('tiltValue').textContent = deg(state.tilt);
-  qs('annSample').textContent = `Sample surface: ${state.tilt} deg from -X axis`;
+  qs('annSample').textContent = `Sample surface: ${state.tilt}° from -X axis`;
   qs('distanceValue').textContent = state.distance.toFixed(1);
   qs('detectorHeightValue').textContent = state.detectorHeight.toFixed(2);
   qs('voltageValue').textContent = `${state.voltage} kV`;
@@ -54,8 +54,8 @@ function updateReadouts() {
   const lambda = electronWavelengthPm(state.voltage);
   const theta = braggThetaDeg(state.voltage, planes[0].d);
   qs('lambdaValue').textContent = `${lambda.toFixed(2)} pm`;
-  qs('thetaValue').textContent = `${theta.toFixed(2)} deg`;
-  qs('bandValue').textContent = `${(2 * theta).toFixed(2)} deg`;
+  qs('thetaValue').textContent = `${theta.toFixed(2)}°`;
+  qs('bandValue').textContent = `${(2 * theta).toFixed(2)}°`;
   qs('modeValue').textContent = state.stage === 6 ? 'All visible' : `Stage ${state.stage}`;
 
   const stage = stages[state.stage - 1];
@@ -79,7 +79,7 @@ function updateMiniFormula() {
   const theta = braggThetaDeg(state.voltage, dNm);
   qs('miniSpacingValue').textContent = `${dNm.toFixed(3)} nm`;
   qs('miniLambdaValue').textContent = `${lambda.toFixed(2)} pm`;
-  qs('miniThetaValue').textContent = `${theta.toFixed(2)} deg`;
+  qs('miniThetaValue').textContent = `${theta.toFixed(2)}°`;
 }
 
 function updateAll() {
@@ -973,12 +973,35 @@ qs('exportNotesButton').addEventListener('click', () => {
 qs('topGlossarySearch').addEventListener('input', renderTopGlossary);
 
 const helpKey = 'ebsdTeachingStudio.helpDismissed.v1';
-qs('helpButton').addEventListener('click', () => qs('helpOverlay').showModal());
+let helpInteractionStarted = false;
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  const openDialogs = Array.from(document.querySelectorAll('dialog[open]'));
+  if (!openDialogs.length) return;
+  event.preventDefault();
+  openDialogs.at(-1).close();
+});
+
+qs('helpButton').addEventListener('click', () => {
+  helpInteractionStarted = true;
+  if (!qs('helpOverlay').open) qs('helpOverlay').showModal();
+});
+qs('helpOverlay').addEventListener('close', () => {
+  helpInteractionStarted = true;
+});
+qs('helpOverlay').addEventListener('cancel', () => {
+  helpInteractionStarted = true;
+});
 qs('dontShowHelpAgain').addEventListener('change', (event) => {
   localStorage.setItem(helpKey, event.target.checked ? 'true' : 'false');
 });
 if (localStorage.getItem(helpKey) !== 'true') {
-  window.setTimeout(() => qs('helpOverlay').showModal(), 600);
+  window.setTimeout(() => {
+    if (helpInteractionStarted || localStorage.getItem(helpKey) === 'true') return;
+    if (document.querySelector('dialog[open]')) return;
+    qs('helpOverlay').showModal();
+  }, 900);
 }
 
 qs('nextStage').addEventListener('click', () => {

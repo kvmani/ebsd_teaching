@@ -425,7 +425,7 @@ export class EbsdScene {
   }
 
   updateTiltLabel() {
-    const text = `${Math.round(state.tilt)} deg from -X`;
+    const text = `${Math.round(state.tilt)}° from -X`;
     if (this.lastTiltLabelText === text) return;
     this.lastTiltLabelText = text;
 

@@ -29,7 +29,7 @@ export class AcquisitionRenderer {
     this.scanCanvas = scanCanvas;
     this.scanContext = scanCanvas.getContext('2d', { willReadFrequently: true });
     this.patternCanvas = patternCanvas;
-    this.patternContext = patternCanvas.getContext('2d');
+    this.patternContext = patternCanvas.getContext('2d', { willReadFrequently: true });
     this.width = scanCanvas.width;
     this.height = scanCanvas.height;
     this.scanX = 0;
