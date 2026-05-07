@@ -1,9 +1,11 @@
 import './styles.css';
+import { glossaryTerms } from './data/glossary.js';
 import { AcquisitionRenderer } from './acquisition.js';
 import { formulaReference } from './data/formulas.js';
 import { learningModules } from './data/learningModules.js';
 import { DetectorRenderer, detectorCaption } from './detector.js';
 import { LearningPath } from './learningPath.js';
+import { loadLearningProgress } from './learningProgress.js';
 import { EbsdScene } from './scene.js';
 import { braggThetaDeg, electronWavelengthPm, planes, stages, state } from './state.js';
 
@@ -22,6 +24,15 @@ const learningPath = new LearningPath({
 let playAccum = 0;
 let last = performance.now();
 let activeView = 'geometry';
+let currentResourceAction = 'worksheet-view';
+let controlLevel = localStorage.getItem('ebsdTeachingStudio.controlLevel.v1') || 'beginner';
+
+const TEACHING_DEFAULT_ACQUISITION = { gain: 1.2, binning: 2, exposureMs: 28, beamCurrent: 55, frameAverage: 2, scanSpeed: 1.0, stepSize: 0.25, drift: 0, bandDetection: 65, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
+const HIGH_QUALITY_PRESET = { gain: 1.0, binning: 2, exposureMs: 80, beamCurrent: 60, frameAverage: 5, scanSpeed: 0.55, stepSize: 0.12, drift: 5, bandDetection: 58, indexingThreshold: 55, indexingMode: 'dictionary', qualityOverlay: 'confidence', mapUpdate: 'line', autoIndex: true, confirmLowConfidence: true, backgroundCorrection: true };
+const FAST_SURVEY_PRESET = { gain: 1.8, binning: 4, exposureMs: 10, beamCurrent: 70, frameAverage: 1, scanSpeed: 1.8, stepSize: 0.55, drift: 8, bandDetection: 72, indexingThreshold: 36, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
+const NOISY_PATTERN_PRESET = { gain: 1.4, binning: 1, exposureMs: 6, beamCurrent: 25, frameAverage: 1, scanSpeed: 1.7, stepSize: 0.35, drift: 0, bandDetection: 55, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'unindexed', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
+const SATURATED_PATTERN_PRESET = { gain: 2.8, binning: 1, exposureMs: 22, beamCurrent: 95, frameAverage: 1, scanSpeed: 1.1, stepSize: 0.25, drift: 0, bandDetection: 80, indexingThreshold: 52, indexingMode: 'hough', qualityOverlay: 'confidence', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: false };
+const DRIFT_MAP_PRESET = { gain: 1.1, binning: 2, exposureMs: 42, beamCurrent: 55, frameAverage: 3, scanSpeed: 0.75, stepSize: 0.25, drift: 55, bandDetection: 65, indexingThreshold: 45, indexingMode: 'hough', qualityOverlay: 'boundaries', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
 
 function deg(value) {
   return `${value} deg`;
@@ -57,6 +68,18 @@ function updateReadouts() {
   qs('explainText').textContent = stage.text;
   qs('patternCaption').textContent = detectorCaption();
   qs('playStage').textContent = state.playing ? 'Pause' : 'Play';
+  updateMiniFormula();
+}
+
+function updateMiniFormula() {
+  const spacingInput = qs('miniDSpacing');
+  if (!spacingInput) return;
+  const dNm = Number(spacingInput.value);
+  const lambda = electronWavelengthPm(state.voltage);
+  const theta = braggThetaDeg(state.voltage, dNm);
+  qs('miniSpacingValue').textContent = `${dNm.toFixed(3)} nm`;
+  qs('miniLambdaValue').textContent = `${lambda.toFixed(2)} pm`;
+  qs('miniThetaValue').textContent = `${theta.toFixed(2)} deg`;
 }
 
 function updateAll() {
@@ -134,6 +157,9 @@ function updateAcquisitionReadouts() {
   qs('parameterStory').textContent = acquisitionStory();
   updateCoach(metrics);
   updateMapModeButtons();
+  updateWarningBadges(metrics);
+  updateQualityChecklist(metrics);
+  updateDiagnosis();
 }
 
 function setBar(id, value, invert = false) {
@@ -270,6 +296,81 @@ function setAcquisitionPreset(values) {
   updateAcquisitionReadouts();
 }
 
+const scenarioKey = 'ebsdTeachingStudio.scenarios.v1';
+
+function loadScenarios() {
+  try {
+    return JSON.parse(localStorage.getItem(scenarioKey) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveScenarios(scenarios) {
+  localStorage.setItem(scenarioKey, JSON.stringify(scenarios));
+}
+
+function currentScenarioPayload(name) {
+  return {
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    name,
+    savedAt: new Date().toISOString(),
+    geometry: {
+      stage: state.stage,
+      tilt: state.tilt,
+      distance: state.distance,
+      detectorHeight: state.detectorHeight,
+      voltage: state.voltage,
+      rx: state.rx,
+      ry: state.ry,
+      rz: state.rz,
+      coneScale: state.coneScale,
+      planeCount: state.planeCount,
+      patternContrast: state.patternContrast,
+      invertPattern: state.invertPattern
+    },
+    acquisition: { ...state.acquisition }
+  };
+}
+
+function renderScenarioSelect() {
+  const scenarios = loadScenarios();
+  qs('scenarioSelect').innerHTML = scenarios.length
+    ? scenarios.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join('')
+    : '<option value="">No saved scenarios</option>';
+}
+
+function applyGeometryValues(values = {}) {
+  Object.assign(state, values);
+  ['stage', 'tilt', 'distance', 'detectorHeight', 'voltage', 'rx', 'ry', 'rz', 'coneScale', 'planeCount', 'patternContrast'].forEach((id) => {
+    if (values[id] !== undefined) qs(id).value = state[id];
+  });
+  ['invertPattern'].forEach((id) => {
+    if (values[id] !== undefined) qs(id).checked = state[id];
+  });
+  updateAll();
+}
+
+function saveCurrentScenario() {
+  const name = qs('scenarioName').value.trim() || 'EBSD teaching scenario';
+  const scenarios = loadScenarios().filter((item) => item.name !== name);
+  scenarios.unshift(currentScenarioPayload(name));
+  saveScenarios(scenarios.slice(0, 12));
+  renderScenarioSelect();
+  qs('explainTitle').textContent = 'Scenario saved';
+  qs('explainText').textContent = `"${name}" is stored in this browser localStorage for offline classroom reuse.`;
+}
+
+function restoreSelectedScenario() {
+  const scenario = loadScenarios().find((item) => item.id === qs('scenarioSelect').value);
+  if (!scenario) return;
+  applyGeometryValues(scenario.geometry);
+  setAcquisitionPreset(scenario.acquisition);
+  qs('scenarioName').value = scenario.name;
+  qs('explainTitle').textContent = 'Scenario restored';
+  qs('explainText').textContent = `"${scenario.name}" restored geometry and acquisition controls from localStorage.`;
+}
+
 function setMapMode(mode) {
   state.acquisition.mapMode = mode;
   acquisition.reset();
@@ -285,6 +386,51 @@ function updateMapModeButtons() {
   ].forEach(([id, mode]) => {
     qs(id).classList.toggle('active', state.acquisition.mapMode === mode);
   });
+}
+
+function updateWarningBadges(metrics) {
+  const badges = [];
+  if (metrics.pattern.saturation > 10 || metrics.warning === 'gain clipping') badges.push(['risk of saturation', 'Lower gain first.']);
+  if (metrics.pattern.noise > 50 || metrics.warning === 'noisy indexing') badges.push(['low signal', 'Add exposure, current, or averaging.']);
+  if (state.acquisition.binning >= 4 || state.acquisition.stepSize >= 0.55) badges.push(['coarse spatial sampling', 'Reduce binning or step size for fine grains.']);
+  if (state.acquisition.drift > 30) badges.push(['drift risk', 'Stabilize or scan faster.']);
+  if (state.acquisition.indexingThreshold > metrics.quality) badges.push(['strict threshold', 'Improve signal or lower threshold for exploration.']);
+  if (!badges.length) badges.push(['teaching default healthy', 'Balanced signal, detail, and speed.']);
+  qs('warningBadges').innerHTML = badges.map(([label, title]) => `<span title="${escapeHtml(title)}">${escapeHtml(label)}</span>`).join('');
+}
+
+function updateQualityChecklist(metrics) {
+  const items = [
+    ['sharp bands', metrics.pattern.sharpness >= 55, 'Raise exposure/current or reduce binning if bands are blurred.'],
+    ['no clipping', metrics.pattern.saturation <= 8, 'Lower gain before increasing other signal controls.'],
+    ['enough contrast', metrics.quality >= 50, 'Use background correction and enough electrons per pixel.'],
+    ['stable map', state.acquisition.drift <= 25, 'Drift can bend boundaries even with usable patterns.'],
+    ['reasonable threshold', state.acquisition.indexingThreshold <= metrics.quality + 12, 'Thresholds should match the teaching goal and data quality.']
+  ];
+  qs('qualityChecklist').innerHTML = items.map(([label, ok, tip]) => `
+    <div class="${ok ? 'ok' : 'caution'}"><b>${ok ? 'OK' : 'Check'}</b><span>${escapeHtml(label)}</span><small>${escapeHtml(tip)}</small></div>
+  `).join('');
+}
+
+function updateDiagnosis() {
+  const symptom = qs('diagnoseSymptom')?.value || 'noisy';
+  const fixes = {
+    noisy: ['Very noisy pattern', 'Likely low exposure/current or too little averaging.', 'Increase exposure or frame averaging, then compare confidence.'],
+    saturated: ['Bright clipped pattern', 'Likely excessive detector gain or beam current.', 'Reduce gain first; recover signal with exposure only if needed.'],
+    coarse: ['Blocky map detail', 'Likely large binning or step size.', 'Reduce binning or step size when grain-boundary detail matters.'],
+    drift: ['Bent grain boundaries', 'Likely stage drift during acquisition.', 'Stabilize the sample/stage or use a faster survey scan.'],
+    threshold: ['Many rejected pixels', 'Likely threshold stricter than current pattern quality.', 'Improve signal before lowering threshold for final interpretation.']
+  };
+  const [title, cause, fix] = fixes[symptom];
+  qs('diagnoseResult').innerHTML = `<strong>${escapeHtml(title)}</strong><p>${escapeHtml(cause)}</p><p><b>Recommended fix:</b> ${escapeHtml(fix)}</p>`;
+}
+
+function setControlLevel(level) {
+  controlLevel = level;
+  localStorage.setItem('ebsdTeachingStudio.controlLevel.v1', level);
+  document.body.classList.toggle('beginner-mode', level === 'beginner');
+  qs('beginnerMode').classList.toggle('active', level === 'beginner');
+  qs('advancedMode').classList.toggle('active', level === 'advanced');
 }
 
 function setActiveView(view) {
@@ -390,12 +536,12 @@ function handleLearningExperiment(action, context = {}) {
   }
 
   const acquisitionActions = {
-    'open-acquisition-balanced': { gain: 1.2, binning: 2, exposureMs: 28, beamCurrent: 55, frameAverage: 2, scanSpeed: 1.0, stepSize: 0.25, drift: 0, bandDetection: 65, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true },
-    'acquisition-compare-quality': { gain: 1.0, binning: 2, exposureMs: 80, beamCurrent: 60, frameAverage: 5, scanSpeed: 0.55, stepSize: 0.12, drift: 5, bandDetection: 58, indexingThreshold: 55, indexingMode: 'dictionary', qualityOverlay: 'confidence', mapUpdate: 'line', autoIndex: true, confirmLowConfidence: true, backgroundCorrection: true },
-    'acquisition-map-views': { gain: 1.2, binning: 2, exposureMs: 28, beamCurrent: 55, frameAverage: 2, scanSpeed: 1.0, stepSize: 0.25, drift: 0, bandDetection: 65, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'confidence', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true },
-    'acquisition-noisy': { gain: 1.4, binning: 1, exposureMs: 6, beamCurrent: 25, frameAverage: 1, scanSpeed: 1.7, stepSize: 0.35, drift: 0, bandDetection: 55, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'unindexed', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true },
-    'acquisition-clipping': { gain: 2.8, binning: 1, exposureMs: 22, beamCurrent: 95, frameAverage: 1, scanSpeed: 1.1, stepSize: 0.25, drift: 0, bandDetection: 80, indexingThreshold: 52, indexingMode: 'hough', qualityOverlay: 'confidence', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: false },
-    'acquisition-drift': { gain: 1.1, binning: 2, exposureMs: 42, beamCurrent: 55, frameAverage: 3, scanSpeed: 0.75, stepSize: 0.25, drift: 55, bandDetection: 65, indexingThreshold: 45, indexingMode: 'hough', qualityOverlay: 'boundaries', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true }
+    'open-acquisition-balanced': TEACHING_DEFAULT_ACQUISITION,
+    'acquisition-compare-quality': HIGH_QUALITY_PRESET,
+    'acquisition-map-views': { ...TEACHING_DEFAULT_ACQUISITION, qualityOverlay: 'confidence' },
+    'acquisition-noisy': NOISY_PATTERN_PRESET,
+    'acquisition-clipping': SATURATED_PATTERN_PRESET,
+    'acquisition-drift': DRIFT_MAP_PRESET
   };
 
   if (acquisitionActions[action]) {
@@ -423,6 +569,17 @@ bindAcquisitionCheck('backgroundCorrection', 'backgroundCorrection');
 bindAcquisitionCheck('showIndexing', 'showIndexing');
 bindAcquisitionCheck('showScanLine', 'showScanLine');
 bindAcquisitionCheck('liveAcquisition', 'live');
+qs('miniDSpacing').addEventListener('input', updateMiniFormula);
+qs('beginnerMode').addEventListener('click', () => setControlLevel('beginner'));
+qs('advancedMode').addEventListener('click', () => setControlLevel('advanced'));
+qs('diagnoseSymptom').addEventListener('change', updateDiagnosis);
+qs('saveScenario').addEventListener('click', saveCurrentScenario);
+qs('loadScenario').addEventListener('click', restoreSelectedScenario);
+qs('resetAcquisitionDefaults').addEventListener('click', () => {
+  setAcquisitionPreset(TEACHING_DEFAULT_ACQUISITION);
+  qs('explainTitle').textContent = 'Teaching default restored';
+  qs('explainText').textContent = 'Acquisition controls are back to a balanced setup for classroom demonstrations.';
+});
 qs('scanMap').addEventListener('click', toggleLiveAcquisition);
 qs('patternPreview').addEventListener('click', toggleLiveAcquisition);
 qs('scanPauseButton').addEventListener('click', toggleLiveAcquisition);
@@ -451,10 +608,12 @@ qs('resetScan').addEventListener('click', () => {
   acquisition.reset();
   updateAcquisitionReadouts();
 });
-qs('presetFast').addEventListener('click', () => setAcquisitionPreset({ gain: 1.8, binning: 4, exposureMs: 10, beamCurrent: 70, frameAverage: 1, scanSpeed: 1.8, stepSize: 0.55, drift: 8, bandDetection: 72, indexingThreshold: 36, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true }));
-qs('presetBalanced').addEventListener('click', () => setAcquisitionPreset({ gain: 1.2, binning: 2, exposureMs: 28, beamCurrent: 55, frameAverage: 2, scanSpeed: 1.0, stepSize: 0.25, drift: 0, bandDetection: 65, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true }));
-qs('presetHighQuality').addEventListener('click', () => setAcquisitionPreset({ gain: 1.0, binning: 2, exposureMs: 80, beamCurrent: 60, frameAverage: 5, scanSpeed: 0.55, stepSize: 0.12, drift: 5, bandDetection: 58, indexingThreshold: 55, indexingMode: 'dictionary', qualityOverlay: 'confidence', mapUpdate: 'line', autoIndex: true, confirmLowConfidence: true, backgroundCorrection: true }));
-qs('presetBadSetup').addEventListener('click', () => setAcquisitionPreset({ gain: 2.8, binning: 1, exposureMs: 6, beamCurrent: 95, frameAverage: 1, scanSpeed: 1.6, stepSize: 0.8, drift: 45, bandDetection: 95, indexingThreshold: 68, indexingMode: 'hough', qualityOverlay: 'unindexed', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: false }));
+qs('presetFast').addEventListener('click', () => setAcquisitionPreset(FAST_SURVEY_PRESET));
+qs('presetBalanced').addEventListener('click', () => setAcquisitionPreset(TEACHING_DEFAULT_ACQUISITION));
+qs('presetHighQuality').addEventListener('click', () => setAcquisitionPreset(HIGH_QUALITY_PRESET));
+qs('presetNoisy').addEventListener('click', () => setAcquisitionPreset(NOISY_PATTERN_PRESET));
+qs('presetSaturated').addEventListener('click', () => setAcquisitionPreset(SATURATED_PATTERN_PRESET));
+qs('presetDrift').addEventListener('click', () => setAcquisitionPreset(DRIFT_MAP_PRESET));
 qs('modeOrientation').addEventListener('click', () => setMapMode('orientation'));
 qs('modeQuality').addEventListener('click', () => setMapMode('quality'));
 qs('modeConfidence').addEventListener('click', () => setMapMode('confidence'));
@@ -489,12 +648,21 @@ qs('resetScene').addEventListener('click', () => {
   updateAll();
 });
 
-['notesButton', 'screenshotButton', 'exportButton', 'glossaryButton', 'downloadModules'].forEach((id) => {
-  qs(id).addEventListener('click', () => {
-    qs('explainTitle').textContent = 'Offline classroom tool';
-    qs('explainText').textContent = 'This button is a local placeholder for classroom workflows. It does not call a cloud service or require internet access.';
-  });
+qs('notesButton').addEventListener('click', openNotesModal);
+qs('learningNotesShortcut').addEventListener('click', openNotesModal);
+qs('learningBookmarksShortcut').addEventListener('click', () => {
+  openNotesModal('bookmarks');
 });
+qs('learningScenariosShortcut').addEventListener('click', () => {
+  setActiveView('acquisition');
+  qs('scenarioName').focus();
+});
+qs('screenshotButton').addEventListener('click', exportCurrentScreenshot);
+qs('exportButton').addEventListener('click', () => {
+  openResource(activeView === 'learning' ? 'worksheet-view' : 'teacher-view');
+});
+qs('glossaryButton').addEventListener('click', () => openGlossaryModal());
+qs('downloadModules').addEventListener('click', () => exportResource('all-modules-view'));
 
 document.querySelectorAll('.checkpoint-card [data-answer]').forEach((button) => {
   button.addEventListener('click', () => {
@@ -511,6 +679,148 @@ function escapeHtml(value) {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
+}
+
+function slug(value) {
+  return String(value || 'ebsd-resource').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'ebsd-resource';
+}
+
+function downloadBlob(filename, content, type = 'text/plain') {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function downloadCanvas(canvas, filename) {
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }, 'image/png');
+}
+
+function learningSnapshotCanvas() {
+  const module = currentLearningModule();
+  const canvas = document.createElement('canvas');
+  canvas.width = 1280;
+  canvas.height = 720;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0b1117';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#62d7f0';
+  ctx.font = '700 34px Segoe UI, Arial';
+  ctx.fillText('EBSD Teaching Studio', 54, 72);
+  ctx.fillStyle = '#eef6f7';
+  ctx.font = '700 46px Segoe UI, Arial';
+  ctx.fillText(module.title, 54, 145);
+  ctx.fillStyle = '#a9b9bd';
+  ctx.font = '24px Segoe UI, Arial';
+  wrapText(ctx, module.explanation, 54, 205, 1120, 34);
+  ctx.fillStyle = '#e6b55a';
+  ctx.font = '700 26px Segoe UI, Arial';
+  ctx.fillText('Current learning focus', 54, 390);
+  ctx.fillStyle = '#eef6f7';
+  ctx.font = '22px Segoe UI, Arial';
+  module.keyIdeas.slice(0, 5).forEach((idea, index) => ctx.fillText(`- ${idea}`, 78, 440 + index * 38));
+  ctx.fillStyle = '#a9b9bd';
+  ctx.font = '18px Segoe UI, Arial';
+  ctx.fillText('Conceptual teaching simulator, not validated EBSD software.', 54, 680);
+  return canvas;
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = String(text).split(/\s+/);
+  let line = '';
+  words.forEach((word) => {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      ctx.fillText(line, x, y);
+      line = word;
+      y += lineHeight;
+    } else {
+      line = test;
+    }
+  });
+  if (line) ctx.fillText(line, x, y);
+}
+
+function exportCurrentScreenshot() {
+  if (activeView === 'geometry') {
+    downloadCanvas(qs('detector'), 'ebsd-geometry-pattern.png');
+  } else if (activeView === 'acquisition') {
+    downloadCanvas(qs('scanMap'), 'ebsd-acquisition-map.png');
+  } else {
+    downloadCanvas(learningSnapshotCanvas(), 'ebsd-learning-path.png');
+  }
+  qs('explainTitle').textContent = 'Screenshot exported';
+  qs('explainText').textContent = 'A PNG was generated from the current teaching canvas for offline use.';
+}
+
+function notesPlainText(progress = loadLearningProgress()) {
+  const lines = ['EBSD Teaching Studio Notes', 'Conceptual teaching simulator, not validated EBSD software.', ''];
+  learningModules.forEach((module) => {
+    const note = String(progress.notes[module.id] || '').trim();
+    const activities = Object.entries(progress.activityObservations || {}).filter(([key, value]) => key.startsWith(`${module.id}-`) && String(value).trim());
+    if (!note && !activities.length && !progress.bookmarks.includes(module.id)) return;
+    lines.push(`# ${module.title}`);
+    if (progress.bookmarks.includes(module.id)) lines.push('Bookmarked: yes');
+    if (note) lines.push(`Note: ${note}`);
+    activities.forEach(([key, value]) => {
+      lines.push(`Observation (${key}): ${String(value).trim()}`);
+    });
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+
+function openNotesModal(focus = 'notes') {
+  const progress = loadLearningProgress();
+  const text = notesPlainText(progress);
+  const hasContent = text.split('\n').length > 3;
+  qs('notesContent').innerHTML = hasContent
+    ? learningModules.map((module) => {
+        const note = String(progress.notes[module.id] || '').trim();
+        const bookmarked = progress.bookmarks.includes(module.id);
+        const activities = Object.entries(progress.activityObservations || {}).filter(([key, value]) => key.startsWith(`${module.id}-`) && String(value).trim());
+        if (!note && !activities.length && !bookmarked) return '';
+        return `<section><h2>${escapeHtml(module.title)}</h2>${bookmarked ? '<p><b>Bookmarked.</b></p>' : ''}${note ? `<p>${escapeHtml(note)}</p>` : ''}${activities.map(([key, value]) => `<p><b>${escapeHtml(key)}:</b> ${escapeHtml(value)}</p>`).join('')}</section>`;
+      }).join('')
+    : '<p>No saved notes yet. Write module notes or activity observations in Learning Path and they will appear here.</p>';
+  qs('notesPlainText').value = text;
+  qs('notesModal').showModal();
+  if (focus === 'bookmarks') qs('notesContent').scrollTop = 0;
+}
+
+function openGlossaryModal(query = '') {
+  qs('topGlossarySearch').value = query;
+  renderTopGlossary();
+  qs('glossaryModal').showModal();
+}
+
+function renderTopGlossary() {
+  const query = qs('topGlossarySearch').value.toLowerCase();
+  const matches = glossaryTerms.filter((entry) => {
+    return !query || entry.term.toLowerCase().includes(query) || entry.definition.toLowerCase().includes(query) || entry.related.join(' ').toLowerCase().includes(query);
+  });
+  qs('topGlossaryContent').innerHTML = (matches.length ? matches : glossaryTerms).map((entry) => `
+    <article>
+      <strong>${escapeHtml(entry.term)}</strong>
+      <p>${escapeHtml(entry.definition)}</p>
+      <small>Related: ${entry.related.map(escapeHtml).join(', ')}</small>
+    </article>
+  `).join('');
 }
 
 function currentLearningModule() {
@@ -561,7 +871,7 @@ function resourceMarkup(action) {
     return {
       title: 'Sample datasets and presets',
       body: `
-        <section><h2>Local synthetic scan presets</h2><ul><li>Fast survey</li><li>Balanced</li><li>High quality</li><li>Bad setup</li><li>Noisy indexing</li><li>Gain clipping</li><li>Drift visible</li></ul></section>
+        <section><h2>Local synthetic scan presets</h2><ul><li>Fast survey</li><li>Balanced</li><li>High quality slow scan</li><li>Noisy pattern</li><li>Saturated pattern</li><li>Drift-distorted map</li></ul></section>
         <section><h2>Real Kikuchi image folder</h2><p><code>D:\\pythonProjects\\EBSD-Teaching\\public\\kikuchi-patterns</code></p></section>
       `
     };
@@ -574,19 +884,63 @@ function resourceMarkup(action) {
       `).join('')
     };
   }
+  if (action === 'all-modules-view') {
+    return {
+      title: 'Complete offline module pack',
+      body: learningModules.map((item, index) => `
+        <section>
+          <h2>${index + 1}. ${escapeHtml(item.title)}</h2>
+          <p>${escapeHtml(item.explanation)}</p>
+          <p><b>Why this matters:</b> ${escapeHtml(item.whyItMatters)}</p>
+          <p><b>Common mistake:</b> ${escapeHtml(item.misconception)}</p>
+          <ul>${item.keyIdeas.map((idea) => `<li>${escapeHtml(idea)}</li>`).join('')}</ul>
+        </section>
+      `).join('')
+    };
+  }
   return {
-    title: 'Local-only export placeholder',
-    body: '<p>Export packaging is intentionally a placeholder. Use View and Print for an offline classroom handout workflow.</p>'
+    title: 'Offline EBSD teaching export',
+    body: '<p>Select a resource card to view, print, or export a local HTML handout.</p>'
   };
 }
 
 function openResource(action) {
   const resource = resourceMarkup(action);
+  currentResourceAction = action;
   qs('resourceTitle').textContent = resource.title;
   qs('resourceContent').innerHTML = resource.body;
   qs('resourceModal').showModal();
   qs('explainTitle').textContent = 'Offline resource';
   qs('explainText').textContent = 'This resource is generated from local Learning Path content. It does not require internet access.';
+}
+
+function resourceDocument(resource) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(resource.title)}</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; max-width: 900px; margin: 32px auto; line-height: 1.5; color: #142027; }
+    h1 { color: #0b5f73; }
+    section, .print-card { break-inside: avoid; border: 1px solid #d8e4e6; border-radius: 8px; padding: 14px; margin: 12px 0; }
+    .formula { font-family: Consolas, monospace; background: #eef7f8; padding: 10px; border-radius: 6px; }
+    .print-box { min-height: 80px; border: 1px dashed #8ba4aa; border-radius: 6px; margin: 10px 0; padding: 8px; }
+  </style>
+</head>
+<body>
+  <h1>${escapeHtml(resource.title)}</h1>
+  <p><b>EBSD Teaching Studio:</b> conceptual teaching simulator, not validated EBSD software.</p>
+  ${resource.body}
+</body>
+</html>`;
+}
+
+function exportResource(action = currentResourceAction) {
+  const resource = resourceMarkup(action);
+  downloadBlob(`${slug(resource.title)}.html`, resourceDocument(resource), 'text/html');
+  qs('explainTitle').textContent = 'Offline export ready';
+  qs('explainText').textContent = `${resource.title} was exported as a local HTML handout.`;
 }
 
 document.querySelectorAll('[data-resource]').forEach((button) => {
@@ -598,19 +952,25 @@ document.querySelectorAll('[data-resource]').forEach((button) => {
       window.print();
       return;
     }
-    if (action === 'export-placeholder') {
-      openResource(action);
-      return;
-    }
     openResource(action);
   });
 });
 
-qs('printResource').addEventListener('click', () => window.print());
-qs('resourceExportPlaceholder').addEventListener('click', () => {
-  qs('explainTitle').textContent = 'Local export placeholder';
-  qs('explainText').textContent = 'A packaged export can be added later without cloud services. For now, the print view is the offline handout path.';
+document.querySelectorAll('[data-resource-export]').forEach((button) => {
+  button.addEventListener('click', () => exportResource(button.dataset.resourceExport));
 });
+
+qs('printResource').addEventListener('click', () => window.print());
+qs('resourceExportButton').addEventListener('click', () => exportResource(currentResourceAction));
+qs('copyNotesButton').addEventListener('click', async () => {
+  await navigator.clipboard.writeText(qs('notesPlainText').value);
+  qs('explainTitle').textContent = 'Notes copied';
+  qs('explainText').textContent = 'Saved Learning Path notes were copied as plain text.';
+});
+qs('exportNotesButton').addEventListener('click', () => {
+  downloadBlob('ebsd-learning-notes.txt', qs('notesPlainText').value, 'text/plain');
+});
+qs('topGlossarySearch').addEventListener('input', renderTopGlossary);
 
 const helpKey = 'ebsdTeachingStudio.helpDismissed.v1';
 qs('helpButton').addEventListener('click', () => qs('helpOverlay').showModal());
@@ -672,6 +1032,8 @@ function animate(now) {
   requestAnimationFrame(animate);
 }
 
+setControlLevel(controlLevel);
+renderScenarioSelect();
 resize();
 updateAll();
 acquisition.drawPatternPreview();

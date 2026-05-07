@@ -19,10 +19,10 @@
           </div>
         </div>
         <div class="app-actions" aria-label="Local teaching tools">
-          <button id="notesButton" type="button" title="Local notes placeholder">Notes</button>
-          <button id="screenshotButton" type="button" title="Local screenshot placeholder">Screenshot</button>
-          <button id="exportButton" type="button" title="Local export placeholder">Export</button>
-          <button id="glossaryButton" type="button" title="Open offline glossary placeholder">Glossary</button>
+          <button id="notesButton" type="button" title="Open saved local notes">Notes</button>
+          <button id="screenshotButton" type="button" title="Download current teaching canvas">Screenshot</button>
+          <button id="exportButton" type="button" title="Export offline lesson content">Export</button>
+          <button id="glossaryButton" type="button" title="Open offline glossary">Glossary</button>
           <button id="helpButton" type="button" title="Open offline help">Help</button>
           <button id="resetScene" type="button" title="Restore default teaching view">Reset scene</button>
         </div>
@@ -176,6 +176,19 @@
               <div class="metric"><b id="modeValue">All visible</b><span>current stage</span></div>
             </div>
           </section>
+
+          <section class="control-group formula-mini">
+            <h3>Formula mini-calculator</h3>
+            <p class="control-note">Uses the current accelerating voltage and a teaching d-spacing. This supports Bragg-law intuition, not calibrated phase identification.</p>
+            <label class="slider-row">
+              <span>d-spacing <output class="value" id="miniSpacingValue">0.120 nm</output></span>
+              <input id="miniDSpacing" type="range" min="0.06" max="0.30" step="0.005" value="0.120" />
+            </label>
+            <div class="readout mini-readout">
+              <div class="metric"><b id="miniLambdaValue">8.59 pm</b><span>from current voltage</span></div>
+              <div class="metric"><b id="miniThetaValue">2.05 deg</b><span>Bragg angle theta</span></div>
+            </div>
+          </section>
         </aside>
 
         <section class="teaching-card-row" aria-label="Geometry teaching cards">
@@ -285,6 +298,16 @@
             </div>
           </section>
 
+          <section class="control-group acquisition-teaching-tools">
+            <h3>Teaching mode</h3>
+            <div class="segmented-control" role="group" aria-label="Control detail level">
+              <button id="beginnerMode" class="active" type="button">Beginner</button>
+              <button id="advancedMode" type="button">Advanced</button>
+            </div>
+            <div id="warningBadges" class="warning-badges" aria-live="polite"></div>
+            <button id="resetAcquisitionDefaults" class="wide" type="button">Reset to teaching default</button>
+          </section>
+
           <section class="control-group">
             <h3>Detector Signal</h3>
             <p class="control-note">More electrons usually improve signal; too much gain or current clips detail that indexing needs.</p>
@@ -313,7 +336,7 @@
               <span>Binning <output class="value" id="binningValue">2 x 2</output></span>
               <input id="binning" type="range" min="1" max="8" step="1" value="2" />
             </label>
-            <label class="slider-row">
+            <label class="slider-row advanced-control">
               <span>Frame averaging <output class="value" id="frameAverageValue">2 frames</output></span>
               <input id="frameAverage" type="range" min="1" max="8" step="1" value="2" />
             </label>
@@ -321,13 +344,13 @@
               <span>Scan speed <output class="value" id="scanSpeedValue">1.0x</output></span>
               <input id="scanSpeedControl" type="range" min="0.4" max="2.0" step="0.1" value="1.0" />
             </label>
-            <label class="slider-row">
+            <label class="slider-row advanced-control">
               <span>Stage drift <output class="value" id="driftValue">0%</output></span>
               <input id="drift" type="range" min="0" max="70" step="5" value="0" />
             </label>
           </section>
 
-          <section class="control-group">
+          <section class="control-group advanced-control">
             <h3>Indexing + Views</h3>
             <p class="control-note">Band detection and thresholds teach decision quality: stricter settings reject more doubtful pixels.</p>
             <label class="select-row">
@@ -380,7 +403,9 @@
               <button id="presetFast" type="button">Fast survey</button>
               <button id="presetBalanced" type="button">Balanced</button>
               <button id="presetHighQuality" type="button">High quality</button>
-              <button id="presetBadSetup" type="button">Bad setup</button>
+              <button id="presetNoisy" type="button">Noisy pattern</button>
+              <button id="presetSaturated" type="button">Saturated pattern</button>
+              <button id="presetDrift" type="button">Drift map</button>
               <button id="resetScan" class="wide" type="button">Restart scan</button>
             </div>
             <div class="checks">
@@ -388,6 +413,42 @@
               <label><input id="showIndexing" type="checkbox" checked /> Index marks</label>
               <label><input id="showScanLine" type="checkbox" checked /> Scan line</label>
               <label><input id="liveAcquisition" type="checkbox" checked /> Live scan</label>
+            </div>
+          </section>
+
+          <section class="control-group">
+            <h3>Pattern quality checklist</h3>
+            <div id="qualityChecklist" class="quality-checklist"></div>
+          </section>
+
+          <section class="control-group diagnose-panel">
+            <h3>Diagnose this scan</h3>
+            <label class="select-row">
+              <span>Symptom</span>
+              <select id="diagnoseSymptom">
+                <option value="noisy">Noisy weak bands</option>
+                <option value="saturated">Bright clipped pattern</option>
+                <option value="coarse">Blocky map detail</option>
+                <option value="drift">Bent grain boundaries</option>
+                <option value="threshold">Many rejected pixels</option>
+              </select>
+            </label>
+            <div id="diagnoseResult" class="diagnose-result"></div>
+          </section>
+
+          <section class="control-group scenario-panel">
+            <h3>Teaching scenarios</h3>
+            <label class="select-row">
+              <span>Name</span>
+              <input id="scenarioName" type="text" value="My EBSD scenario" />
+            </label>
+            <label class="select-row">
+              <span>Saved</span>
+              <select id="scenarioSelect"></select>
+            </label>
+            <div class="buttons">
+              <button id="saveScenario" type="button">Save scenario</button>
+              <button id="loadScenario" type="button">Restore scenario</button>
             </div>
           </section>
         </aside>
@@ -443,21 +504,21 @@
           <section class="side-card">
             <h2>Classroom tools</h2>
             <div class="tool-grid">
-              <button type="button">Notes</button>
-              <button type="button">Bookmarks</button>
-              <button type="button">Saved experiments</button>
+              <button id="learningNotesShortcut" type="button">Notes</button>
+              <button id="learningBookmarksShortcut" type="button">Bookmarks</button>
+              <button id="learningScenariosShortcut" type="button">Saved scenarios</button>
               <label class="teacher-toggle"><input id="teacherMode" type="checkbox" /> Teacher mode</label>
             </div>
           </section>
         </aside>
 
         <section class="offline-resources" aria-label="Offline resources">
-          <article><span>Worksheet</span><p>Printable classroom prompts stored locally.</p><button data-resource="worksheet-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
-          <article><span>Lesson cards</span><p>Compact EBSD concept cards for revision.</p><button data-resource="lesson-cards-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
-          <article><span>Formula cheat sheet</span><p>Bragg law and wavelength reference.</p><button data-resource="formula-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
-          <article><span>Practice questions</span><p>Local checkpoint questions from the modules.</p><button data-resource="practice-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
-          <article><span>Sample datasets</span><p>Local synthetic acquisition presets.</p><button data-resource="datasets-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
-          <article><span>Teacher demo plan</span><p>Suggested classroom demo order.</p><button data-resource="teacher-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource="export-placeholder" type="button" title="Local-only export placeholder">Export</button></article>
+          <article><span>Worksheet</span><p>Printable classroom prompts stored locally.</p><button data-resource="worksheet-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="worksheet-view" type="button" title="Download worksheet HTML">Export</button></article>
+          <article><span>Lesson cards</span><p>Compact EBSD concept cards for revision.</p><button data-resource="lesson-cards-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="lesson-cards-view" type="button" title="Download lesson cards HTML">Export</button></article>
+          <article><span>Formula cheat sheet</span><p>Bragg law and wavelength reference.</p><button data-resource="formula-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="formula-view" type="button" title="Download formula sheet HTML">Export</button></article>
+          <article><span>Practice questions</span><p>Local checkpoint questions from the modules.</p><button data-resource="practice-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="practice-view" type="button" title="Download practice questions HTML">Export</button></article>
+          <article><span>Sample datasets</span><p>Local synthetic acquisition presets.</p><button data-resource="datasets-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="datasets-view" type="button" title="Download preset reference HTML">Export</button></article>
+          <article><span>Teacher demo plan</span><p>Suggested classroom demo order.</p><button data-resource="teacher-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="teacher-view" type="button" title="Download teacher demo plan HTML">Export</button></article>
         </section>
       </main>
 
@@ -486,8 +547,43 @@
           <div id="resourceContent" class="resource-content"></div>
           <div class="modal-actions">
             <button id="printResource" type="button">Print</button>
-            <button id="resourceExportPlaceholder" type="button">Export placeholder</button>
+            <button id="resourceExportButton" type="button">Export HTML</button>
           </div>
+        </form>
+      </dialog>
+
+      <dialog id="notesModal" class="resource-modal notes-modal">
+        <form method="dialog">
+          <div class="modal-heading">
+            <div>
+              <span>Saved local notes</span>
+              <strong>Learning Path notes and observations</strong>
+            </div>
+            <button value="close" type="submit" aria-label="Close notes">Close</button>
+          </div>
+          <div id="notesContent" class="resource-content"></div>
+          <textarea id="notesPlainText" rows="8" readonly></textarea>
+          <div class="modal-actions">
+            <button id="copyNotesButton" type="button">Copy text</button>
+            <button id="exportNotesButton" type="button">Export text</button>
+          </div>
+        </form>
+      </dialog>
+
+      <dialog id="glossaryModal" class="resource-modal glossary-modal">
+        <form method="dialog">
+          <div class="modal-heading">
+            <div>
+              <span>Offline glossary</span>
+              <strong>EBSD terms</strong>
+            </div>
+            <button value="close" type="submit" aria-label="Close glossary">Close</button>
+          </div>
+          <label class="select-row glossary-modal-search">
+            <span>Search</span>
+            <input id="topGlossarySearch" type="search" placeholder="Search EBSD terms..." />
+          </label>
+          <div id="topGlossaryContent" class="glossary-modal-content"></div>
         </form>
       </dialog>
 

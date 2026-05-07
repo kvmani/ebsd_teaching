@@ -122,3 +122,35 @@ Educational references on EBSD:
 
 **Last Updated**: April 2026  
 **Educational Purpose**: Understanding EBSD through interactive 3D visualization
+
+## Audit Report - May 2026
+
+This project is a conceptual teaching simulator, not validated EBSD software. It is designed for offline classroom learning, not research-grade phase indexing, detector calibration, or quantitative EBSD analysis.
+
+### Implemented learning-studio features
+
+- Three-tab studio preserved: Geometry + Pattern, Live Scan Acquisition, and Learning Path.
+- Real local Kikuchi image support preserved under `public/kikuchi-patterns`, with graceful schematic fallback when images are missing.
+- Top-bar Notes modal reads existing Learning Path localStorage notes, observations, and bookmarks, with copy and text export.
+- Top-bar Screenshot exports the active teaching canvas as PNG where possible.
+- Resource View, Print, and Export now generate offline HTML handouts for worksheets, lesson cards, formula sheets, practice questions, preset references, and teacher demo plans.
+- Top-bar Glossary opens a searchable offline EBSD glossary.
+- Learning Path guided demos jump into the relevant tab, apply a preset, and prompt prediction, expected observation, and "what changed?" reflection.
+- Acquisition now includes warning badges, beginner/advanced controls, teaching-default reset, one-click presets, pattern-quality checklist, diagnosis activity, and named scenario save/restore in localStorage.
+- Learning modules include concise advanced-but-safe subcards for calibration, phase selection, pseudosymmetry, FCC Cu/Ni-like ambiguity, binning/exposure/gain, step size, confidence, grain boundaries, and IPF color interpretation.
+
+### Known conceptual simplifications
+
+- Bragg/Kossel cones are schematic and visually magnified so students can see the geometry.
+- Detector pattern generation is a teaching projection, not dynamical electron diffraction.
+- Acquisition quality, confidence, drift, threshold, and map effects are qualitative models.
+- IPF maps and grain boundaries are synthetic teaching visuals, not measured microstructure.
+- Hough/dictionary/manual indexing options are conceptual comparisons, not actual indexing engines.
+
+### Future ideas
+
+- Optional instructor-authored lesson packs.
+- More curated public-domain real Kikuchi images with source notes.
+- A printable lab worksheet sequence by course week.
+- Import/export of complete classroom scenario bundles.
+- A calibration-focused activity using a deliberately wrong pattern center.

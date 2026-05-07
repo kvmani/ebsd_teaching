@@ -25,7 +25,153 @@ function glossaryEntry(term) {
   return glossaryTerms.find((entry) => entry.term.toLowerCase() === String(term).toLowerCase());
 }
 
-function diagramForModule(index) {
+function geometryConeDiagram(index) {
+  const familyOne = '#78d85e';
+  const familyTwo = '#62d7f0';
+  return `
+    <svg class="geometry-cone-diagram" viewBox="0 0 820 390" role="img" aria-label="EBSD schematic with tilted sample, beam, diffraction cones, and detector pattern">
+      <defs>
+        <radialGradient id="studioBg${index}" cx="42%" cy="42%" r="70%">
+          <stop offset="0" stop-color="#16303a" />
+          <stop offset="0.55" stop-color="#08141a" />
+          <stop offset="1" stop-color="#05090d" />
+        </radialGradient>
+        <linearGradient id="metalColumn${index}" x1="0" x2="1">
+          <stop offset="0" stop-color="#20272a" />
+          <stop offset="0.48" stop-color="#626b6d" />
+          <stop offset="0.62" stop-color="#d1d7d6" />
+          <stop offset="1" stop-color="#242a2c" />
+        </linearGradient>
+        <linearGradient id="sampleFace${index}" x1="0" x2="1">
+          <stop offset="0" stop-color="#2b3031" />
+          <stop offset="0.42" stop-color="#747b78" />
+          <stop offset="1" stop-color="#1e2324" />
+        </linearGradient>
+        <linearGradient id="detectorFace${index}" x1="0" x2="1">
+          <stop offset="0" stop-color="#11181b" />
+          <stop offset="0.5" stop-color="#596263" />
+          <stop offset="1" stop-color="#20292c" />
+        </linearGradient>
+        <linearGradient id="samplePlane${index}" x1="0" x2="1">
+          <stop offset="0" stop-color="#d7e2df" stop-opacity="0.72" />
+          <stop offset="0.48" stop-color="#ffffff" stop-opacity="0.95" />
+          <stop offset="1" stop-color="#aeb9b8" stop-opacity="0.62" />
+        </linearGradient>
+        <filter id="softGlow${index}" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="2.6" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter id="deepShadow${index}" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#000" flood-opacity="0.48" />
+        </filter>
+      </defs>
+
+      <rect x="10" y="10" width="800" height="370" rx="18" fill="url(#studioBg${index})" stroke="rgba(221,235,239,0.22)" />
+
+      <g aria-label="SEM column" filter="url(#deepShadow${index})">
+        <rect x="122" y="22" width="82" height="54" rx="5" fill="url(#metalColumn${index})" />
+        <rect x="126" y="74" width="74" height="18" fill="#252d30" opacity="0.96" />
+        <rect x="138" y="92" width="50" height="20" rx="4" fill="url(#metalColumn${index})" />
+        <rect x="148" y="112" width="30" height="12" rx="3" fill="#20282b" />
+      </g>
+
+      <line x1="163" y1="124" x2="163" y2="216" stroke="#16c7ef" stroke-width="8" stroke-linecap="round" filter="url(#softGlow${index})" />
+
+      <g aria-label="tilted sample with explicit sample plane" filter="url(#deepShadow${index})">
+        <polygon points="122,103 180,263 153,273 94,113" fill="#050708" opacity="0.7" />
+        <polygon points="122,103 180,263 154,273 95,113" fill="url(#sampleFace${index})" stroke="rgba(255,255,255,0.44)" />
+        <line x1="122" y1="103" x2="180" y2="263" stroke="url(#samplePlane${index})" stroke-width="5.2" stroke-linecap="round" />
+        <line x1="118" y1="118" x2="172" y2="266" stroke="rgba(0,0,0,0.38)" stroke-width="1.4" />
+      </g>
+
+      <circle cx="163" cy="216" r="8" fill="#f1ce70" opacity="0.86" filter="url(#softGlow${index})" />
+      <circle cx="163" cy="216" r="2.8" fill="#fff7bd" />
+
+      <g aria-label="sample normal and EBSD tilt annotations">
+        <line x1="163" y1="216" x2="238" y2="189" stroke="rgba(255,255,255,0.88)" stroke-width="1.8" stroke-dasharray="7 6" />
+        <path d="M229 185 L241 188 L232 197" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="1.6" />
+        <rect x="216" y="164" width="100" height="22" rx="6" fill="rgba(7,12,16,0.72)" stroke="rgba(221,235,239,0.16)" />
+        <text x="222" y="180" fill="#eef6f7" font-size="13" font-weight="750">sample normal</text>
+        <path d="M163 174 A42 42 0 0 0 149 177" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="2" />
+        <path d="M149 177 L159 170 M149 177 L152 166" stroke="rgba(255,255,255,0.95)" stroke-width="1.6" />
+        <path d="M107 151 L152 151" stroke="rgba(255,255,255,0.62)" stroke-width="1" />
+        <rect x="30" y="128" width="196" height="26" rx="7" fill="rgba(7,12,16,0.78)" stroke="rgba(221,235,239,0.18)" />
+        <text x="38" y="146" fill="#f7fbfb" font-size="14" font-weight="800">20° beam–sample plane angle</text>
+        <rect x="72" y="267" width="152" height="24" rx="7" fill="rgba(7,12,16,0.72)" stroke="rgba(230,181,90,0.24)" />
+        <text x="91" y="286" fill="#ffe7b1" font-size="13" font-weight="800">70° EBSD sample tilt</text>
+      </g>
+
+      <g aria-label="two enlarged schematic Kikuchi cone families">
+        <path d="M163 216 C268 92 424 80 534 108 C426 116 285 152 163 216 Z" fill="${familyOne}" opacity="0.14" />
+        <path d="M163 216 C284 143 430 145 536 190 C424 168 291 174 163 216 Z" fill="${familyOne}" opacity="0.095" />
+        <path d="M163 216 C268 92 424 80 534 108" fill="none" stroke="${familyOne}" stroke-width="3" opacity="0.96" />
+        <path d="M163 216 C284 143 430 145 536 190" fill="none" stroke="${familyOne}" stroke-width="2.5" opacity="0.62" />
+
+        <path d="M163 216 C282 193 424 193 538 236 C421 211 291 204 163 216 Z" fill="${familyTwo}" opacity="0.13" />
+        <path d="M163 216 C296 227 423 238 540 274 C421 245 294 226 163 216 Z" fill="${familyTwo}" opacity="0.08" />
+        <path d="M163 216 C282 193 424 193 538 236" fill="none" stroke="${familyTwo}" stroke-width="3" opacity="0.95" />
+        <path d="M163 216 C296 227 423 238 540 274" fill="none" stroke="${familyTwo}" stroke-width="2.5" opacity="0.58" />
+      </g>
+
+      <g transform="translate(530 72) skewY(8)" aria-label="EBSD detector / phosphor screen" filter="url(#deepShadow${index})">
+        <rect x="0" y="0" width="98" height="202" rx="9" fill="#111516" stroke="rgba(255,255,255,0.16)" stroke-width="8" />
+        <rect x="8" y="8" width="82" height="186" rx="7" fill="url(#detectorFace${index})" stroke="rgba(255,255,255,0.26)" />
+        <g opacity="0.5" stroke-linecap="round">
+          <path d="M14 55 C40 42 61 48 84 66" stroke="${familyOne}" stroke-width="4" opacity="0.34" />
+          <path d="M14 64 C41 51 62 56 84 74" stroke="${familyOne}" stroke-width="1.4" opacity="0.86" />
+          <path d="M12 125 C42 105 62 111 86 134" stroke="${familyTwo}" stroke-width="4" opacity="0.3" />
+          <path d="M12 136 C42 116 62 122 86 145" stroke="${familyTwo}" stroke-width="1.4" opacity="0.78" />
+        </g>
+        <circle cx="48" cy="93" r="3.6" fill="#f8ffff" opacity="0.7" />
+      </g>
+      <text x="498" y="56" fill="#eef6f7" font-size="13" font-weight="850">EBSD detector / phosphor screen</text>
+
+      <g transform="translate(645 78)" aria-label="detector view inset">
+        <rect x="0" y="0" width="146" height="190" rx="14" fill="rgba(8,13,18,0.86)" stroke="rgba(221,235,239,0.24)" />
+        <text x="12" y="26" fill="#f7fbfb" font-size="15" font-weight="850">Detector view</text>
+        <rect x="12" y="42" width="122" height="102" rx="9" fill="#171c1e" stroke="rgba(221,235,239,0.2)" />
+        <g transform="translate(12 42)" opacity="0.82">
+          <rect width="122" height="102" rx="9" fill="#242b2d" />
+          <g opacity="0.85" stroke-linecap="round">
+            <path d="M-8 25 L130 88" stroke="#0c1112" stroke-width="10" opacity="0.28" />
+            <path d="M-8 23 L130 86" stroke="#e9f8f2" stroke-width="3" opacity="0.66" />
+            <path d="M-8 31 L130 94" stroke="${familyOne}" stroke-width="2" opacity="0.62" />
+            <path d="M-6 80 L128 18" stroke="#0c1112" stroke-width="10" opacity="0.28" />
+            <path d="M-6 78 L128 16" stroke="#e9f8f2" stroke-width="3" opacity="0.62" />
+            <path d="M-6 87 L128 25" stroke="${familyTwo}" stroke-width="2" opacity="0.6" />
+            <path d="M42 -8 L82 110" stroke="#f6fbfb" stroke-width="2.4" opacity="0.38" />
+            <path d="M51 -8 L91 110" stroke="#0a0d0e" stroke-width="4.5" opacity="0.22" />
+          </g>
+          <circle cx="61" cy="51" r="5.5" fill="#fff" opacity="0.56" filter="url(#softGlow${index})" />
+          <circle cx="61" cy="51" r="1.8" fill="#fff" />
+        </g>
+        <text x="12" y="162" fill="#d6e0e3" font-size="11.5">Band = cone intersection</text>
+        <text x="12" y="178" fill="#d6e0e3" font-size="11.5">with detector</text>
+      </g>
+
+      <g transform="translate(40 320)" aria-label="legend">
+        <rect x="0" y="0" width="24" height="6" rx="3" fill="#16c7ef" />
+        <text x="34" y="8" fill="#eef6f7" font-size="13" font-weight="650">electron beam</text>
+        <rect x="160" y="0" width="24" height="6" rx="3" fill="${familyOne}" />
+        <text x="194" y="8" fill="#eef6f7" font-size="13" font-weight="650">Kikuchi cone family 1</text>
+        <rect x="384" y="0" width="24" height="6" rx="3" fill="${familyTwo}" />
+        <text x="418" y="8" fill="#eef6f7" font-size="13" font-weight="650">Kikuchi cone family 2</text>
+        <rect x="612" y="-5" width="24" height="14" rx="3" fill="url(#sampleFace${index})" stroke="rgba(255,255,255,0.34)" />
+        <text x="646" y="8" fill="#eef6f7" font-size="13" font-weight="650">sample</text>
+      </g>
+
+      <text x="40" y="360" fill="#a9b9bd" font-size="13">Cones are enlarged for teaching clarity.</text>
+    </svg>
+  `;
+}
+
+function diagramForModule(index, module) {
+  if (['geometry', 'bragg', 'kikuchi', 'detector'].includes(module?.id)) {
+    return geometryConeDiagram(index);
+  }
   const colors = ['#62d7f0', '#92d46f', '#e6b55a', '#ae98e8'];
   const accent = colors[index % colors.length];
   return `
@@ -427,7 +573,7 @@ export class LearningPath {
           <button type="button" class="${this.progress.selectedMode === mode ? 'active' : ''}" data-learning-mode="${mode}">${mode === 'teacher' ? 'Teacher Demo' : mode[0].toUpperCase() + mode.slice(1)}</button>
         `).join('')}
       </div>
-      <div class="lesson-diagram">${diagramForModule(learningModules.indexOf(module))}</div>
+      <div class="lesson-diagram">${diagramForModule(learningModules.indexOf(module), module)}</div>
       ${this.progress.weakReviewOpen ? this.renderWeakAreas() : ''}
       ${this.renderModeContent(module)}
       ${this.progress.selectedMode === 'learn' ? '' : this.renderSpecialModuleContent(module)}
@@ -549,6 +695,7 @@ export class LearningPath {
         ${this.renderQuiz(module)}
         ${this.renderActivityCards(module)}
         ${this.renderSpecialModuleContent(module)}
+        ${this.renderAdvancedConceptCards()}
       </div>
     `;
   }
@@ -574,10 +721,11 @@ export class LearningPath {
                 <ol>${listItems(activity.steps)}</ol>
               </details>
               <p><b>Prediction:</b> ${escapeHtml(activity.prediction)}</p>
-              <button type="button" data-experiment="${escapeHtml(activity.action)}" data-activity-id="${escapeHtml(activity.id)}">Open simulator action</button>
+              <button type="button" data-experiment="${escapeHtml(activity.action)}" data-activity-id="${escapeHtml(activity.id)}">Start guided demo</button>
+              <p class="activity-expectation"><b>Expected observation:</b> ${escapeHtml(activity.explanation)}</p>
               <label class="observation-box">
-                <span>Observation after trying it</span>
-                <textarea rows="3" data-activity-observation="${escapeHtml(activity.id)}" placeholder="Write what changed...">${escapeHtml(observation)}</textarea>
+                <span>What changed?</span>
+                <textarea rows="3" data-activity-observation="${escapeHtml(activity.id)}" placeholder="Describe what changed in the pattern, map, or readout...">${escapeHtml(observation)}</textarea>
               </label>
               <p class="activity-explanation"><b>Explanation:</b> ${escapeHtml(activity.explanation)}</p>
               <div class="note-actions">
@@ -613,6 +761,27 @@ export class LearningPath {
         <span>Useful formula reference</span>
         ${module.formulas.map((id) => `<div class="formula">${escapeHtml(formulaReference[id] ?? id)}</div>`).join('')}
         <small>Conceptual teaching reference, not calibrated EBSD software.</small>
+      </article>
+    `;
+  }
+
+  renderAdvancedConceptCards() {
+    const cards = [
+      ['Pattern center and detector calibration', 'Pattern center is a geometric calibration reference. If it is wrong, visible bands can still index poorly.'],
+      ['Phase selection and pseudosymmetry', 'Similar symmetries can make a plausible wrong phase look tempting. Use phase knowledge and chemistry, not geometry alone.'],
+      ['FCC Cu/Ni-like phases', 'Cu and Ni have similar FCC band geometry, so EBSD band positions alone may not separate them reliably.'],
+      ['Binning vs exposure vs gain', 'Binning and exposure collect more usable signal; gain amplifies what is already there and can clip detail.'],
+      ['Step size relative to grain size', 'Step size should be small enough to sample grains and boundaries; oversized steps can miss fine structure.'],
+      ['Confidence vs pattern quality', 'Pattern quality describes image clarity; confidence describes the indexing decision. They should be interpreted together.'],
+      ['Grain boundary misorientation', 'Boundaries are orientation changes. Low-angle and high-angle boundaries mean different microstructural stories.'],
+      ['IPF color interpretation', 'IPF color encodes crystal direction relative to a sample axis, not composition by itself.']
+    ];
+    return `
+      <article class="lesson-card advanced-concepts wide-card">
+        <span>Advanced but safe EBSD concepts</span>
+        <div>
+          ${cards.map(([title, text]) => `<section><strong>${escapeHtml(title)}</strong><p>${escapeHtml(text)}</p></section>`).join('')}
+        </div>
       </article>
     `;
   }
