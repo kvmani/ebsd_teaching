@@ -168,8 +168,10 @@ function geometryConeDiagram(index) {
   `;
 }
 
+const geometryDiagramModuleIds = new Set(['intro', 'geometry', 'interaction', 'bragg', 'kikuchi', 'detector']);
+
 function diagramForModule(index, module) {
-  if (['geometry', 'bragg', 'kikuchi', 'detector'].includes(module?.id)) {
+  if (geometryDiagramModuleIds.has(module?.id)) {
     return geometryConeDiagram(index);
   }
   const colors = ['#62d7f0', '#92d46f', '#e6b55a', '#ae98e8'];
