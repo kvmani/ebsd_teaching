@@ -96,8 +96,8 @@ export function braggThetaDeg(kV, dNm) {
 
 export function visualThetaDeg(kV, dNm) {
   // EBSD Bragg angles are only a few degrees, which is too subtle for a
-  // classroom 3D schematic. The slider-controlled scale keeps the mapping
-  // honest while letting instructors enlarge the cone opening for discussion.
+  // student-facing 3D schematic. The slider-controlled scale keeps the mapping
+  // honest while letting learners enlarge the cone opening for comparison.
   return THREE.MathUtils.clamp(braggThetaDeg(kV, dNm) * state.coneScale, 3.5, 12);
 }
 

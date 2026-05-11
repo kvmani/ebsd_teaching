@@ -13,7 +13,7 @@ const SAMPLE_TEACHING_YAW_DEG = 24;
 
 function coneColorVariant(baseColorHex, useBrightTeachingVariant) {
   const color = new THREE.Color(baseColorHex);
-  // A slight tone lift keeps translucent teaching cones readable against the
+  // A slight tone lift keeps translucent learning cones readable against the
   // dark scene while preserving each plane family's color identity.
   return useBrightTeachingVariant ? color.offsetHSL(0, 0.06, 0.12) : color.offsetHSL(0, -0.03, -0.16);
 }
@@ -475,7 +475,7 @@ export class EbsdScene {
       const baseIndex = vertices.length / 3;
       const points = [];
       const lobeBasis = this.axisBasis(axis);
-      // The transparent body is intentionally a readable teaching cone around
+      // The transparent body is intentionally a readable learning cone around
       // the diffracted direction. The detector band spacing still comes from
       // the Bragg angle; this wider shell helps students see the cone shape.
       const teachingConeHalfAngle = THREE.MathUtils.degToRad(
@@ -590,7 +590,7 @@ export class EbsdScene {
     if (traceSpecs.length === 0) return;
 
     // A true cone-plane intersection can project mostly to one side for a
-    // given teaching pose. For this classroom overlay we recentre the family
+    // given learning pose. For this student overlay we recentre the family
     // of cuts on the detector so students can compare both band edges instead
     // of reading the view as a failed alignment.
     const averageOffset = traceSpecs.reduce((sum, trace) => sum + trace.offset, 0) / traceSpecs.length;

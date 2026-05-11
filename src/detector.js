@@ -162,7 +162,7 @@ export class DetectorRenderer {
     ctx.rotate(angle);
     ctx.fillStyle = gradient;
     // Real EBSD bands appear as diffuse bright/dark detector contrast, not
-    // solid colored tubes. The colored strokes below keep the teaching link
+    // solid colored tubes. The colored strokes below keep the learning link
     // to each plane family, while this grayscale envelope stays subtle.
     ctx.globalAlpha = 0.52;
     ctx.fillRect(-canvas.width * 1.4, -width * 3.2, canvas.width * 2.8, width * 6.4);
@@ -189,5 +189,5 @@ export function detectorCaption() {
   const lambda = electronWavelengthPm(state.voltage);
   const theta = braggThetaDeg(state.voltage, planes[0].d);
   const visualTheta = visualThetaDeg(state.voltage, planes[0].d);
-  return `Each pair of thin colored lines marks the two cone-cut band edges for one lattice-plane family. At ${state.voltage} kV, lambda is approximately ${lambda.toFixed(2)} pm; for ${planes[0].hkl}, physical theta is ${theta.toFixed(2)}° and the teaching cone angle is ${visualTheta.toFixed(1)}°.`;
+  return `Each pair of thin colored lines marks the two cone-cut band edges for one lattice-plane family. At ${state.voltage} kV, lambda is approximately ${lambda.toFixed(2)} pm; for ${planes[0].hkl}, physical theta is ${theta.toFixed(2)}° and the enlarged visual cone angle is ${visualTheta.toFixed(1)}°.`;
 }

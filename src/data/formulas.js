@@ -5,8 +5,8 @@ export const formulaReference = {
     'V is accelerating voltage in volts.',
     'lambda is electron wavelength.',
     'd is interplanar spacing.',
-    'n is diffraction order, usually 1 in this teaching example.',
+    'n is diffraction order, usually 1 in this learning example.',
     'theta is the Bragg angle.'
   ],
-  notes: 'This is a conceptual teaching calculator. It is not an EBSD calibration or validated indexing tool.'
+  notes: 'This is a conceptual learning calculator. It is not an EBSD calibration or validated indexing tool.'
 };

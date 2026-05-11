@@ -20,7 +20,6 @@ const defaultProgress = {
   diagnosticSymptom: 'saturated-pattern',
   diagnosticFollowup: '',
   selectedMode: 'learn',
-  teacherMode: false,
   helpDismissed: false
 };
 

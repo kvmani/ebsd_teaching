@@ -29,7 +29,7 @@ class PatternLibrary {
     return new Promise((resolve) => {
       const image = new Image();
       image.onload = () => resolve({ ...entry, image });
-      // Broken local paths are expected while teachers are still adding assets.
+      // Broken local paths are expected while local study assets are still being curated.
       // Resolve null instead of rejecting so the app never crashes.
       image.onerror = () => resolve(null);
       image.src = entry.src;

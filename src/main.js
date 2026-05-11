@@ -4,6 +4,7 @@ import { AcquisitionRenderer } from './acquisition.js';
 import { formulaReference } from './data/formulas.js';
 import { learningModules } from './data/learningModules.js';
 import { DetectorRenderer, detectorCaption } from './detector.js';
+import { IndexingStudio } from './indexingStudio.js';
 import { LearningPath } from './learningPath.js';
 import { loadLearningProgress } from './learningProgress.js';
 import { EbsdScene } from './scene.js';
@@ -13,6 +14,10 @@ const qs = (id) => document.getElementById(id);
 const sceneView = new EbsdScene(qs('scene'));
 const detector = new DetectorRenderer(qs('detector'), qs('detectorInset'));
 const acquisition = new AcquisitionRenderer(qs('scanMap'), qs('patternPreview'));
+const indexingStudio = new IndexingStudio({
+  root: qs('indexingStudio'),
+  getReduceMotion: () => reduceMotion
+});
 const learningPath = new LearningPath({
   moduleList: qs('moduleList'),
   lessonWorkspace: qs('lessonWorkspace'),
@@ -23,9 +28,13 @@ const learningPath = new LearningPath({
 
 let playAccum = 0;
 let last = performance.now();
-let activeView = 'geometry';
+let activeView = 'start';
 let currentResourceAction = 'worksheet-view';
 let controlLevel = localStorage.getItem('ebsdTeachingStudio.controlLevel.v1') || 'beginner';
+const savedReduceMotion = localStorage.getItem('ebsdLearningStudio.reduceMotion.v1');
+let reduceMotion = savedReduceMotion === null
+  ? window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+  : savedReduceMotion === 'true';
 
 const TEACHING_DEFAULT_ACQUISITION = { gain: 1.2, binning: 2, exposureMs: 28, beamCurrent: 55, frameAverage: 2, scanSpeed: 1.0, stepSize: 0.25, drift: 0, bandDetection: 65, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
 const HIGH_QUALITY_PRESET = { gain: 1.0, binning: 2, exposureMs: 80, beamCurrent: 60, frameAverage: 5, scanSpeed: 0.55, stepSize: 0.12, drift: 5, bandDetection: 58, indexingThreshold: 55, indexingMode: 'dictionary', qualityOverlay: 'confidence', mapUpdate: 'line', autoIndex: true, confirmLowConfidence: true, backgroundCorrection: true };
@@ -213,7 +222,7 @@ function acquisitionStory() {
     return 'Stage drift is intentionally high here. Watch the raster bend the grain boundaries: the pattern at each point may be good, but the scan no longer represents the true position cleanly.';
   }
   if (!state.acquisition.autoIndex) {
-    return 'Auto-indexing is paused. This is useful for teaching: students can see that pattern formation and indexing are separate steps in the EBSD workflow.';
+    return 'Auto-indexing is paused. This is useful for learning: students can see that pattern formation and indexing are separate steps in the EBSD workflow.';
   }
   if (state.acquisition.confirmLowConfidence) {
     return 'Low-confidence confirmation is enabled. Borderline pixels are held back so students can discuss whether strict rejection improves trust or simply creates more unindexed area.';
@@ -352,13 +361,13 @@ function applyGeometryValues(values = {}) {
 }
 
 function saveCurrentScenario() {
-  const name = qs('scenarioName').value.trim() || 'EBSD teaching scenario';
+  const name = qs('scenarioName').value.trim() || 'EBSD practice scenario';
   const scenarios = loadScenarios().filter((item) => item.name !== name);
   scenarios.unshift(currentScenarioPayload(name));
   saveScenarios(scenarios.slice(0, 12));
   renderScenarioSelect();
   qs('explainTitle').textContent = 'Scenario saved';
-  qs('explainText').textContent = `"${name}" is stored in this browser localStorage for offline classroom reuse.`;
+  qs('explainText').textContent = `"${name}" is stored in this browser localStorage for offline self-study.`;
 }
 
 function restoreSelectedScenario() {
@@ -395,7 +404,7 @@ function updateWarningBadges(metrics) {
   if (state.acquisition.binning >= 4 || state.acquisition.stepSize >= 0.55) badges.push(['coarse spatial sampling', 'Reduce binning or step size for fine grains.']);
   if (state.acquisition.drift > 30) badges.push(['drift risk', 'Stabilize or scan faster.']);
   if (state.acquisition.indexingThreshold > metrics.quality) badges.push(['strict threshold', 'Improve signal or lower threshold for exploration.']);
-  if (!badges.length) badges.push(['teaching default healthy', 'Balanced signal, detail, and speed.']);
+  if (!badges.length) badges.push(['balanced setup healthy', 'Balanced signal, detail, and speed.']);
   qs('warningBadges').innerHTML = badges.map(([label, title]) => `<span title="${escapeHtml(title)}">${escapeHtml(label)}</span>`).join('');
 }
 
@@ -405,7 +414,7 @@ function updateQualityChecklist(metrics) {
     ['no clipping', metrics.pattern.saturation <= 8, 'Lower gain before increasing other signal controls.'],
     ['enough contrast', metrics.quality >= 50, 'Use background correction and enough electrons per pixel.'],
     ['stable map', state.acquisition.drift <= 25, 'Drift can bend boundaries even with usable patterns.'],
-    ['reasonable threshold', state.acquisition.indexingThreshold <= metrics.quality + 12, 'Thresholds should match the teaching goal and data quality.']
+    ['reasonable threshold', state.acquisition.indexingThreshold <= metrics.quality + 12, 'Thresholds should match the study goal and data quality.']
   ];
   qs('qualityChecklist').innerHTML = items.map(([label, ok, tip]) => `
     <div class="${ok ? 'ok' : 'caution'}"><b>${ok ? 'OK' : 'Check'}</b><span>${escapeHtml(label)}</span><small>${escapeHtml(tip)}</small></div>
@@ -433,33 +442,96 @@ function setControlLevel(level) {
   qs('advancedMode').classList.toggle('active', level === 'advanced');
 }
 
+function updateReduceMotionButton() {
+  qs('reduceMotionButton').setAttribute('aria-pressed', String(reduceMotion));
+  qs('reduceMotionButton').textContent = reduceMotion ? 'Motion paused' : 'Reduce motion';
+  document.body.classList.toggle('reduce-motion', reduceMotion);
+}
+
+function setReduceMotion(value) {
+  reduceMotion = value;
+  localStorage.setItem('ebsdLearningStudio.reduceMotion.v1', String(reduceMotion));
+  if (reduceMotion) {
+    state.playing = false;
+    state.acquisition.live = false;
+    qs('liveAcquisition').checked = false;
+  }
+  updateReduceMotionButton();
+  indexingStudio.setReduceMotion();
+  updateAll();
+}
+
 function setActiveView(view) {
   activeView = view;
+  const isStart = view === 'start';
   const isGeometry = view === 'geometry';
   const isAcquisition = view === 'acquisition';
+  const isIndexing = view === 'indexing';
   const isLearning = view === 'learning';
+  const isResources = view === 'resources';
+  qs('startView').classList.toggle('active', isStart);
   qs('geometryView').classList.toggle('active', isGeometry);
   qs('acquisitionView').classList.toggle('active', isAcquisition);
+  qs('indexingView').classList.toggle('active', isIndexing);
   qs('learningView').classList.toggle('active', isLearning);
+  qs('resourcesView').classList.toggle('active', isResources);
+  [
+    ['startView', isStart],
+    ['geometryView', isGeometry],
+    ['acquisitionView', isAcquisition],
+    ['indexingView', isIndexing],
+    ['learningView', isLearning],
+    ['resourcesView', isResources]
+  ].forEach(([id, isActive]) => {
+    qs(id).setAttribute('aria-hidden', String(!isActive));
+  });
+  qs('tabStart').classList.toggle('active', isStart);
   qs('tabGeometry').classList.toggle('active', isGeometry);
   qs('tabAcquisition').classList.toggle('active', isAcquisition);
+  qs('tabIndexing').classList.toggle('active', isIndexing);
   qs('tabLearning').classList.toggle('active', isLearning);
+  qs('tabResources').classList.toggle('active', isResources);
   qs('geometryLegend').classList.toggle('hidden', !isGeometry);
+  qs('tabStart').setAttribute('aria-selected', String(isStart));
   qs('tabGeometry').setAttribute('aria-selected', String(isGeometry));
   qs('tabAcquisition').setAttribute('aria-selected', String(isAcquisition));
+  qs('tabIndexing').setAttribute('aria-selected', String(isIndexing));
   qs('tabLearning').setAttribute('aria-selected', String(isLearning));
-  if (isGeometry) {
+  qs('tabResources').setAttribute('aria-selected', String(isResources));
+  document.querySelectorAll('.tab-button').forEach((button) => {
+    button.tabIndex = button.classList.contains('active') ? 0 : -1;
+  });
+  if (isStart) {
+    qs('explainTitle').textContent = 'Start Here';
+    qs('explainText').textContent = 'Choose a student path, then move between geometry, acquisition, indexing, and revision at your own pace.';
+  } else if (isGeometry) {
     resize();
     updateReadouts();
   } else if (isAcquisition) {
     qs('explainTitle').textContent = 'Live Scan Acquisition';
     qs('explainText').textContent = 'Gain, binning, exposure, beam current, and averaging trade speed, noise, saturation, and spatial resolution. The scan view is schematic but designed to make those trade-offs visible.';
     updateAcquisitionReadouts();
+  } else if (isIndexing) {
+    qs('explainTitle').textContent = 'How Kikuchi Bands Are Indexed';
+    qs('explainText').textContent = 'This foundation module explains the simplified indexing pipeline without adding a full Hough transform simulator.';
   } else {
-    qs('explainTitle').textContent = 'Learning Path';
-    qs('explainText').textContent = 'A complete offline curriculum: geometry, scattering, Bragg diffraction, Kikuchi bands, detector calibration, indexing, and acquisition troubleshooting.';
-    learningPath.render();
+    if (isLearning) {
+      qs('explainTitle').textContent = 'Learning Path';
+      qs('explainText').textContent = 'A self-study path: geometry, scattering, Bragg diffraction, Kikuchi bands, detector calibration, indexing, and acquisition troubleshooting.';
+      learningPath.render();
+    } else if (isResources) {
+      qs('explainTitle').textContent = 'Glossary / Resources';
+      qs('explainText').textContent = 'Open local glossary entries, notes, worksheets, practice questions, and self-study exports.';
+    }
   }
+}
+
+function moveSectionFocus(delta) {
+  const tabs = Array.from(document.querySelectorAll('.tab-button'));
+  const currentIndex = Math.max(0, tabs.findIndex((button) => button.classList.contains('active')));
+  const nextIndex = (currentIndex + delta + tabs.length) % tabs.length;
+  tabs[nextIndex].focus();
+  tabs[nextIndex].click();
 }
 
 function showDemoBanner(title, text) {
@@ -577,8 +649,8 @@ qs('saveScenario').addEventListener('click', saveCurrentScenario);
 qs('loadScenario').addEventListener('click', restoreSelectedScenario);
 qs('resetAcquisitionDefaults').addEventListener('click', () => {
   setAcquisitionPreset(TEACHING_DEFAULT_ACQUISITION);
-  qs('explainTitle').textContent = 'Teaching default restored';
-  qs('explainText').textContent = 'Acquisition controls are back to a balanced setup for classroom demonstrations.';
+  qs('explainTitle').textContent = 'Balanced setup restored';
+  qs('explainText').textContent = 'Acquisition controls are back to a balanced setup for self-study comparisons.';
 });
 qs('scanMap').addEventListener('click', toggleLiveAcquisition);
 qs('patternPreview').addEventListener('click', toggleLiveAcquisition);
@@ -594,11 +666,34 @@ qs('patternPauseButton').addEventListener('click', toggleLiveAcquisition);
   });
 });
 
+qs('tabStart').addEventListener('click', () => setActiveView('start'));
 qs('tabGeometry').addEventListener('click', () => setActiveView('geometry'));
 qs('tabAcquisition').addEventListener('click', () => setActiveView('acquisition'));
+qs('tabIndexing').addEventListener('click', () => setActiveView('indexing'));
 qs('tabLearning').addEventListener('click', () => {
   hideDemoBanner();
   setActiveView('learning');
+});
+qs('tabResources').addEventListener('click', () => setActiveView('resources'));
+document.querySelector('.view-tabs').addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    moveSectionFocus(1);
+  }
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    moveSectionFocus(-1);
+  }
+  if (event.key === 'Home') {
+    event.preventDefault();
+    qs('tabStart').focus();
+    setActiveView('start');
+  }
+  if (event.key === 'End') {
+    event.preventDefault();
+    qs('tabResources').focus();
+    setActiveView('resources');
+  }
 });
 qs('returnToLesson').addEventListener('click', () => {
   hideDemoBanner();
@@ -657,12 +752,55 @@ qs('learningScenariosShortcut').addEventListener('click', () => {
   setActiveView('acquisition');
   qs('scenarioName').focus();
 });
+qs('learningIndexingShortcut').addEventListener('click', () => setActiveView('indexing'));
 qs('screenshotButton').addEventListener('click', exportCurrentScreenshot);
 qs('exportButton').addEventListener('click', () => {
-  openResource(activeView === 'learning' ? 'worksheet-view' : 'teacher-view');
+  openResource(activeView === 'learning' ? 'worksheet-view' : 'self-study-view');
 });
 qs('glossaryButton').addEventListener('click', () => openGlossaryModal());
+qs('resourcesGlossaryButton').addEventListener('click', () => openGlossaryModal());
+qs('resourcesNotesButton').addEventListener('click', openNotesModal);
 qs('downloadModules').addEventListener('click', () => exportResource('all-modules-view'));
+
+document.querySelectorAll('[data-start-target]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const target = button.dataset.startTarget;
+    if (target === 'learning-intro') {
+      learningPath.selectModule('intro');
+      learningPath.progress.selectedMode = 'learn';
+      learningPath.save();
+      setActiveView('learning');
+      return;
+    }
+    if (target === 'acquisition') {
+      setActiveView('acquisition');
+      return;
+    }
+    if (target === 'indexing') {
+      setActiveView('indexing');
+      return;
+    }
+    if (target === 'revise') {
+      learningPath.progress.selectedMode = 'revise';
+      learningPath.save();
+      setActiveView('learning');
+    }
+  });
+});
+
+document.querySelectorAll('[data-indexing-answer]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const correct = button.dataset.indexingAnswer === 'correct';
+    qs('indexingCheckpointFeedback').textContent = correct
+      ? 'Correct. Indexing is a decision process that depends on band evidence, geometry, phase choice, and confidence.'
+      : 'Try again. Look for the answer that treats indexing as evidence-based rather than automatic truth.';
+    const card = button.closest('.indexing-step-card');
+    const cards = Array.from(document.querySelectorAll('.indexing-step-card'));
+    indexingStudio.recordCheckpoint(cards.indexOf(card), correct);
+  });
+});
+
+qs('reduceMotionButton').addEventListener('click', () => setReduceMotion(!reduceMotion));
 
 document.querySelectorAll('.checkpoint-card [data-answer]').forEach((button) => {
   button.addEventListener('click', () => {
@@ -721,7 +859,7 @@ function learningSnapshotCanvas() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#62d7f0';
   ctx.font = '700 34px Segoe UI, Arial';
-  ctx.fillText('EBSD Teaching Studio', 54, 72);
+  ctx.fillText('EBSD Learning Studio', 54, 72);
   ctx.fillStyle = '#eef6f7';
   ctx.font = '700 46px Segoe UI, Arial';
   ctx.fillText(module.title, 54, 145);
@@ -736,7 +874,7 @@ function learningSnapshotCanvas() {
   module.keyIdeas.slice(0, 5).forEach((idea, index) => ctx.fillText(`- ${idea}`, 78, 440 + index * 38));
   ctx.fillStyle = '#a9b9bd';
   ctx.font = '18px Segoe UI, Arial';
-  ctx.fillText('Conceptual teaching simulator, not validated EBSD software.', 54, 680);
+  ctx.fillText('Conceptual learning simulator, not validated EBSD software.', 54, 680);
   return canvas;
 }
 
@@ -765,11 +903,11 @@ function exportCurrentScreenshot() {
     downloadCanvas(learningSnapshotCanvas(), 'ebsd-learning-path.png');
   }
   qs('explainTitle').textContent = 'Screenshot exported';
-  qs('explainText').textContent = 'A PNG was generated from the current teaching canvas for offline use.';
+  qs('explainText').textContent = 'A PNG was generated from the current study canvas for offline use.';
 }
 
 function notesPlainText(progress = loadLearningProgress()) {
-  const lines = ['EBSD Teaching Studio Notes', 'Conceptual teaching simulator, not validated EBSD software.', ''];
+  const lines = ['EBSD Learning Studio Notes', 'Conceptual learning simulator, not validated EBSD software.', ''];
   learningModules.forEach((module) => {
     const note = String(progress.notes[module.id] || '').trim();
     const activities = Object.entries(progress.activityObservations || {}).filter(([key, value]) => key.startsWith(`${module.id}-`) && String(value).trim());
@@ -872,15 +1010,15 @@ function resourceMarkup(action) {
       title: 'Sample datasets and presets',
       body: `
         <section><h2>Local synthetic scan presets</h2><ul><li>Fast survey</li><li>Balanced</li><li>High quality slow scan</li><li>Noisy pattern</li><li>Saturated pattern</li><li>Drift-distorted map</li></ul></section>
-        <section><h2>Real Kikuchi image folder</h2><p><code>D:\\pythonProjects\\EBSD-Teaching\\public\\kikuchi-patterns</code></p></section>
+        <section><h2>Real Kikuchi image folder</h2><p><code>public/kikuchi-patterns</code></p><p>Add local assets there, then update <code>src/data/kikuchiPatterns.js</code>.</p></section>
       `
     };
   }
-  if (action === 'teacher-view') {
+  if (action === 'self-study-view') {
     return {
-      title: 'Teacher demo plan',
+      title: 'Self-study guide',
       body: learningModules.map((item, index) => `
-        <section><h2>${index + 1}. ${escapeHtml(item.title)}</h2><p><b>Time:</b> ${escapeHtml(item.estimatedTime)}</p><ul>${item.teacherPrompts.map((prompt) => `<li>${escapeHtml(prompt)}</li>`).join('')}</ul><p><b>Expected observation:</b> ${escapeHtml(item.whyItMatters)}</p></section>
+        <section><h2>${index + 1}. ${escapeHtml(item.title)}</h2><p><b>Time:</b> ${escapeHtml(item.estimatedTime)}</p><ul>${(item.reflectionPrompts || []).map((prompt) => `<li>${escapeHtml(prompt)}</li>`).join('')}</ul><p><b>Why it matters:</b> ${escapeHtml(item.whyItMatters)}</p></section>
       `).join('')
     };
   }
@@ -899,7 +1037,7 @@ function resourceMarkup(action) {
     };
   }
   return {
-    title: 'Offline EBSD teaching export',
+    title: 'Offline EBSD learning export',
     body: '<p>Select a resource card to view, print, or export a local HTML handout.</p>'
   };
 }
@@ -930,7 +1068,7 @@ function resourceDocument(resource) {
 </head>
 <body>
   <h1>${escapeHtml(resource.title)}</h1>
-  <p><b>EBSD Teaching Studio:</b> conceptual teaching simulator, not validated EBSD software.</p>
+  <p><b>EBSD Learning Studio:</b> conceptual learning simulator, not validated EBSD software.</p>
   ${resource.body}
 </body>
 </html>`;
@@ -1031,9 +1169,9 @@ window.addEventListener('resize', resize);
 function animate(now) {
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
-  state.time += dt;
+  if (!reduceMotion) state.time += dt;
 
-  if (state.playing) {
+  if (state.playing && !reduceMotion) {
     playAccum += dt;
     if (playAccum > 2.3) {
       playAccum = 0;
@@ -1044,11 +1182,11 @@ function animate(now) {
   }
 
   sceneView.update();
-  if (state.showNoise && Math.floor(state.time * 10) !== Math.floor((state.time - dt) * 10)) {
+  if (!reduceMotion && state.showNoise && Math.floor(state.time * 10) !== Math.floor((state.time - dt) * 10)) {
     detector.draw();
   }
-  acquisition.update(dt);
-  if (activeView === 'acquisition' && Math.floor(state.time * 3) !== Math.floor((state.time - dt) * 3)) {
+  if (!reduceMotion) acquisition.update(dt);
+  if (!reduceMotion && activeView === 'acquisition' && Math.floor(state.time * 3) !== Math.floor((state.time - dt) * 3)) {
     updateAcquisitionReadouts();
   }
   sceneView.render();
@@ -1056,8 +1194,15 @@ function animate(now) {
 }
 
 setControlLevel(controlLevel);
+updateReduceMotionButton();
+if (reduceMotion) {
+  state.playing = false;
+  state.acquisition.live = false;
+  qs('liveAcquisition').checked = false;
+}
 renderScenarioSelect();
 resize();
 updateAll();
 acquisition.drawPatternPreview();
+setActiveView('start');
 requestAnimationFrame(animate);

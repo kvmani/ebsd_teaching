@@ -1,8 +1,8 @@
-# EBSD Teaching Studio
+# EBSD Learning Studio
 
-An offline-first, browser-based learning studio for teaching Electron Backscatter Diffraction (EBSD) concepts through clear schematic visualization, guided activities, and classroom-ready resources.
+An offline-first, browser-based learning studio for students studying Electron Backscatter Diffraction (EBSD) concepts through clear schematic visualization, guided activities, and self-study resources.
 
-This is a conceptual teaching simulator, not validated EBSD software. It is designed to help students reason about geometry, Kikuchi patterns, scan quality, and common acquisition trade-offs. It should not be used for quantitative indexing, phase identification, detector calibration, or research-grade EBSD analysis.
+This is a conceptual learning simulator, not validated EBSD software. It is designed to help students reason about geometry, Kikuchi patterns, scan quality, indexing confidence, and common acquisition trade-offs. It should not be used for quantitative indexing, phase identification, detector calibration, or research-grade EBSD analysis.
 
 ## What It Teaches
 
@@ -15,23 +15,24 @@ This is a conceptual teaching simulator, not validated EBSD software. It is desi
 
 ## Key Features
 
-- Three preserved studio tabs: Geometry + Pattern, Live Scan Acquisition, and Learning Path.
+- Preserved core simulators plus student-first navigation: Start Here, Geometry, Acquisition, Indexing Basics, Learning Path, and Glossary / Resources.
 - Real local Kikuchi image support from `public/kikuchi-patterns`, with graceful schematic fallback when image assets are missing.
 - Interactive Three.js EBSD geometry with guided stages, sample/detector controls, cone magnification, crystal orientation, labels, detector noise, contrast, and pattern inversion.
 - Live scan acquisition trainer with map modes, pause/resume, reset, warning badges, presets, beginner/advanced controls, diagnosis activity, quality checklist, and named scenario save/restore in localStorage.
+- Interactive Indexing Basics studio with a pausable conceptual walkthrough, pattern-center calibration exercise, band matching practice, real pattern review overlays, and local weak-area review.
 - Learning Path modules with quizzes, hints, flashcards, bookmarks, notes, guided demos, expected observations, and reflection prompts.
 - Top-bar tools for Notes, Screenshot, offline Resource Export, Glossary, Help, and scene reset.
-- Offline HTML/text exports for worksheets, lesson cards, formula sheets, practice questions, preset references, and teacher demo plans.
+- Offline HTML/text exports for worksheets, lesson cards, formula sheets, practice questions, preset references, and self-study guides.
 
 ## Local Kikuchi Images
 
-Place curated teaching images in:
+Place curated study images in:
 
 ```text
 public/kikuchi-patterns
 ```
 
-The app preloads the local pattern catalog and reports whether the current view is using a real local Kikuchi image or the fallback schematic pattern. Keep image files small enough for classroom laptops and document sources in `public/kikuchi-patterns/README.md` when adding new assets.
+The app preloads the local pattern catalog and reports whether the current view is using a real local Kikuchi image or the fallback schematic pattern. Keep image files small enough for student laptops and document sources in `public/kikuchi-patterns/README.md` when adding new assets.
 
 ## Project Structure
 
@@ -46,6 +47,7 @@ The app preloads the local pattern catalog and reports whether the current view 
 |   |-- detector.js
 |   |-- learningPath.js
 |   |-- learningProgress.js
+|   |-- indexingStudio.js
 |   |-- main.js
 |   |-- patternLibrary.js
 |   |-- scene.js
@@ -91,30 +93,32 @@ npm run build
 
 On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd install`, `npm.cmd run dev`, and `npm.cmd run build`.
 
-## Classroom Use
+## Self-Study Use
 
-1. Start with Geometry + Pattern to show the beam, tilted sample, detector, enlarged teaching cones, and Kikuchi band formation.
-2. Move to Live Scan Acquisition to demonstrate how acquisition parameters influence pattern quality, confidence, unindexed pixels, and map stability.
-3. Use Learning Path for guided modules, quizzes, notes, flashcards, bookmarks, and mini experiments that jump into the relevant tab with presets applied.
-4. Use Resource Export to generate offline handouts or worksheets, and Screenshot to capture the current visible teaching state.
+1. Start with Start Here to choose a study path.
+2. Use Geometry to inspect the beam, tilted sample, detector, enlarged schematic cones, and Kikuchi band formation.
+3. Move to Acquisition to explore how acquisition parameters influence pattern quality, confidence, unindexed pixels, and map stability.
+4. Use Learning Path for guided modules, quizzes, notes, flashcards, bookmarks, and mini experiments that jump into the relevant tab with presets applied.
+5. Use Indexing Basics to review the simplified workflow from raw pattern to confidence, practice band matching, and explore pattern-center sensitivity.
+6. Use Resource Export to generate offline worksheets, and Screenshot to capture the current visible study state.
 
 ## Conceptual Simplifications
 
-- Kikuchi cones are enlarged for teaching clarity and are not a full dynamical electron diffraction model.
+- Kikuchi cones are enlarged for learning clarity and are not a full dynamical electron diffraction model.
 - Detector bands are schematic projections intended to explain how cone intersections become bands.
-- Acquisition quality, confidence, drift, saturation, and threshold effects are qualitative classroom models.
+- Acquisition quality, confidence, drift, saturation, and threshold effects are qualitative learning models.
 - IPF maps and grain boundaries are synthetic visuals, not measured microstructure.
-- Hough/dictionary/manual indexing controls are conceptual comparisons, not actual indexing engines.
+- Hough-style band detection, candidate scoring, pattern-center confidence, and band matching activities are conceptual teaching tools, not actual indexing engines or calibrated refinement software.
 
 ## Performance Notes
 
-The production build may report a large Vite chunk warning because Three.js and the learning studio ship together for offline classroom use. This is acceptable for the current app. Future code-splitting may be useful if the studio grows substantially, but it is not necessary for the present teaching workflow.
+The production build may report a large Vite chunk warning because Three.js and the learning studio ship together for offline use. This is acceptable for the current app. Future code-splitting may be useful if the studio grows substantially, but it is not necessary for the present workflow.
 
 ## Development Guidelines
 
-- Preserve the three-tab structure and existing localStorage behavior.
+- Preserve the core simulator behavior and existing localStorage behavior.
 - Preserve real local Kikuchi image support and the schematic fallback.
-- Keep new features directly useful for EBSD teaching.
+- Keep new features directly useful for EBSD learning.
 - Prefer clear pedagogical comments over unvalidated physics complexity.
 - Test geometry controls, acquisition controls, learning progress, notes, glossary, screenshots, exports, and responsive layouts before release.
 
@@ -126,24 +130,25 @@ Clone:
 git clone https://github.com/kvmani/ebsd_teaching.git
 ```
 
-Use GitHub Issues or Discussions on the repository for questions, classroom feedback, and future feature requests.
+Use GitHub Issues or Discussions on the repository for questions, study feedback, and future feature requests.
 
 ## License
 
-No license file is currently included. Add a license before public redistribution or reuse outside the project owner's intended classroom setting.
+No license file is currently included. Add a license before public redistribution or reuse outside the project owner's intended setting.
 
 ## Audit Report - May 2026
 
 Implemented and verified:
 
 - Notes, glossary, screenshot, export/resource view, help, reset, progress, bookmarks, local notes, guided demos, presets, warning badges, scenario save/restore, and offline fallback behavior.
-- EBSD teaching modules covering geometry, interaction volume, Bragg law, band formation, pattern center, indexing, confidence, acquisition trade-offs, sample preparation, phase ambiguity, pseudosymmetry, IPF maps, grain boundaries, and troubleshooting.
+- EBSD learning modules covering geometry, interaction volume, Bragg law, band formation, pattern center, indexing, confidence, acquisition trade-offs, sample preparation, phase ambiguity, pseudosymmetry, IPF maps, grain boundaries, and troubleshooting.
+- Phase 2 Indexing Basics activities covering conceptual band detection, band position measurement, candidate orientation matching, pattern-center sensitivity, real pattern review, and weak-area self-review.
 - Responsive layout checks for desktop, laptop, tablet, and narrow mobile widths.
 
 Known future ideas:
 
-- Optional instructor-authored lesson packs.
+- Optional student lesson packs.
 - More curated real Kikuchi images with source notes.
 - A printable multi-week lab worksheet sequence.
-- Import/export of complete classroom scenario bundles.
-- A calibration activity using an intentionally wrong pattern center.
+- Import/export of complete practice scenario bundles.
+- Optional advanced indexing comparison activities, still clearly labeled as conceptual unless a real solver is implemented.

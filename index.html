@@ -3,35 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EBSD Teaching Studio</title>
+    <title>EBSD Learning Studio</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b1117'/%3E%3Cpath d='M10 42c14-22 30-22 44 0' fill='none' stroke='%2362d7f0' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M12 22h40M20 14l24 36' stroke='%23e6b55a' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%2392d46f'/%3E%3C/svg%3E" />
   </head>
   <body>
     <div id="app" class="app">
       <header class="topbar">
         <div class="brand-block">
           <div class="title">
-            <h1>EBSD Teaching Studio</h1>
-            <p>Interactive conceptual simulator for EBSD fundamentals</p>
+            <h1>EBSD Learning Studio</h1>
+            <p>Self-study workspace for EBSD geometry, acquisition, indexing, and review</p>
           </div>
           <div class="badges" aria-label="Application status">
             <span class="badge badge-green">Offline-first</span>
             <span class="badge badge-amber">Conceptual, not a validated physics simulator</span>
           </div>
         </div>
-        <div class="app-actions" aria-label="Local teaching tools">
+        <div class="app-actions" aria-label="Local study tools">
           <button id="notesButton" type="button" title="Open saved local notes">Notes</button>
-          <button id="screenshotButton" type="button" title="Download current teaching canvas">Screenshot</button>
-          <button id="exportButton" type="button" title="Export offline lesson content">Export</button>
+          <button id="screenshotButton" type="button" title="Download current study canvas">Screenshot</button>
+          <button id="exportButton" type="button" title="Export offline self-study content">Export</button>
           <button id="glossaryButton" type="button" title="Open offline glossary">Glossary</button>
           <button id="helpButton" type="button" title="Open offline help">Help</button>
-          <button id="resetScene" type="button" title="Restore default teaching view">Reset scene</button>
+          <button id="reduceMotionButton" type="button" aria-pressed="false" title="Pause continuous animation and reduce motion">Reduce motion</button>
+          <button id="resetScene" type="button" title="Restore default study view">Reset scene</button>
         </div>
       </header>
 
-      <nav class="view-tabs" aria-label="Simulation views">
-        <button class="tab-button active" id="tabGeometry" type="button" aria-controls="geometryView" aria-selected="true">Geometry + Pattern</button>
-        <button class="tab-button" id="tabAcquisition" type="button" aria-controls="acquisitionView" aria-selected="false">Live Scan Acquisition</button>
-        <button class="tab-button" id="tabLearning" type="button" aria-controls="learningView" aria-selected="false">Learning Path</button>
+      <nav class="view-tabs" role="tablist" aria-label="Learning studio sections">
+        <button class="tab-button active" id="tabStart" type="button" role="tab" aria-controls="startView" aria-selected="true">Start Here</button>
+        <button class="tab-button" id="tabGeometry" type="button" role="tab" aria-controls="geometryView" aria-selected="false">Geometry</button>
+        <button class="tab-button" id="tabAcquisition" type="button" role="tab" aria-controls="acquisitionView" aria-selected="false">Acquisition</button>
+        <button class="tab-button" id="tabIndexing" type="button" role="tab" aria-controls="indexingView" aria-selected="false">Indexing Basics</button>
+        <button class="tab-button" id="tabLearning" type="button" role="tab" aria-controls="learningView" aria-selected="false">Learning Path</button>
+        <button class="tab-button" id="tabResources" type="button" role="tab" aria-controls="resourcesView" aria-selected="false">Glossary / Resources</button>
       </nav>
 
       <section id="demoBanner" class="demo-banner hidden" aria-live="polite">
@@ -42,11 +47,47 @@
         <button id="returnToLesson" type="button">Return to lesson</button>
       </section>
 
-      <main class="workspace view-pane active" id="geometryView">
+      <main class="start-workspace view-pane active" id="startView" role="tabpanel" aria-labelledby="tabStart">
+        <section class="panel start-panel" aria-label="Start here">
+          <div class="start-hero">
+            <span class="fidelity-label">Student-first</span>
+            <h2>Choose your EBSD study path</h2>
+            <p>Start from where you are. The studio keeps the simulators, notes, quizzes, glossary, real Kikuchi examples, and local progress tracking together for self-study.</p>
+          </div>
+          <div class="start-path-grid" aria-label="Student onboarding paths">
+            <article class="start-path-card">
+              <span>I am new to EBSD</span>
+              <p>Begin with the learning path, then open Geometry to connect beam, sample tilt, cones, and detector bands.</p>
+              <button type="button" data-start-target="learning-intro">Start beginner path</button>
+            </article>
+            <article class="start-path-card">
+              <span>I know EBSD basics and want acquisition practice</span>
+              <p>Use the live acquisition simulator to compare exposure, gain, binning, drift, confidence, and map quality.</p>
+              <button type="button" data-start-target="acquisition">Practice acquisition</button>
+            </article>
+            <article class="start-path-card">
+              <span>I want to understand indexing and confidence</span>
+              <p>Review the simplified indexing workflow before experimenting with confidence and failure modes.</p>
+              <button type="button" data-start-target="indexing">Open indexing basics</button>
+            </article>
+            <article class="start-path-card">
+              <span>I want to revise using quizzes</span>
+              <p>Jump to checkpoints, flashcards, weak-area review, notes, and glossary links.</p>
+              <button type="button" data-start-target="revise">Revise with quizzes</button>
+            </article>
+          </div>
+          <div class="start-integrity-note">
+            <span class="fidelity-label">Scientific honesty</span>
+            <p>This is a conceptual learning studio. Some visuals are schematic, simplified, or not physically calibrated so the core EBSD ideas remain visible.</p>
+          </div>
+        </section>
+      </main>
+
+      <main class="workspace view-pane" id="geometryView" role="tabpanel" aria-labelledby="tabGeometry" aria-hidden="true">
         <section class="panel scene-panel" aria-label="SEM and EBSD geometry">
           <div class="panel-title">
             <strong>SEM / EBSD Geometry</strong>
-            <span>Drag to orbit, scroll to zoom</span>
+            <span><b class="fidelity-label inline">Schematic</b> Drag to orbit, scroll to zoom</span>
           </div>
           <div class="annotation numbered-label" id="annColumn"><b>1</b> SEM column</div>
           <div class="annotation numbered-label" id="annBeam"><b>2</b> Incident electron beam</div>
@@ -61,12 +102,12 @@
         <section class="panel detector-panel" aria-label="Live detector pattern">
           <div class="panel-title">
             <strong>Live Detector Pattern</strong>
-            <span>Kikuchi bands from cone intersections</span>
+            <span><b class="fidelity-label inline">Simplified</b> Kikuchi bands from cone intersections</span>
           </div>
           <div class="detector-toolbar">
             <label>
               <span>Contrast</span>
-              <input id="patternContrast" type="range" min="60" max="160" step="5" value="100" />
+              <input id="patternContrast" type="range" min="60" max="160" step="5" value="100" aria-label="Detector pattern contrast" />
             </label>
             <label class="compact-check"><input id="invertPattern" type="checkbox" /> Invert</label>
           </div>
@@ -78,13 +119,13 @@
             </div>
           </div>
           <p class="pattern-caption" id="patternCaption"></p>
-          <p class="simulation-note">Pattern simulated for teaching purposes only.</p>
+          <p class="simulation-note"><span class="fidelity-label inline">Not physically calibrated</span> Pattern simulated for learning purposes only.</p>
         </section>
 
         <aside class="panel controls" aria-label="Simulation controls">
           <div class="control-intro">
             <h2>Guided Geometry Lab</h2>
-            <p>Use guided mode for lectures, or adjust geometry and orientation to show how schematic EBSD bands respond.</p>
+            <p>Step through the geometry, then adjust orientation and detector controls to see how schematic EBSD bands respond.</p>
           </div>
 
           <section class="stage-card" aria-label="Guided explanation">
@@ -101,7 +142,7 @@
             </div>
             <label class="slider-row">
               <span>Stage <output class="value" id="stageValue">6 / 6</output></span>
-              <input id="stage" type="range" min="1" max="6" step="1" value="6" />
+              <input id="stage" type="range" min="1" max="6" step="1" value="6" aria-label="Guided geometry stage" />
             </label>
           </section>
 
@@ -110,19 +151,19 @@
             <p class="control-note">Geometry controls change where diffracted directions meet the detector; they do not make the model physically validated.</p>
             <label class="slider-row">
               <span>Sample tilt <output class="value" id="tiltValue">70°</output></span>
-              <input id="tilt" type="range" min="0" max="80" step="1" value="70" />
+              <input id="tilt" type="range" min="0" max="80" step="1" value="70" aria-label="Sample tilt in degrees" />
             </label>
             <label class="slider-row">
               <span>Detector distance <output class="value" id="distanceValue">2.9</output></span>
-              <input id="distance" type="range" min="1.8" max="4.6" step="0.1" value="2.9" />
+              <input id="distance" type="range" min="1.8" max="4.6" step="0.1" value="2.9" aria-label="Detector distance" />
             </label>
             <label class="slider-row">
               <span>Detector height <output class="value" id="detectorHeightValue">1.30</output></span>
-              <input id="detectorHeight" type="range" min="0.4" max="2.4" step="0.05" value="1.3" />
+              <input id="detectorHeight" type="range" min="0.4" max="2.4" step="0.05" value="1.3" aria-label="Detector height" />
             </label>
             <label class="slider-row">
               <span>Accelerating voltage <output class="value" id="voltageValue">20 kV</output></span>
-              <input id="voltage" type="range" min="5" max="30" step="1" value="20" />
+              <input id="voltage" type="range" min="5" max="30" step="1" value="20" aria-label="Accelerating voltage in kilovolts" />
             </label>
           </details>
 
@@ -144,11 +185,11 @@
           </details>
 
           <details class="control-group" open>
-            <summary>Teaching Emphasis</summary>
+            <summary>Learning Emphasis</summary>
             <p class="control-note">These sliders exaggerate or simplify visual elements so beginners can see the idea before worrying about exact physics.</p>
             <label class="slider-row">
               <span>Cone angle magnifier <output class="value" id="coneScaleValue">6.0x</output></span>
-              <input id="coneScale" type="range" min="3" max="9" step="0.5" value="6" />
+              <input id="coneScale" type="range" min="3" max="9" step="0.5" value="6" aria-label="Cone angle magnifier" />
             </label>
             <label class="slider-row">
               <span>Plane family count <output class="value" id="planeCountValue">4</output></span>
@@ -179,7 +220,7 @@
 
           <section class="control-group formula-mini">
             <h3>Formula mini-calculator</h3>
-            <p class="control-note">Uses the current accelerating voltage and a teaching d-spacing. This supports Bragg-law intuition, not calibrated phase identification.</p>
+            <p class="control-note">Uses the current accelerating voltage and a study d-spacing. This supports Bragg-law intuition, not calibrated phase identification.</p>
             <label class="slider-row">
               <span>d-spacing <output class="value" id="miniSpacingValue">0.120 nm</output></span>
               <input id="miniDSpacing" type="range" min="0.06" max="0.30" step="0.005" value="0.120" />
@@ -191,7 +232,7 @@
           </section>
         </aside>
 
-        <section class="teaching-card-row" aria-label="Geometry teaching cards">
+        <section class="teaching-card-row" aria-label="Geometry learning cards">
           <article class="teaching-card">
             <span>What’s happening right now?</span>
             <p id="nowCard">Multiple plane families produce a network of Kikuchi bands on the detector.</p>
@@ -222,11 +263,11 @@
         </section>
       </main>
 
-      <main class="acquisition-workspace view-pane" id="acquisitionView">
+      <main class="acquisition-workspace view-pane" id="acquisitionView" role="tabpanel" aria-labelledby="tabAcquisition" aria-hidden="true">
         <section class="panel scan-panel" aria-label="Live EBSD scan acquisition">
           <div class="panel-title">
             <strong>Live EBSD Scan Acquisition</strong>
-            <span>Raster scan: each pixel needs a usable diffraction pattern</span>
+            <span><b class="fidelity-label inline">Schematic</b> Raster scan: each pixel needs a usable diffraction pattern</span>
           </div>
           <button id="scanPauseButton" class="live-toggle-pill" type="button" aria-pressed="false">Pause live scan</button>
           <div class="scan-status-strip" aria-label="Live scan state">
@@ -257,7 +298,7 @@
         <section class="panel pattern-lab" aria-label="Acquired EBSD pattern preview">
           <div class="panel-title">
             <strong>Pattern at Current Pixel</strong>
-            <span>Noise, clipping, and band sharpness change indexability</span>
+            <span><b class="fidelity-label inline">Real pattern capable</b> Noise, clipping, and band sharpness change indexability</span>
           </div>
           <button id="patternPauseButton" class="live-toggle-pill pattern-toggle" type="button" aria-pressed="false">Pause live scan</button>
           <canvas id="patternPreview" width="420" height="420"></canvas>
@@ -299,13 +340,13 @@
           </section>
 
           <section class="control-group acquisition-teaching-tools">
-            <h3>Teaching mode</h3>
+            <h3>Study depth</h3>
             <div class="segmented-control" role="group" aria-label="Control detail level">
               <button id="beginnerMode" class="active" type="button">Beginner</button>
               <button id="advancedMode" type="button">Advanced</button>
             </div>
             <div id="warningBadges" class="warning-badges" aria-live="polite"></div>
-            <button id="resetAcquisitionDefaults" class="wide" type="button">Reset to teaching default</button>
+            <button id="resetAcquisitionDefaults" class="wide" type="button">Reset to balanced study setup</button>
           </section>
 
           <section class="control-group">
@@ -358,7 +399,7 @@
               <select id="indexingMode">
                 <option value="hough">Hough bands</option>
                 <option value="dictionary">Dictionary match</option>
-                <option value="manual">Manual teaching</option>
+                <option value="manual">Manual review</option>
               </select>
             </label>
             <label class="slider-row advanced-control">
@@ -437,7 +478,7 @@
           </section>
 
           <section class="control-group scenario-panel">
-            <h3>Teaching scenarios</h3>
+            <h3>Practice scenarios</h3>
             <label class="select-row">
               <span>Name</span>
               <input id="scenarioName" type="text" value="My EBSD scenario" />
@@ -453,7 +494,7 @@
           </section>
         </aside>
 
-        <section class="teaching-card-row acquisition-cards" aria-label="Acquisition teaching cards">
+        <section class="teaching-card-row acquisition-cards" aria-label="Acquisition learning cards">
           <article class="teaching-card">
             <span>What students should notice</span>
             <p>Indexing works when enough sharp bands are visible with good signal and without saturation. Improve signal or detail, or reduce speed/drift.</p>
@@ -477,13 +518,104 @@
         </section>
       </main>
 
-      <main class="learning-workspace view-pane" id="learningView">
+      <main class="indexing-workspace view-pane" id="indexingView" role="tabpanel" aria-labelledby="tabIndexing" aria-hidden="true">
+        <section class="panel indexing-foundation" aria-label="How Kikuchi bands are indexed">
+          <div class="indexing-heading">
+            <span class="fidelity-label">Conceptual explanation</span>
+            <h2>How Kikuchi Bands Are Indexed</h2>
+            <p>This module is a simplified indexing workflow, not a full commercial indexing engine. It shows why indexing depends on pattern quality, calibration, phase selection, band geometry, and confidence metrics.</p>
+          </div>
+          <div class="indexing-pipeline" aria-label="Simplified indexing workflow">
+            <article class="indexing-step-card">
+              <div class="indexing-visual raw-pattern" aria-hidden="true"></div>
+              <span>1. Raw Kikuchi pattern</span>
+              <p>The detector records a diffraction pattern with bands, background intensity, noise, and possible saturation.</p>
+              <small>What can go wrong: weak bands, damaged surfaces, poor exposure, drift, or clipping can hide useful features.</small>
+              <div class="mini-checkpoint">
+                <p>Checkpoint: Can a bright raw pattern still be hard to index?</p>
+                <button type="button" data-indexing-answer="correct">Yes</button>
+                <button type="button" data-indexing-answer="wrong">No</button>
+              </div>
+            </article>
+            <article class="indexing-step-card">
+              <div class="indexing-visual background-correction" aria-hidden="true"></div>
+              <span>2. Background correction</span>
+              <p>Smooth background is reduced so Kikuchi bands stand out more clearly from diffuse intensity.</p>
+              <small>What can go wrong: over-correction can distort bands; under-correction leaves bands hard to detect.</small>
+              <div class="mini-checkpoint">
+                <p>Checkpoint: Why remove smooth background?</p>
+                <button type="button" data-indexing-answer="correct">To reveal band contrast</button>
+                <button type="button" data-indexing-answer="wrong">To change the crystal phase</button>
+              </div>
+            </article>
+            <article class="indexing-step-card">
+              <div class="indexing-visual band-detection" aria-hidden="true"></div>
+              <span>3. Band detection</span>
+              <p>Software searches for band-like line features and estimates their positions, widths, and angles.</p>
+              <small>What can go wrong: low thresholds find false bands; high thresholds miss weak real bands.</small>
+              <div class="mini-checkpoint">
+                <p>Checkpoint: What is being detected?</p>
+                <button type="button" data-indexing-answer="correct">Band positions and angles</button>
+                <button type="button" data-indexing-answer="wrong">Sample temperature</button>
+              </div>
+            </article>
+            <article class="indexing-step-card">
+              <div class="indexing-visual hough-transform" aria-hidden="true"></div>
+              <span>4. Hough transform</span>
+              <p>The Hough transform helps detect Kikuchi bands as lines or line-like features by mapping image features into a voting space.</p>
+              <small>What can go wrong: noise, overlap, and bad background correction can create ambiguous peaks.</small>
+              <div class="mini-checkpoint">
+                <p>Checkpoint: What does the Hough transform help find?</p>
+                <button type="button" data-indexing-answer="correct">Line features from bands</button>
+                <button type="button" data-indexing-answer="wrong">Chemical composition directly</button>
+              </div>
+            </article>
+            <article class="indexing-step-card">
+              <div class="indexing-visual angle-matching" aria-hidden="true"></div>
+              <span>5. Band angle matching</span>
+              <p>Detected band positions and angles are compared with theoretical crystal plane geometry for the selected phase.</p>
+              <small>What can go wrong: wrong phase choice, pseudosymmetry, or bad detector calibration can produce plausible but wrong matches.</small>
+              <div class="mini-checkpoint">
+                <p>Checkpoint: What is compared during matching?</p>
+                <button type="button" data-indexing-answer="correct">Detected bands with theoretical plane geometry</button>
+                <button type="button" data-indexing-answer="wrong">Only the map colors</button>
+              </div>
+            </article>
+            <article class="indexing-step-card">
+              <div class="indexing-visual orientation-solution" aria-hidden="true"></div>
+              <span>6. Orientation solution</span>
+              <p>The best match gives a candidate crystal orientation, often expressed through Euler angles, matrices, or IPF map colors.</p>
+              <small>What can go wrong: a solution can look tidy but still be wrong if the setup or phase model is wrong.</small>
+              <div class="mini-checkpoint">
+                <p>Checkpoint: Does a good-looking map prove the solution is correct?</p>
+                <button type="button" data-indexing-answer="wrong">Always</button>
+                <button type="button" data-indexing-answer="correct">No, confidence and context matter</button>
+              </div>
+            </article>
+            <article class="indexing-step-card wide-step">
+              <div class="indexing-visual confidence-failures" aria-hidden="true"></div>
+              <span>7. Confidence and failure modes</span>
+              <p>Indexing is not magic. Confidence metrics help judge decision strength, but they are not proof of physical truth. Pattern quality, calibration, phase selection, and thresholds all matter.</p>
+              <small>What can go wrong: good-looking EBSD maps can still be wrong, especially with wrong phase lists, damaged patterns, pseudosymmetry, or poor calibration.</small>
+              <div class="mini-checkpoint">
+                <p>Checkpoint: Which evidence should you inspect before trusting a map?</p>
+                <button type="button" data-indexing-answer="correct">Pattern quality, confidence, phase choice, and calibration</button>
+                <button type="button" data-indexing-answer="wrong">IPF color alone</button>
+              </div>
+            </article>
+          </div>
+          <p id="indexingCheckpointFeedback" class="checkpoint-feedback" aria-live="polite"></p>
+          <div id="indexingStudio" class="indexing-studio" aria-label="Interactive indexing understanding module"></div>
+        </section>
+      </main>
+
+      <main class="learning-workspace view-pane" id="learningView" role="tabpanel" aria-labelledby="tabLearning" aria-hidden="true">
         <aside class="panel curriculum-sidebar" aria-label="Learning path modules">
           <div class="panel-heading">
-            <span>Curriculum</span>
+            <span>Study path</span>
             <strong>EBSD from first principles to practice</strong>
           </div>
-          <p class="sidebar-note">Choose a module. All diagrams, quizzes, formulas, and classroom prompts are stored locally.</p>
+          <p class="sidebar-note">Choose a module. Diagrams, quizzes, formulas, reflection prompts, notes, and progress are stored locally.</p>
           <div id="moduleList" class="module-list"></div>
           <button id="downloadModules" class="offline-download" type="button">Download all modules for offline use</button>
         </aside>
@@ -492,7 +624,7 @@
           <div id="lessonWorkspace"></div>
         </section>
 
-        <aside class="panel learning-sidebar" aria-label="Glossary and classroom tools">
+        <aside class="panel learning-sidebar" aria-label="Glossary and study tools">
           <section class="side-card">
             <h2>Mini glossary</h2>
             <div id="miniGlossary"></div>
@@ -502,23 +634,43 @@
             <div id="formulaPanel"></div>
           </section>
           <section class="side-card">
-            <h2>Classroom tools</h2>
+            <h2>Study tools</h2>
             <div class="tool-grid">
               <button id="learningNotesShortcut" type="button">Notes</button>
               <button id="learningBookmarksShortcut" type="button">Bookmarks</button>
               <button id="learningScenariosShortcut" type="button">Saved scenarios</button>
-              <label class="teacher-toggle"><input id="teacherMode" type="checkbox" /> Teacher mode</label>
+              <button id="learningIndexingShortcut" type="button">Indexing basics</button>
             </div>
           </section>
         </aside>
 
         <section class="offline-resources" aria-label="Offline resources">
-          <article><span>Worksheet</span><p>Printable classroom prompts stored locally.</p><button data-resource="worksheet-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="worksheet-view" type="button" title="Download worksheet HTML">Export</button></article>
+          <article><span>Worksheet</span><p>Printable self-study prompts stored locally.</p><button data-resource="worksheet-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="worksheet-view" type="button" title="Download worksheet HTML">Export</button></article>
           <article><span>Lesson cards</span><p>Compact EBSD concept cards for revision.</p><button data-resource="lesson-cards-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="lesson-cards-view" type="button" title="Download lesson cards HTML">Export</button></article>
           <article><span>Formula cheat sheet</span><p>Bragg law and wavelength reference.</p><button data-resource="formula-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="formula-view" type="button" title="Download formula sheet HTML">Export</button></article>
           <article><span>Practice questions</span><p>Local checkpoint questions from the modules.</p><button data-resource="practice-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="practice-view" type="button" title="Download practice questions HTML">Export</button></article>
           <article><span>Sample datasets</span><p>Local synthetic acquisition presets.</p><button data-resource="datasets-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="datasets-view" type="button" title="Download preset reference HTML">Export</button></article>
-          <article><span>Teacher demo plan</span><p>Suggested classroom demo order.</p><button data-resource="teacher-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="teacher-view" type="button" title="Download teacher demo plan HTML">Export</button></article>
+          <article><span>Self-study guide</span><p>Suggested practice order and reflection prompts.</p><button data-resource="self-study-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="self-study-view" type="button" title="Download self-study guide HTML">Export</button></article>
+        </section>
+      </main>
+
+      <main class="resources-workspace view-pane" id="resourcesView" role="tabpanel" aria-labelledby="tabResources" aria-hidden="true">
+        <section class="panel resources-panel" aria-label="Glossary and resources">
+          <div class="resources-heading">
+            <span class="fidelity-label">Local resources</span>
+            <h2>Glossary / Resources</h2>
+            <p>Use these for self-study exports, revision, and quick term lookup. Everything is generated from local app content.</p>
+          </div>
+          <div class="resource-launch-grid">
+            <button id="resourcesGlossaryButton" type="button">Open glossary</button>
+            <button id="resourcesNotesButton" type="button">Open notes</button>
+            <button data-resource="worksheet-view" type="button">Worksheet</button>
+            <button data-resource="practice-view" type="button">Practice questions</button>
+            <button data-resource="formula-view" type="button">Formula sheet</button>
+            <button data-resource="datasets-view" type="button">Sample datasets</button>
+            <button data-resource="self-study-view" type="button">Self-study guide</button>
+            <button data-resource-export="all-modules-view" type="button">Export all modules</button>
+          </div>
         </section>
       </main>
 
@@ -592,7 +744,7 @@
           <div class="modal-heading">
             <div>
               <span>Offline help</span>
-              <strong>Using EBSD Teaching Studio</strong>
+              <strong>Using EBSD Learning Studio</strong>
             </div>
             <button value="close" type="submit" aria-label="Close help">Close</button>
           </div>
@@ -606,16 +758,16 @@
               <p>Students should begin in Learning Path, try the linked simulator activities, answer checkpoints, write notes, and mark modules complete.</p>
             </section>
             <section>
-              <h2>Teacher use</h2>
-              <p>Turn on Teacher Demo mode for prompts, expected observations, and short classroom sequences.</p>
+              <h2>Self-study use</h2>
+              <p>Start with the path chooser, use guided simulator activities, answer checkpoints, and save notes for revision.</p>
             </section>
             <section>
               <h2>Offline and conceptual</h2>
-              <p>No cloud services or remote assets are required. This is a conceptual teaching simulator, not validated EBSD physics or indexing software.</p>
+              <p>No cloud services or remote assets are required. This is a conceptual learning simulator, not validated EBSD physics or indexing software.</p>
             </section>
             <section>
               <h2>Real Kikuchi images</h2>
-              <p>Local images are stored in <code>D:\pythonProjects\EBSD-Teaching\public\kikuchi-patterns</code>. Update <code>src\data\kikuchiPatterns.js</code> after adding more files.</p>
+              <p>Local images are stored in the project-relative <code>public/kikuchi-patterns</code> folder. Update <code>src/data/kikuchiPatterns.js</code> after adding more files.</p>
             </section>
           </div>
           <label class="compact-check"><input id="dontShowHelpAgain" type="checkbox" /> Do not show this again automatically</label>

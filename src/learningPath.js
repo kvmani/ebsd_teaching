@@ -163,7 +163,7 @@ function geometryConeDiagram(index) {
         <text x="646" y="8" fill="#eef6f7" font-size="13" font-weight="650">sample</text>
       </g>
 
-      <text x="40" y="360" fill="#a9b9bd" font-size="13">Cones are enlarged for teaching clarity.</text>
+      <text x="40" y="360" fill="#a9b9bd" font-size="13">Cones are enlarged for learning clarity.</text>
     </svg>
   `;
 }
@@ -211,13 +211,13 @@ const activityDefaults = {
     aim: 'See why EBSD is treated as a near-surface diffraction method.',
     steps: ['Open Geometry + Pattern.', 'Go to interaction volume stage.', 'Inspect the glowing near-surface marker.', 'Discuss why polishing damage matters.'],
     prediction: 'If the surface is damaged, what should happen to band sharpness?',
-    explanation: 'The interaction volume is schematic. It marks the teaching idea that useful EBSD signal is tied to the prepared near-surface region.'
+    explanation: 'The interaction volume is schematic. It marks the learning idea that useful EBSD signal is tied to the prepared near-surface region.'
   },
   'geometry-stage-4': {
     aim: 'Explore how voltage and d-spacing affect Bragg angle and cone visibility.',
     steps: ['Open Geometry + Pattern.', 'Go to cone formation stage.', 'Change voltage from 10 kV to 30 kV.', 'Watch wavelength and band-width readouts.'],
     prediction: 'What happens to electron wavelength when voltage increases?',
-    explanation: 'Higher accelerating voltage gives shorter electron wavelength. For a fixed d-spacing, Bragg angle becomes smaller; the app magnifies cones for teaching.'
+    explanation: 'Higher accelerating voltage gives shorter electron wavelength. For a fixed d-spacing, Bragg angle becomes smaller; the app magnifies cones for visual learning.'
   },
   'geometry-stage-6': {
     aim: 'Observe how crystal orientation moves Kikuchi bands.',
@@ -308,7 +308,7 @@ const mapModes = {
 };
 
 const mapRegions = {
-  'grain-a': { label: 'Grain A', orientation: '[001] blue-green', quality: 84, confidence: 88, indexed: 'indexed', text: 'Coherent color and good confidence make this a good teaching example of a stable grain interior.' },
+  'grain-a': { label: 'Grain A', orientation: '[001] blue-green', quality: 84, confidence: 88, indexed: 'indexed', text: 'Coherent color and good confidence make this a good example of a stable grain interior.' },
   'grain-b': { label: 'Grain B', orientation: '[101] amber', quality: 76, confidence: 72, indexed: 'indexed', text: 'This region is usable, but students should still compare quality and confidence before interpreting boundaries.' },
   boundary: { label: 'Boundary band', orientation: 'rapid orientation change', quality: 46, confidence: 38, indexed: 'mixed', text: 'Quality and confidence drop near boundaries, where patterns can overlap or become harder to index.' },
   damaged: { label: 'Prepared surface issue', orientation: 'uncertain', quality: 28, confidence: 22, indexed: 'partly unindexed', text: 'Low quality plus low confidence is a prompt to discuss preparation, signal, phase choice, and thresholds.' }
@@ -389,6 +389,7 @@ export class LearningPath {
     this.formulaPanel = formulaPanel;
     this.onExperiment = onExperiment;
     this.progress = loadLearningProgress();
+    if (!['learn', 'practice', 'revise'].includes(this.progress.selectedMode)) this.progress.selectedMode = 'learn';
     this.selectedQuestionIndex = 0;
     this.glossaryQuery = '';
     this.glossaryCategory = 'all';
@@ -416,7 +417,6 @@ export class LearningPath {
     this.renderLesson();
     this.renderGlossary();
     this.renderFormula();
-    this.bindTeacherToggle();
   }
 
   moduleStatus(module) {
@@ -533,7 +533,7 @@ export class LearningPath {
     return `
       <section class="course-dashboard" aria-label="Learning Path dashboard">
         <div class="dashboard-main">
-          <span>Course dashboard</span>
+          <span>Study dashboard</span>
           <strong>${escapeHtml(module.shortTitle || module.title)} - ${escapeHtml(this.progress.selectedMode)}</strong>
           <p>${escapeHtml(this.nextRecommendedAction(module))}</p>
         </div>
@@ -546,7 +546,7 @@ export class LearningPath {
         <div class="dashboard-actions">
           <button type="button" data-course-action="previous" ${index === 0 ? 'disabled' : ''}>Previous module</button>
           <button type="button" data-course-action="next" ${index === learningModules.length - 1 ? 'disabled' : ''}>Next module</button>
-          <button type="button" data-course-action="continue">Continue course</button>
+          <button type="button" data-course-action="continue">Continue path</button>
           <button type="button" data-course-action="weak">Review weak areas</button>
         </div>
       </section>
@@ -571,8 +571,8 @@ export class LearningPath {
         </div>
       </div>
       <div class="learning-mode-selector" role="group" aria-label="Learning mode">
-        ${['learn', 'practice', 'revise', 'teacher'].map((mode) => `
-          <button type="button" class="${this.progress.selectedMode === mode ? 'active' : ''}" data-learning-mode="${mode}">${mode === 'teacher' ? 'Teacher Demo' : mode[0].toUpperCase() + mode.slice(1)}</button>
+        ${['learn', 'practice', 'revise'].map((mode) => `
+          <button type="button" class="${this.progress.selectedMode === mode ? 'active' : ''}" data-learning-mode="${mode}">${mode[0].toUpperCase() + mode.slice(1)}</button>
         `).join('')}
       </div>
       <div class="lesson-diagram">${diagramForModule(learningModules.indexOf(module), module)}</div>
@@ -638,27 +638,27 @@ export class LearningPath {
       `;
     }
 
-    if (this.progress.selectedMode === 'teacher' || this.progress.teacherMode) {
+    if (false) {
       return `
-        <section class="mode-panel teacher">
-          <strong>Teacher Demo mode</strong>
-          <p>Run this as a short classroom sequence: prediction before slider movement, observation after, then a misconception check.</p>
+        <section class="mode-panel self-study">
+          <strong>Self-study sequence</strong>
+          <p>Use prediction before slider movement, observation after, then a misconception check.</p>
         </section>
-        <div class="lesson-grid teacher-grid">
-          <article class="lesson-card teacher-note">
-            <span>Suggested demo sequence</span>
+        <div class="lesson-grid self-study-grid">
+          <article class="lesson-card self-study-note">
+            <span>Suggested practice sequence</span>
             <ol>
-              <li>Ask students to predict the visible change.</li>
+              <li>Predict the visible change.</li>
               <li>Run the linked simulator activity.</li>
               <li>Pause on the readout or map evidence.</li>
-              <li>Ask students to explain the result using one glossary term.</li>
+              <li>Explain the result using one glossary term.</li>
             </ol>
           </article>
-          <article class="lesson-card teacher-note">
-            <span>Discussion prompts</span>
-            <ul>${listItems(module.teacherPrompts)}</ul>
+          <article class="lesson-card self-study-note">
+            <span>Reflection prompts</span>
+            <ul>${listItems(module.reflectionPrompts)}</ul>
           </article>
-          <article class="lesson-card teacher-note">
+          <article class="lesson-card self-study-note">
             <span>Expected observations</span>
             <ul>${listItems(this.activityList(module).map((activity) => activity.explanation))}</ul>
           </article>
@@ -702,11 +702,11 @@ export class LearningPath {
     `;
   }
 
-  renderActivityCards(module, teacherCompact = false) {
+  renderActivityCards(module, compactActivity = false) {
     const activities = this.activityList(module);
     if (!activities.length) return '';
     return `
-      <article class="lesson-card activity-card ${teacherCompact ? 'teacher-activity' : ''}">
+      <article class="lesson-card activity-card ${compactActivity ? 'compact-activity' : ''}">
         <span>Guided activity worksheet</span>
         ${activities.map((activity) => {
           const done = this.progress.completedActivities.includes(activity.id);
@@ -718,7 +718,7 @@ export class LearningPath {
                 <small>${done ? 'done' : 'not done'}</small>
               </div>
               <p><b>Aim:</b> ${escapeHtml(activity.aim)}</p>
-              <details ${teacherCompact ? '' : 'open'}>
+              <details ${compactActivity ? '' : 'open'}>
                 <summary>Steps</summary>
                 <ol>${listItems(activity.steps)}</ol>
               </details>
@@ -754,7 +754,7 @@ export class LearningPath {
             <li>sin(theta) = 0.0358</li>
             <li>theta is about 2.05°</li>
           </ol>
-          <small>Teaching note: the app magnifies cone angles so beginners can see the geometry.</small>
+          <small>Learning note: the app magnifies cone angles so beginners can see the geometry.</small>
         </article>
       `;
     }
@@ -762,7 +762,7 @@ export class LearningPath {
       <article class="lesson-card formula-focus">
         <span>Useful formula reference</span>
         ${module.formulas.map((id) => `<div class="formula">${escapeHtml(formulaReference[id] ?? id)}</div>`).join('')}
-        <small>Conceptual teaching reference, not calibrated EBSD software.</small>
+        <small>Conceptual learning reference, not calibrated EBSD software.</small>
       </article>
     `;
   }
@@ -1042,10 +1042,8 @@ export class LearningPath {
     this.lessonWorkspace.querySelectorAll('[data-learning-mode]').forEach((button) => {
       button.addEventListener('click', () => {
         this.progress.selectedMode = button.dataset.learningMode;
-        if (button.dataset.learningMode === 'teacher') this.progress.teacherMode = true;
         this.save();
         this.renderLesson();
-        this.bindTeacherToggle();
       });
     });
 
@@ -1220,7 +1218,7 @@ export class LearningPath {
 
   renderFormula() {
     this.formulaPanel.innerHTML = `
-      <p class="formula-note">Conceptual teaching tools, not calibrated EBSD software.</p>
+      <p class="formula-note">Conceptual learning tools, not calibrated EBSD software.</p>
       <div class="formula">${escapeHtml(formulaReference.bragg)}</div>
       <div class="formula small">${escapeHtml(formulaReference.wavelength)}</div>
       <div class="formula-explorer">
@@ -1271,15 +1269,4 @@ export class LearningPath {
     update();
   }
 
-  bindTeacherToggle() {
-    const toggle = document.getElementById('teacherMode');
-    if (!toggle) return;
-    toggle.checked = Boolean(this.progress.teacherMode);
-    toggle.onchange = () => {
-      this.progress.teacherMode = toggle.checked;
-      this.progress.selectedMode = toggle.checked ? 'teacher' : 'learn';
-      this.save();
-      this.renderLesson();
-    };
-  }
 }

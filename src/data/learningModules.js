@@ -1,7 +1,7 @@
-const commonTeacherPrompts = [
-  'Ask students to predict the visual change before moving a slider.',
-  'Ask students to separate pattern quality from indexing confidence.',
-  'Ask students to name the simplification used in the simulator.'
+﻿const commonReflectionPrompts = [
+  'Predict the visual change before moving a slider.',
+  'Separate pattern quality from indexing confidence.',
+  'Name the simplification used in the simulator.'
 ];
 
 function q(id, type, question, options, answerIndex, feedback, extra = {}) {
@@ -46,7 +46,7 @@ export const learningModules = [
     miniExperiments: [{ label: 'Compare map quality', action: 'open-acquisition-balanced', text: 'Open Live Scan Acquisition and compare orientation and confidence views.' }],
     practiceTasks: ['Switch map modes and describe what each one means.'],
     simulatorLinks: ['Live Scan Acquisition'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask why EBSD is a diffraction method rather than a color camera.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Reflect on why EBSD is a diffraction method rather than a color camera.'],
     troubleshootingCards: []
   },
   {
@@ -59,7 +59,7 @@ export const learningModules = [
     learningObjectives: ['Identify beam, sample, and detector geometry.', 'Explain why high sample tilt is common.', 'Predict detector visibility changes.'],
     topics: ['SEM column', 'Incident beam', 'Tilted specimen', 'Detector position', 'Working distance', 'Pattern visibility'],
     keyIdeas: ['The SEM beam strikes a tilted crystal.', 'High tilt helps useful electrons escape toward the detector.', 'Detector distance changes projection.', 'Detector height shifts the visible pattern.', 'Geometry affects whether a pattern is easy to index.'],
-    explanation: 'The geometry tab uses a readable teaching convention: the sample is tilted toward the detector so students can see why backscattered electrons reach the phosphor screen.',
+    explanation: 'The geometry tab uses a readable learning convention: the sample is tilted toward the detector so students can see why backscattered electrons reach the phosphor screen.',
     whyItMatters: 'Bad geometry can reduce pattern intensity before software has any chance to index the pattern.',
     misconception: 'Sample tilt is not just a viewing angle; it changes electron escape and detector visibility.',
     formulas: [],
@@ -71,7 +71,7 @@ export const learningModules = [
     miniExperiments: [{ label: 'Open geometry demo', action: 'geometry-stage-1', text: 'Open the geometry tab and step through beam, interaction volume, and detector.' }],
     practiceTasks: ['Move sample tilt and describe what becomes easier or harder to see.'],
     simulatorLinks: ['Geometry + Pattern'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask students to predict what happens when tilt is reduced.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Ask yourself to predict what happens when tilt is reduced.'],
     troubleshootingCards: []
   },
   {
@@ -84,19 +84,19 @@ export const learningModules = [
     learningObjectives: ['Describe the interaction volume.', 'Explain surface sensitivity.', 'Connect preparation quality to pattern quality.'],
     topics: ['Backscattered electrons', 'Elastic scattering', 'Inelastic scattering', 'Surface preparation', 'Surface sensitivity'],
     keyIdeas: ['Useful signal is near-surface.', 'Backscattered electrons carry diffraction information.', 'Damaged surface layers weaken bands.', 'The app volume is schematic.', 'Good preparation improves real EBSD reliability.'],
-    explanation: 'The glowing volume is a teaching marker for where useful backscattered electrons originate. It is not a Monte Carlo simulation.',
+    explanation: 'The glowing volume is a schematic marker for where useful backscattered electrons originate. It is not a Monte Carlo simulation.',
     whyItMatters: 'Real EBSD is very sensitive to polishing damage, oxidation, contamination, and deformation near the surface.',
     misconception: 'EBSD does not directly measure deep bulk orientation.',
     formulas: [],
     glossaryTerms: ['interaction volume', 'backscattered electron', 'pattern quality'],
     quizQuestions: [
       q('interaction-q1', 'multiple-choice', 'Why does sample preparation matter for EBSD?', ['It changes keyboard shortcuts', 'EBSD is surface sensitive', 'It removes the detector', 'It stops all scattering'], 1, 'The useful diffraction signal comes from near the surface.'),
-      q('interaction-q2', 'choose-best', 'Best explanation of the glowing volume in this app:', ['A validated Monte Carlo result', 'A schematic teaching marker', 'A chemical map', 'A thermal image'], 1, 'The app is conceptual and uses simplified visual anchors.')
+      q('interaction-q2', 'choose-best', 'Best explanation of the glowing volume in this app:', ['A validated Monte Carlo result', 'A schematic learning marker', 'A chemical map', 'A thermal image'], 1, 'The app is conceptual and uses simplified visual anchors.')
     ],
     miniExperiments: [{ label: 'Show interaction volume', action: 'geometry-stage-2', text: 'Open stage 2 and discuss why the volume is schematic.' }],
     practiceTasks: ['List three surface issues that could lower pattern quality.'],
     simulatorLinks: ['Geometry + Pattern'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask why EBSD is surface sensitive.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Reflect on why EBSD is surface sensitive.'],
     troubleshootingCards: []
   },
   {
@@ -108,10 +108,10 @@ export const learningModules = [
     difficulty: 'Intermediate',
     learningObjectives: ['Use Bragg law conceptually.', 'Relate wavelength to voltage.', 'Explain why cones become detector bands.'],
     topics: ['Bragg law', 'Electron wavelength', 'd-spacing', 'Diffraction cones', 'Band width'],
-    keyIdeas: ['Bragg law links wavelength, spacing, and angle.', 'Higher voltage gives shorter wavelength.', 'Real EBSD angles are small.', 'Cones are magnified for teaching.', 'Cone cuts explain band edges.'],
+    keyIdeas: ['Bragg law links wavelength, spacing, and angle.', 'Higher voltage gives shorter wavelength.', 'Real EBSD angles are small.', 'Cones are magnified for learning clarity.', 'Cone cuts explain band edges.'],
     explanation: 'Each lattice-plane family can be represented by a diffraction cone. The detector cuts the cone, and the cut appears as a Kikuchi band edge.',
     whyItMatters: 'This geometry explains why changing orientation moves bands and why detector calibration matters.',
-    misconception: 'The large visual cones are not real physical angles; they are magnified for teaching.',
+    misconception: 'The large visual cones are not real physical angles; they are magnified for learning clarity.',
     formulas: ['bragg', 'wavelength'],
     glossaryTerms: ['Bragg law', 'Bragg angle', 'interplanar spacing', 'hkl'],
     quizQuestions: [
@@ -121,7 +121,7 @@ export const learningModules = [
     miniExperiments: [{ label: 'Show cone formation', action: 'geometry-stage-4', text: 'Open cone stage and compare voltage/cone magnifier.' }],
     practiceTasks: ['Use the formula explorer to calculate theta for d = 0.120 nm at 20 kV.'],
     simulatorLinks: ['Geometry + Pattern'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask why the app magnifies cone angles.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Reflect on why the app magnifies cone angles.'],
     troubleshootingCards: []
   },
   {
@@ -146,7 +146,7 @@ export const learningModules = [
     miniExperiments: [{ label: 'Show full Kikuchi pattern', action: 'geometry-stage-6', text: 'Open full pattern and rotate crystal Z.' }],
     practiceTasks: ['Rotate Z and describe how band positions move.'],
     simulatorLinks: ['Geometry + Pattern'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask why band position matters more than band color.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Reflect on why band position matters more than band color.'],
     troubleshootingCards: []
   },
   {
@@ -171,22 +171,22 @@ export const learningModules = [
     miniExperiments: [{ label: 'Move detector', action: 'geometry-detector-demo', text: 'Open geometry tab and adjust detector distance/height.' }],
     practiceTasks: ['Compare short and long detector distance.'],
     simulatorLinks: ['Geometry + Pattern'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask why calibration matters even with visible bands.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Reflect on why calibration matters even with visible bands.'],
     troubleshootingCards: []
   },
   {
     id: 'indexing',
-    title: 'Pattern indexing and crystal orientation',
-    shortTitle: 'Indexing',
+    title: 'How Kikuchi Bands Are Indexed',
+    shortTitle: 'Indexing basics',
     category: 'Indexing',
     estimatedTime: '20 min',
     difficulty: 'Intermediate',
-    learningObjectives: ['Describe band detection.', 'Explain confidence conceptually.', 'Connect orientation to IPF color.'],
-    topics: ['Band detection', 'Hough transform', 'Confidence index', 'Euler angles', 'Orientation matrix', 'IPF color'],
-    keyIdeas: ['Indexing starts with band detection.', 'Detected bands are matched to candidate orientations.', 'Confidence is a decision score.', 'IPF color encodes orientation.', 'Bright saturated patterns may index poorly.'],
-    explanation: 'Indexing turns a band pattern into a crystal orientation by comparing detected band geometry with possible simulated geometries.',
-    whyItMatters: 'Understanding indexing prevents blind trust in software output.',
-    misconception: 'Indexing confidence is not the same thing as pattern brightness.',
+    learningObjectives: ['Describe the simplified indexing workflow.', 'Explain how Hough-style band detection supports indexing.', 'Interpret confidence as decision strength, not proof.'],
+    topics: ['Raw pattern', 'Background correction', 'Band detection', 'Hough transform', 'Band angle matching', 'Orientation solution', 'Confidence and failure modes'],
+    keyIdeas: ['Indexing starts with a raw Kikuchi pattern and background correction.', 'The Hough transform helps detect Kikuchi bands as line-like features.', 'Detected band positions and angles are compared with theoretical crystal plane geometry.', 'The selected phase and detector calibration strongly affect the solution.', 'Good-looking EBSD maps can still be wrong.'],
+    explanation: 'This module introduces the indexing pipeline step by step: raw pattern, background correction, band detection, Hough transform, band angle matching, orientation solution, and confidence checks.',
+    whyItMatters: 'Understanding indexing prevents blind trust in software output. Indexing is evidence-based, and it can fail when patterns, calibration, phase selection, or thresholds are poor.',
+    misconception: 'Indexing is not magic, and confidence is not the same thing as truth or brightness.',
     formulas: [],
     glossaryTerms: ['indexing', 'Hough transform', 'Euler angles', 'orientation matrix', 'confidence index'],
     quizQuestions: [
@@ -196,7 +196,7 @@ export const learningModules = [
     miniExperiments: [{ label: 'Try indexing preset', action: 'open-acquisition-balanced', text: 'Open acquisition and compare confidence map.' }],
     practiceTasks: ['Raise threshold and observe unindexed area.'],
     simulatorLinks: ['Live Scan Acquisition'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask whether brighter is always better.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Ask whether brighter is always better.'],
     troubleshootingCards: []
   },
   {
@@ -206,7 +206,7 @@ export const learningModules = [
     category: 'Acquisition',
     estimatedTime: '22 min',
     difficulty: 'Intermediate',
-    learningObjectives: ['Balance signal, detail, speed, and risk.', 'Recognize noise and clipping.', 'Choose settings for a teaching goal.'],
+    learningObjectives: ['Balance signal, detail, speed, and risk.', 'Recognize noise and clipping.', 'Choose settings for a study goal.'],
     topics: ['Gain', 'Exposure time', 'Beam current', 'Binning', 'Frame averaging', 'Drift', 'Thresholds'],
     keyIdeas: ['Exposure improves signal but slows scan.', 'Gain can clip signal.', 'Binning reduces noise but loses detail.', 'Averaging reduces random noise.', 'Drift distorts maps.'],
     explanation: 'Acquisition is a trade-off. The best setting depends on whether the goal is speed, spatial detail, or reliable indexing.',
@@ -221,7 +221,7 @@ export const learningModules = [
     miniExperiments: [{ label: 'Compare fast vs high quality', action: 'acquisition-compare-quality', text: 'Open acquisition and compare Fast survey with High quality.' }],
     practiceTasks: ['Demonstrate noisy, clipped, coarse, and drift cases.'],
     simulatorLinks: ['Live Scan Acquisition'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask students to diagnose the coach warning.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Ask yourself to diagnose the coach warning.'],
     troubleshootingCards: []
   },
   {
@@ -246,7 +246,7 @@ export const learningModules = [
     miniExperiments: [{ label: 'Switch map views', action: 'acquisition-map-views', text: 'Open acquisition and switch orientation, quality, and confidence views.' }],
     practiceTasks: ['Explain one possible reason for dark pattern-quality regions.'],
     simulatorLinks: ['Live Scan Acquisition'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask students to distinguish orientation color from phase.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Ask yourself to distinguish orientation color from phase.'],
     troubleshootingCards: []
   },
   {
@@ -275,7 +275,7 @@ export const learningModules = [
     ],
     practiceTasks: ['For each failure card, state symptom, cause, and first fix.'],
     simulatorLinks: ['Live Scan Acquisition', 'Geometry + Pattern'],
-    teacherPrompts: [...commonTeacherPrompts, 'Ask students why a brighter pattern can be worse.'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Ask yourself why a brighter pattern can be worse.'],
     troubleshootingCards: [
       { problem: 'No bands visible', symptom: 'Pattern is mostly flat.', causes: 'Poor surface, bad geometry, weak signal.', fix: 'Improve preparation, geometry, exposure/current.', observe: 'Bands become visible.' },
       { problem: 'Very noisy pattern', symptom: 'Random speckle hides bands.', causes: 'Low exposure/current, fast scan.', fix: 'Increase exposure, averaging, or current.', observe: 'Noise decreases.' },
