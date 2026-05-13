@@ -1,6 +1,6 @@
 ﻿const commonReflectionPrompts = [
   'Predict the visual change before moving a slider.',
-  'Separate pattern quality from indexing confidence.',
+  'Separate pattern quality from confidence-like indexing evidence.',
   'Name the simplification used in the simulator.'
 ];
 
@@ -193,7 +193,7 @@ export const learningModules = [
       q('indexing-q1', 'multiple-choice', 'Why can too much gain reduce indexing quality?', ['It clips pixels and hides band contrast', 'It improves all bands forever', 'It changes the crystal', 'It removes drift'], 0, 'Clipping removes useful contrast.'),
       q('indexing-q2', 'choose-best', 'Best description of confidence index:', ['A guarantee of truth', 'A decision-strength score', 'A chemical assay', 'A sample tilt angle'], 1, 'Confidence is a useful score, not proof by itself.')
     ],
-    miniExperiments: [{ label: 'Try indexing preset', action: 'open-acquisition-balanced', text: 'Open acquisition and compare confidence map.' }],
+    miniExperiments: [{ label: 'Try indexing preset', action: 'open-acquisition-balanced', text: 'Open acquisition and compare the confidence-like map.' }],
     practiceTasks: ['Raise threshold and observe unindexed area.'],
     simulatorLinks: ['Live Scan Acquisition'],
     reflectionPrompts: [...commonReflectionPrompts, 'Ask whether brighter is always better.'],
@@ -250,6 +250,81 @@ export const learningModules = [
     troubleshootingCards: []
   },
   {
+    id: 'pattern-quality',
+    title: 'Pattern quality and failure analysis',
+    shortTitle: 'Pattern quality',
+    category: 'Interpretation',
+    estimatedTime: '22 min',
+    difficulty: 'Applied',
+    learningObjectives: ['Diagnose common pattern-quality failures.', 'Connect pattern artefacts to indexing risk.', 'Choose a reasonable first correction.'],
+    topics: ['Excellent patterns', 'Noise', 'Overexposure', 'Underexposure', 'Charging', 'Damage', 'Contamination', 'Overlapping patterns', 'Pseudo-symmetry'],
+    keyIdeas: ['Pattern quality is evidence quality.', 'Bright is not always better.', 'Weak bands can produce false confidence.', 'Overlapping signals can create plausible wrong solutions.', 'Corrections should target the observed symptom.'],
+    explanation: 'This module teaches diagnostic review of EBSD pattern examples before trusting a map or confidence-like score.',
+    whyItMatters: 'Experienced EBSD users interpret the pattern, acquisition context, and map together rather than accepting a single output.',
+    misconception: 'A high-looking score or bright image always means the pattern is reliable.',
+    formulas: [],
+    glossaryTerms: ['pattern quality', 'Kikuchi band', 'confidence index', 'pseudo-symmetry'],
+    quizQuestions: [
+      q('quality-q1', 'multiple-choice', 'Why can an overexposed pattern index poorly?', ['Clipping destroys band contrast', 'It guarantees phase identity', 'It removes all noise perfectly', 'It fixes deformation'], 0, 'Clipping can flatten useful band contrast.'),
+      q('quality-q2', 'choose-best', 'Best response to close competing candidate fits:', ['Trust the first answer automatically', 'Inspect pattern quality, phase context, and neighbors', 'Ignore calibration', 'Increase color saturation'], 1, 'Close candidate fits need evidence review.')
+    ],
+    miniExperiments: [{ label: 'Open pattern quality cases', action: 'interpretation-quality', text: 'Open Interpretation and compare failure cases.' }],
+    practiceTasks: ['For three cases, write symptom, possible cause, and first correction.'],
+    simulatorLinks: ['Interpretation Studio', 'Live Scan Acquisition'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Ask what evidence would make this pattern trustworthy.'],
+    troubleshootingCards: []
+  },
+  {
+    id: 'sample-prep',
+    title: 'Sample preparation impact',
+    shortTitle: 'Sample prep',
+    category: 'Preparation',
+    estimatedTime: '20 min',
+    difficulty: 'Applied',
+    learningObjectives: ['Explain why EBSD is surface-sensitive.', 'Identify preparation artefacts.', 'Relate preparation quality to Kikuchi band sharpness.'],
+    topics: ['Grinding damage', 'Deformation layer', 'Final polishing', 'Colloidal silica', 'Electropolishing', 'Oxidation', 'Contamination', 'Relief'],
+    keyIdeas: ['EBSD signal is near-surface.', 'A shiny surface can still be damaged.', 'Final polishing can sharpen bands.', 'Surface films reduce band contrast.', 'Relief can mimic meaningful contrast.'],
+    explanation: 'Preparation controls whether useful near-surface diffraction survives. The app shows before/after conceptual patterns without prescribing material-specific chemistry.',
+    whyItMatters: 'Many EBSD failures start before acquisition: damaged or contaminated surfaces cannot produce reliable bands.',
+    misconception: 'If the sample looks mirror-polished, EBSD quality must be good.',
+    formulas: [],
+    glossaryTerms: ['interaction volume', 'pattern quality', 'sample preparation'],
+    quizQuestions: [
+      q('prep-q1', 'multiple-choice', 'Why does a deformation layer hurt EBSD?', ['It weakens near-surface diffraction', 'It improves all phases', 'It changes the keyboard', 'It validates the map'], 0, 'EBSD is sensitive to the near-surface region.'),
+      q('prep-q2', 'identify-misconception', 'Which statement is the misconception?', ['Relief can affect patterns.', 'Contamination can weaken bands.', 'A shiny surface always gives good EBSD.', 'Cleaning matters before scanning.'], 2, 'Shiny is not the same as EBSD-ready.')
+    ],
+    miniExperiments: [{ label: 'Open prep impact module', action: 'sample-prep-impact', text: 'Open Interpretation and compare poor prep with improved prep.' }],
+    practiceTasks: ['List two preparation issues and how each would change the pattern.'],
+    simulatorLinks: ['Interpretation Studio'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Ask whether the problem is acquisition or surface condition.'],
+    troubleshootingCards: []
+  },
+  {
+    id: 'interpretation-studio',
+    title: 'Real EBSD interpretation workflow',
+    shortTitle: 'Interpretation',
+    category: 'Interpretation',
+    estimatedTime: '28 min',
+    difficulty: 'Applied',
+    learningObjectives: ['Connect sample prep, acquisition, indexing, confidence, and maps.', 'Interpret map views together.', 'Use troubleshooting trees before changing settings randomly.'],
+    topics: ['IPF maps', 'Phase maps', 'Band contrast', 'Grain boundaries', 'Twins', 'Deformation', 'Recrystallized grains', 'Confidence and fit'],
+    keyIdeas: ['No single EBSD view is enough.', 'IPF color is orientation, not chemistry.', 'Band contrast and confidence guide trust.', 'Possible twins need crystallographic context.', 'Troubleshooting starts from symptoms.'],
+    explanation: 'This capstone module uses the Interpretation Studio to connect the whole EBSD workflow from surface preparation to map interpretation.',
+    whyItMatters: 'EBSD interpretation is a chain of evidence. Students should learn to compare patterns, settings, confidence, and maps before making claims.',
+    misconception: 'Map interpretation is just reading colors.',
+    formulas: [],
+    glossaryTerms: ['IPF map', 'phase map', 'grain boundary', 'confidence index', 'fit'],
+    quizQuestions: [
+      q('interpret-q1', 'multiple-choice', 'What should you compare before trusting an EBSD map?', ['Only IPF color', 'Pattern quality, confidence, phase context, and acquisition conditions', 'Only file size', 'Only the legend'], 1, 'Reliable interpretation compares several evidence views.'),
+      q('interpret-q2', 'true-false', 'The Interpretation Studio performs real grain-size or phase quantification.', ['True', 'False'], 1, 'It uses schematic maps and educational overlays only.')
+    ],
+    miniExperiments: [{ label: 'Open Interpretation Studio', action: 'open-interpretation', text: 'Open the full Phase 3 interpretation workspace.' }],
+    practiceTasks: ['Use the map studio to identify grains, noisy regions, deformation clues, and likely bad indexing areas.'],
+    simulatorLinks: ['Interpretation Studio', 'Indexing Basics', 'Live Scan Acquisition'],
+    reflectionPrompts: [...commonReflectionPrompts, 'Ask what additional evidence you would need in real EBSD software.'],
+    troubleshootingCards: []
+  },
+  {
     id: 'troubleshooting',
     title: 'Troubleshooting and practice',
     shortTitle: 'Troubleshoot',
@@ -259,7 +334,7 @@ export const learningModules = [
     learningObjectives: ['Diagnose common EBSD failure modes.', 'Choose a reasonable first fix.', 'Connect symptoms to simulator controls.'],
     topics: ['No bands', 'Noisy pattern', 'Saturated pattern', 'Poor indexing', 'Drift', 'Coarse step size', 'Bad preparation', 'Wrong phase', 'Wrong geometry', 'Strict threshold'],
     keyIdeas: ['Diagnose symptom before changing settings.', 'Clipping hides detail.', 'Noise can be improved with signal or averaging.', 'Wrong phase selection can mislead indexing.', 'Drift can ruin maps even with good patterns.'],
-    explanation: 'Troubleshooting is a loop: observe symptom, identify likely causes, change one setting, and compare result.',
+    explanation: 'Troubleshooting is a loop: observe symptom, identify possible causes, change one setting, and compare result.',
     whyItMatters: 'Real EBSD sessions are limited by time and sample condition. Efficient troubleshooting saves microscope time.',
     misconception: 'There is one universal best EBSD setting.',
     formulas: [],
@@ -280,7 +355,7 @@ export const learningModules = [
       { problem: 'No bands visible', symptom: 'Pattern is mostly flat.', causes: 'Poor surface, bad geometry, weak signal.', fix: 'Improve preparation, geometry, exposure/current.', observe: 'Bands become visible.' },
       { problem: 'Very noisy pattern', symptom: 'Random speckle hides bands.', causes: 'Low exposure/current, fast scan.', fix: 'Increase exposure, averaging, or current.', observe: 'Noise decreases.' },
       { problem: 'Saturated pattern', symptom: 'Bright regions clipped; band contrast lost.', causes: 'Gain, exposure, or current too high.', fix: 'Reduce gain first.', observe: 'Band contrast returns.' },
-      { problem: 'Poor indexing', symptom: 'Many low-confidence pixels.', causes: 'Weak bands, wrong phase, strict threshold.', fix: 'Improve pattern or adjust threshold/phase.', observe: 'Confidence improves.' },
+      { problem: 'Poor indexing', symptom: 'Many low-confidence-like pixels.', causes: 'Weak bands, possible wrong phase, strict threshold.', fix: 'Improve pattern or review threshold/phase.', observe: 'Confidence-like cues improve.' },
       { problem: 'Drift / distorted map', symptom: 'Boundaries bend or smear.', causes: 'Stage/sample drift during scan.', fix: 'Stabilize or scan faster.', observe: 'Boundaries straighten.' },
       { problem: 'Coarse step size', symptom: 'Small grains missed.', causes: 'Step size too large.', fix: 'Reduce step size.', observe: 'More spatial detail.' },
       { problem: 'Bad sample preparation', symptom: 'Broad weak bands.', causes: 'Damage, contamination, oxide.', fix: 'Improve polish/cleaning.', observe: 'Sharper bands.' },

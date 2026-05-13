@@ -111,6 +111,10 @@ export class AcquisitionRenderer {
   update(dt) {
     const key = [
       state.acquisition.gain,
+      state.acquisition.acceleratingVoltage,
+      state.acquisition.workingDistance,
+      state.acquisition.detectorDistance,
+      state.acquisition.noiseLevel,
       state.acquisition.binning,
       state.acquisition.exposureMs,
       state.acquisition.beamCurrent,
@@ -172,14 +176,18 @@ export class AcquisitionRenderer {
     const currentSignal = Math.sqrt(state.acquisition.beamCurrent / 55);
     const binningSignal = Math.sqrt(state.acquisition.binning);
     const averagingSignal = Math.sqrt(state.acquisition.frameAverage);
-    const signalToNoise = exposureSignal * currentSignal * binningSignal * averagingSignal;
-    const clipping = Math.max(0, state.acquisition.gain * state.acquisition.beamCurrent / 92 - 1);
+    const voltageSignal = clamp(0.78 + state.acquisition.acceleratingVoltage / 90, 0.82, 1.16);
+    const workingDistanceLoss = Math.abs(state.acquisition.workingDistance - 15) * 0.018;
+    const detectorGeometryLoss = Math.abs(state.acquisition.detectorDistance - 1) * 0.18;
+    const signalToNoise = exposureSignal * currentSignal * binningSignal * averagingSignal * voltageSignal;
+    const clipping = Math.max(0, state.acquisition.gain * state.acquisition.beamCurrent * voltageSignal / 92 - 1);
     const spatialLoss = (state.acquisition.binning - 1) * 0.055;
     const driftLoss = state.acquisition.drift * 0.005;
+    const addedNoiseLoss = state.acquisition.noiseLevel * 0.0032;
     const correctionBoost = state.acquisition.backgroundCorrection ? 0.07 : -0.03;
     const detectionBoost = (state.acquisition.bandDetection - 65) * 0.0018;
-    const quality = clamp(0.22 + signalToNoise * 0.22 - clipping * 0.26 - spatialLoss - driftLoss + correctionBoost + detectionBoost, 0.05, 0.98);
-    return { signalToNoise, clipping, spatialLoss, driftLoss, quality };
+    const quality = clamp(0.22 + signalToNoise * 0.22 - clipping * 0.26 - spatialLoss - driftLoss - addedNoiseLoss - workingDistanceLoss - detectorGeometryLoss + correctionBoost + detectionBoost, 0.05, 0.98);
+    return { signalToNoise, clipping, spatialLoss, driftLoss, addedNoiseLoss, workingDistanceLoss, detectorGeometryLoss, quality };
   }
 
   drawPixel(x, y) {
@@ -194,7 +202,7 @@ export class AcquisitionRenderer {
       const grainColor = GRAIN_COLORS[this.baseMap[idx]];
       const confidence = this.confidenceMap[idx] * quality;
       const indexed = this.isIndexed(confidence);
-      const noiseAmp = (1 - quality) * 130;
+      const noiseAmp = (1 - quality) * 130 + state.acquisition.noiseLevel * 1.2;
     const shade = 0.74 + confidence * 0.32;
     const seed = this.frame * 17 + y * 0.13;
     const darkPixels = confidence < 0.38 && hashNoise(x, y, seed + 3) > confidence + 0.25;
@@ -265,10 +273,10 @@ export class AcquisitionRenderer {
     const data = image.data;
     const signal = Math.sqrt((state.acquisition.exposureMs * state.acquisition.beamCurrent) / (28 * 55));
     const averaging = Math.sqrt(state.acquisition.frameAverage);
-    const noiseScale = clamp(1.15 - quality - signal * 0.12 - averaging * 0.05, 0.04, 0.88);
+    const noiseScale = clamp(1.15 - quality - signal * 0.12 - averaging * 0.05 + state.acquisition.noiseLevel / 150, 0.04, 0.95);
     const exposureScale = clamp(0.72 + signal * 0.24, 0.58, 1.25);
     const background = state.acquisition.backgroundCorrection ? 0.93 : 1.12;
-    const detailLoss = (state.acquisition.binning - 1) * 0.045;
+    const detailLoss = (state.acquisition.binning - 1) * 0.045 + Math.abs(state.acquisition.workingDistance - 15) * 0.01 + Math.abs(state.acquisition.detectorDistance - 1) * 0.045;
     for (let i = 0; i < data.length; i += 4) {
       const n = (hashNoise(i, this.frame + this.scanX * 0.03 + this.scanY * 0.07, 4) - 0.5) * noiseScale * 150;
       const clippedBoost = clipping > 0 ? clipping * 44 : 0;
@@ -456,7 +464,7 @@ export class AcquisitionRenderer {
   }
 
   metrics() {
-    const { quality, clipping } = this.qualityModel();
+    const { quality, clipping, workingDistanceLoss, detectorGeometryLoss } = this.qualityModel();
     const current = this.currentPatternState();
     const dwellMs = state.acquisition.exposureMs * state.acquisition.frameAverage;
     const speed = 1000 / Math.max(1, dwellMs) * state.acquisition.scanSpeed;
@@ -471,9 +479,9 @@ export class AcquisitionRenderer {
     const indexModeBoost = state.acquisition.indexingMode === 'dictionary' ? 0.06 : state.acquisition.indexingMode === 'manual' ? -0.18 : 0;
     const autoIndexPenalty = state.acquisition.autoIndex ? 0 : 0.42;
     const indexRate = clamp(quality + (state.acquisition.bandDetection - 65) / 160 - (state.acquisition.indexingThreshold - 42) / 120 + indexModeBoost - autoIndexPenalty, 0.02, 0.99);
-    const noise = clamp((1 - quality) * 100 + (state.acquisition.exposureMs < 12 ? 16 : 0), 0, 100);
+    const noise = clamp((1 - quality) * 100 + (state.acquisition.exposureMs < 12 ? 16 : 0) + state.acquisition.noiseLevel * 0.45, 0, 100);
     const saturation = clamp(clipping * 100, 0, 100);
-    const sharpness = clamp(quality * 112 - (pixelSize - 1) * 5 - saturation * 0.35, 0, 100);
+    const sharpness = clamp(quality * 112 - (pixelSize - 1) * 5 - saturation * 0.35 - workingDistanceLoss * 180 - detectorGeometryLoss * 110, 0, 100);
     return {
       quality: Math.round(quality * 100),
       speed: `${speed.toFixed(1)} px/ms`,
@@ -497,7 +505,7 @@ export class AcquisitionRenderer {
         speed: Math.round(speedScore * 100),
         risk: Math.round(risk * 100)
       },
-      warning: clipping > 0.18 ? 'gain clipping' : quality < 0.45 ? 'noisy indexing' : pixelSize >= 4 ? 'coarse pixels' : state.acquisition.drift > 35 ? 'drift visible' : state.acquisition.bandDetection < 35 ? 'missed bands' : state.acquisition.indexingThreshold > quality * 100 ? 'strict threshold' : 'stable scan'
+      warning: clipping > 0.18 ? 'gain clipping' : workingDistanceLoss > 0.12 || detectorGeometryLoss > 0.14 ? 'geometry mismatch' : quality < 0.45 ? 'noisy indexing' : pixelSize >= 4 ? 'coarse pixels' : state.acquisition.drift > 35 ? 'drift visible' : state.acquisition.bandDetection < 35 ? 'missed bands' : state.acquisition.indexingThreshold > quality * 100 ? 'strict threshold' : 'stable scan'
     };
   }
 }

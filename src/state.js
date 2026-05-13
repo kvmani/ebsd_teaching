@@ -22,6 +22,10 @@ export const state = {
   time: 0,
   acquisition: {
     gain: 1.2,
+    acceleratingVoltage: 20,
+    workingDistance: 15,
+    detectorDistance: 1.0,
+    noiseLevel: 12,
     binning: 2,
     exposureMs: 28,
     beamCurrent: 55,

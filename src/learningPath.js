@@ -285,11 +285,11 @@ const mapModes = {
     question: 'What acquisition or preparation issue could make a region dark?'
   },
   confidence: {
-    label: 'Confidence map',
-    meaning: 'Brightness shows indexing decision strength.',
+    label: 'Confidence-like map',
+    meaning: 'Brightness shows conceptual indexing decision strength.',
     observe: 'Low-confidence regions can appear where bands are weak, clipped, or phase choice is wrong.',
-    mistake: 'Confidence is a decision score, not proof of physical truth.',
-    question: 'What would you change first if confidence is low but the pattern is visible?'
+    mistake: 'Confidence-like cues are not proof of physical truth.',
+    question: 'What would you check first if confidence-like cues are low but the pattern is visible?'
   },
   unindexed: {
     label: 'Unindexed pixels map',
@@ -300,7 +300,7 @@ const mapModes = {
   },
   boundaries: {
     label: 'Grain boundary overlay',
-    meaning: 'Lines mark orientation discontinuities.',
+    meaning: 'Lines schematically mark orientation discontinuities.',
     observe: 'Compare boundary locations with quality and confidence before interpreting fine features.',
     mistake: 'Every boundary-like line is not automatically a real microstructural boundary.',
     question: 'Which overlay would reveal if a boundary is caused by poor indexing?'
@@ -308,10 +308,10 @@ const mapModes = {
 };
 
 const mapRegions = {
-  'grain-a': { label: 'Grain A', orientation: '[001] blue-green', quality: 84, confidence: 88, indexed: 'indexed', text: 'Coherent color and good confidence make this a good example of a stable grain interior.' },
-  'grain-b': { label: 'Grain B', orientation: '[101] amber', quality: 76, confidence: 72, indexed: 'indexed', text: 'This region is usable, but students should still compare quality and confidence before interpreting boundaries.' },
-  boundary: { label: 'Boundary band', orientation: 'rapid orientation change', quality: 46, confidence: 38, indexed: 'mixed', text: 'Quality and confidence drop near boundaries, where patterns can overlap or become harder to index.' },
-  damaged: { label: 'Prepared surface issue', orientation: 'uncertain', quality: 28, confidence: 22, indexed: 'partly unindexed', text: 'Low quality plus low confidence is a prompt to discuss preparation, signal, phase choice, and thresholds.' }
+  'grain-a': { label: 'Grain A', orientation: 'blue-green orientation cue', quality: 84, confidence: 88, indexed: 'accepted cue', text: 'Coherent color and good confidence-like cue make this a good schematic example of a stable grain interior.' },
+  'grain-b': { label: 'Grain B', orientation: 'amber orientation cue', quality: 76, confidence: 72, indexed: 'accepted cue', text: 'This region is usable in the exercise, but students should still compare quality and confidence-like cues before interpreting boundaries.' },
+  boundary: { label: 'Boundary band', orientation: 'rapid orientation change', quality: 46, confidence: 38, indexed: 'mixed cue', text: 'Quality and confidence-like cues drop near boundaries, where patterns can overlap or become harder to index.' },
+  damaged: { label: 'Prepared surface issue', orientation: 'uncertain', quality: 28, confidence: 22, indexed: 'partly unindexed cue', text: 'Low quality plus low confidence-like cue is a prompt to discuss preparation, signal, phase choice, and thresholds.' }
 };
 
 const diagnosticCases = {
@@ -923,7 +923,7 @@ export class LearningPath {
             <p><b>Diagnostic question:</b> ${escapeHtml(mode.question)}</p>
             <hr />
             <p><b>Clicked region:</b> ${escapeHtml(region.label)}</p>
-            <p>Orientation: ${escapeHtml(region.orientation)} | Quality: ${region.quality}% | Confidence: ${region.confidence}% | ${escapeHtml(region.indexed)}</p>
+            <p>Orientation cue: ${escapeHtml(region.orientation)} | Quality cue: ${region.quality}/100 | Confidence-like cue: ${region.confidence}/100 | ${escapeHtml(region.indexed)}</p>
             <p>${escapeHtml(region.text)}</p>
           </div>
         </div>
@@ -942,15 +942,15 @@ export class LearningPath {
           </div>
           <div class="diagnostic-result">
             <strong>${escapeHtml(selected.symptom)}</strong>
-            <p><b>Likely causes ranked:</b></p>
+            <p><b>Possible causes to check:</b></p>
             <ol>${listItems(selected.causes)}</ol>
-            <p><b>First setting to change:</b> ${escapeHtml(selected.firstFix)}</p>
-            <p><b>Expected improvement:</b> ${escapeHtml(selected.expected)}</p>
+            <p><b>First check:</b> ${escapeHtml(selected.firstFix)}</p>
+            <p><b>Expected conceptual improvement:</b> ${escapeHtml(selected.expected)}</p>
             <p><b>Common wrong fix:</b> ${escapeHtml(selected.warning)}</p>
             <button type="button" data-experiment="${escapeHtml(selected.preset)}">Open relevant simulator preset</button>
             <div class="diagnostic-followup">
               <button type="button" data-diagnostic-followup="Improvement observed. Ask students which metric changed first.">I observed improvement</button>
-              <button type="button" data-diagnostic-followup="No improvement. Try the next likely cause and compare quality plus confidence.">No improvement</button>
+              <button type="button" data-diagnostic-followup="No improvement. Try the next possible cause and compare quality plus confidence-like cues.">No improvement</button>
             </div>
             <p>${escapeHtml(this.progress.diagnosticFollowup)}</p>
           </div>

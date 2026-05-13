@@ -49,7 +49,7 @@ class PatternLibrary {
   sourceLabel() {
     if (this.status === 'loading') return 'Pattern source: checking local image library';
     return this.hasRealPatterns()
-      ? 'Pattern source: Real local Kikuchi image'
+      ? 'Pattern source: Local Kikuchi example image'
       : 'Pattern source: Fallback schematic';
   }
 }

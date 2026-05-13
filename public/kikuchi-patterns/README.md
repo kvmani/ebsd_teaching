@@ -33,9 +33,9 @@ Each entry should point to the local public URL, for example:
 {
   id: "pattern_001",
   src: "/kikuchi-patterns/pattern_001.png",
-  label: "Real Kikuchi pattern 1",
-  grainLabel: "Grain 1",
-  orientationLabel: "Orientation A"
+  label: "Educational review example 1",
+  grainLabel: "Example pattern 1",
+  orientationLabel: "Source-provided note, if available"
 }
 ```
 

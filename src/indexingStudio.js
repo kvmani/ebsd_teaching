@@ -28,14 +28,14 @@ const walkthroughSteps = [
   {
     title: 'Band detection',
     tag: 'Hough-style conceptual detection',
-    notice: 'Band guides appear one by one to show that detection selects line-like features.',
-    matters: 'This is not a real Hough implementation. It teaches why Hough-style voting is useful for finding band centerlines.',
+    notice: 'Band guides appear one by one to show how line-like features can be selected.',
+    matters: 'This is not a real Hough implementation. It shows why Hough-style voting is useful for finding band centerlines.',
     caption: 'Detected bands are highlighted as educational overlays.'
   },
   {
     title: 'Band position measurement',
     tag: 'Simplified measurement',
-    notice: 'Each band has a centerline, width, and angular relationship to other bands.',
+    notice: 'Each conceptual band guide has a centerline, width, and angular relationship to other bands.',
     matters: 'EBSD indexing uses band geometry, not just brightness. Geometry is what connects a pattern to crystal planes.',
     caption: 'Band centerline, width, and angles are conceptual measurements here.'
   },
@@ -47,9 +47,9 @@ const walkthroughSteps = [
     caption: 'Scores are schematic decision-strength values, not real solver output.'
   },
   {
-    title: 'Best solution and confidence',
+    title: 'Best schematic match and confidence',
     tag: 'Not a real indexing engine',
-    notice: 'The strongest candidate is selected, but confidence is a score, not proof of truth.',
+    notice: 'The strongest schematic candidate is highlighted, but confidence is a simplified score, not proof of truth.',
     matters: 'Multiple candidates can be close. Fit, confidence, phase knowledge, and pattern quality should be interpreted together.',
     caption: 'The selected orientation is educational, not measured.'
   },
@@ -133,8 +133,8 @@ const matchingScenarios = [
 
 const failureModes = [
   ['Too few visible bands', 'Band detection cannot constrain orientation well.'],
-  ['Poor pattern center', 'Projected theoretical bands shift away from measured bands.'],
-  ['Wrong phase selected', 'The solver compares the pattern to the wrong crystal geometry.'],
+  ['Poor pattern center', 'Projected theoretical bands shift away from observed band guides.'],
+  ['Wrong phase selected', 'A real solver would compare the pattern to the wrong crystal geometry.'],
   ['Overlapping phases', 'Signals from multiple crystals or phases can confuse band evidence.'],
   ['Poor polishing / deformation', 'Damaged surfaces broaden or weaken Kikuchi bands.'],
   ['Low signal-to-noise', 'Noise can hide real bands and create false candidates.'],
@@ -155,6 +155,23 @@ function loadProgress() {
 
 function saveProgress(progress) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+}
+
+function defaultCalibrationEvidence() {
+  return {
+    movedAwayFromDefault: false,
+    observedDegradedConfidence: false,
+    restoredNearCorrect: false,
+    resetAfterDegraded: false
+  };
+}
+
+function calibrationIsComplete(evidence) {
+  return Boolean(
+    evidence?.movedAwayFromDefault
+    && evidence?.observedDegradedConfidence
+    && (evidence?.restoredNearCorrect || evidence?.resetAfterDegraded)
+  );
 }
 
 function lineEndpoint(band, width, height, offset = 0) {
@@ -187,6 +204,47 @@ function drawBand(ctx, band, width, height, options = {}) {
     ctx.stroke();
   }
   ctx.restore();
+}
+
+function drawBandInRect(ctx, band, rect, options = {}) {
+  const { offset = 0, alpha = 0.75, centerline = true, widthScale = 1, color = band.color } = options;
+  const p = {
+    x0: rect.x + band.x0 * rect.width,
+    y0: rect.y + (band.y0 + offset) * rect.height,
+    x1: rect.x + band.x1 * rect.width,
+    y1: rect.y + (band.y1 + offset) * rect.height
+  };
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = alpha * 0.26;
+  ctx.lineWidth = Math.max(8, (band.width || 20) * widthScale);
+  ctx.beginPath();
+  ctx.moveTo(p.x0, p.y0);
+  ctx.lineTo(p.x1, p.y1);
+  ctx.stroke();
+  if (centerline) {
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p.x0, p.y0);
+    ctx.lineTo(p.x1, p.y1);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function imageContainRect(image, width, height) {
+  const imageAspect = image.naturalWidth / image.naturalHeight;
+  const canvasAspect = width / height;
+  if (imageAspect > canvasAspect) {
+    const drawWidth = width;
+    const drawHeight = width / imageAspect;
+    return { x: 0, y: (height - drawHeight) / 2, width: drawWidth, height: drawHeight };
+  }
+  const drawHeight = height;
+  const drawWidth = height * imageAspect;
+  return { x: (width - drawWidth) / 2, y: 0, width: drawWidth, height: drawHeight };
 }
 
 function drawPatternBase(ctx, width, height, noise = 0.16, corrected = false) {
@@ -242,8 +300,14 @@ export class IndexingStudio {
       checkpoints: {},
       matchingAnswers: {},
       calibrationComplete: false,
+      calibrationEvidence: defaultCalibrationEvidence(),
       ...loadProgress()
     };
+    this.progress.calibrationEvidence = {
+      ...defaultCalibrationEvidence(),
+      ...(this.progress.calibrationEvidence || {})
+    };
+    this.progress.calibrationComplete = calibrationIsComplete(this.progress.calibrationEvidence);
     this.timer = null;
     this.realPatterns = [];
     this.render();
@@ -261,7 +325,7 @@ export class IndexingStudio {
           <div class="lab-card-heading">
             <span class="fidelity-label">Not a real indexing engine</span>
             <h3>Animated Indexing Walkthrough</h3>
-            <p>Step through how EBSD software conceptually moves from pattern evidence to a candidate orientation.</p>
+            <p>Step through a conceptual path from pattern evidence to a candidate orientation.</p>
           </div>
           <div class="walkthrough-stage">
             <canvas id="indexingWalkthroughCanvas" width="760" height="420" aria-label="Conceptual indexing walkthrough canvas"></canvas>
@@ -303,7 +367,8 @@ export class IndexingStudio {
               <label class="slider-row"><span>Detector scale <output id="pcScaleValue">1.00x</output></span><input id="pcScaleControl" type="range" min="0.82" max="1.18" step="0.01" value="1.00" aria-label="Detector distance or scale"></label>
               <label class="compact-check"><input id="pcNoiseToggle" type="checkbox" /> Add noise / poor calibration</label>
               <button id="pcResetButton" type="button">Reset to correct pattern center</button>
-              <div class="confidence-meter" aria-label="Conceptual confidence meter"><b id="pcConfidenceBar"></b><span id="pcConfidenceText">High confidence</span></div>
+              <div class="confidence-meter" role="status" aria-live="polite" aria-label="Conceptual confidence meter"><b id="pcConfidenceBar"></b><span id="pcConfidenceText">High confidence</span></div>
+              <p id="pcCalibrationStatus" class="calibration-status" aria-live="polite"></p>
             </div>
           </div>
           <p class="lab-note">Not a real pattern-center refinement engine. Calibration standards or known phases are useful because they anchor the projection geometry used during matching.</p>
@@ -329,9 +394,10 @@ export class IndexingStudio {
 
         <article class="indexing-lab-card real-review-card">
           <div class="lab-card-heading">
-            <span class="fidelity-label">Educational overlay</span>
+            <span class="fidelity-label">Conceptual guide only</span>
             <h3>Real Kikuchi Pattern Review</h3>
-            <p>Inspect local real patterns with optional conceptual overlays and quality notes.</p>
+            <p>Inspect local example patterns with optional conceptual overlays and quality notes.</p>
+            <p class="lab-note">Conceptual overlays are learning guides only; they are not measured band detections.</p>
           </div>
           <div class="real-review-layout" id="realPatternReview"></div>
         </article>
@@ -351,6 +417,8 @@ export class IndexingStudio {
   }
 
   bindEvents() {
+    this.root.querySelector('#indexingPlayPause').setAttribute('aria-label', 'Play animated indexing walkthrough');
+    this.root.querySelector('#indexingPlayPause').setAttribute('aria-pressed', 'false');
     this.root.querySelector('#indexingPlayPause').addEventListener('click', () => this.togglePlay());
     this.root.querySelector('#indexingPrevStep').addEventListener('click', () => this.setStep(this.step - 1));
     this.root.querySelector('#indexingNextStep').addEventListener('click', () => this.setStep(this.step + 1));
@@ -414,13 +482,19 @@ export class IndexingStudio {
 
   play() {
     this.playing = true;
-    this.root.querySelector('#indexingPlayPause').textContent = 'Pause';
+    const button = this.root.querySelector('#indexingPlayPause');
+    button.textContent = 'Pause';
+    button.setAttribute('aria-label', 'Pause animated indexing walkthrough');
+    button.setAttribute('aria-pressed', 'true');
     this.timer = window.setInterval(() => this.setStep(this.step + 1), 2400);
   }
 
   stop() {
     this.playing = false;
-    this.root.querySelector('#indexingPlayPause')?.replaceChildren(document.createTextNode('Play'));
+    const button = this.root.querySelector('#indexingPlayPause');
+    button?.replaceChildren(document.createTextNode('Play'));
+    button?.setAttribute('aria-label', 'Play animated indexing walkthrough');
+    button?.setAttribute('aria-pressed', 'false');
     if (this.timer) window.clearInterval(this.timer);
     this.timer = null;
   }
@@ -545,14 +619,41 @@ export class IndexingStudio {
   }
 
   resetCalibration() {
+    const confidenceBeforeReset = this.calibrationConfidence();
+    if (this.calibrationMovedAway() && confidenceBeforeReset <= 75) {
+      this.progress.calibrationEvidence.movedAwayFromDefault = true;
+      this.progress.calibrationEvidence.observedDegradedConfidence = true;
+    }
+    if (this.progress.calibrationEvidence.observedDegradedConfidence) {
+      this.progress.calibrationEvidence.resetAfterDegraded = true;
+    }
     this.pc = { x: 0.5, y: 0.5, scale: 1, noise: false };
     this.root.querySelector('#pcxControl').value = this.pc.x;
     this.root.querySelector('#pcyControl').value = this.pc.y;
     this.root.querySelector('#pcScaleControl').value = this.pc.scale;
     this.root.querySelector('#pcNoiseToggle').checked = false;
-    this.progress.calibrationComplete = true;
+    this.progress.calibrationComplete = calibrationIsComplete(this.progress.calibrationEvidence);
     this.save();
     this.updateCalibration();
+  }
+
+  calibrationError() {
+    return Math.hypot(this.pc.x - 0.5, this.pc.y - 0.5) * 3.4 + Math.abs(this.pc.scale - 1) * 1.8 + (this.pc.noise ? 0.16 : 0);
+  }
+
+  calibrationConfidence() {
+    return clamp(Math.round((1 - this.calibrationError()) * 100), 8, 98);
+  }
+
+  calibrationMovedAway() {
+    return Math.abs(this.pc.x - 0.5) > 0.04 || Math.abs(this.pc.y - 0.5) > 0.04 || Math.abs(this.pc.scale - 1) > 0.05;
+  }
+
+  calibrationNearCorrect(confidence) {
+    return confidence >= 86
+      && Math.abs(this.pc.x - 0.5) <= 0.02
+      && Math.abs(this.pc.y - 0.5) <= 0.02
+      && Math.abs(this.pc.scale - 1) <= 0.03;
   }
 
   updateCalibration() {
@@ -560,15 +661,43 @@ export class IndexingStudio {
     this.root.querySelector('#pcyValue').textContent = this.pc.y.toFixed(2);
     this.root.querySelector('#pcScaleValue').textContent = `${this.pc.scale.toFixed(2)}x`;
     this.drawCalibration();
-    const error = Math.hypot(this.pc.x - 0.5, this.pc.y - 0.5) * 3.4 + Math.abs(this.pc.scale - 1) * 1.8 + (this.pc.noise ? 0.16 : 0);
-    const confidence = clamp(Math.round((1 - error) * 100), 8, 98);
+    const confidence = this.calibrationConfidence();
     const label = confidence > 78 ? 'High confidence' : confidence > 46 ? 'Medium confidence' : 'Low confidence';
     this.root.querySelector('#pcConfidenceBar').style.width = `${confidence}%`;
     this.root.querySelector('#pcConfidenceText').textContent = `${label} (${confidence}%)`;
-    if (Math.abs(this.pc.x - 0.5) > 0.04 || Math.abs(this.pc.y - 0.5) > 0.04 || Math.abs(this.pc.scale - 1) > 0.05) {
-      this.progress.calibrationComplete = true;
+    if (this.calibrationMovedAway()) {
+      this.progress.calibrationEvidence.movedAwayFromDefault = true;
+    }
+    if (this.progress.calibrationEvidence.movedAwayFromDefault && confidence <= 75) {
+      this.progress.calibrationEvidence.observedDegradedConfidence = true;
+    }
+    if (this.progress.calibrationEvidence.observedDegradedConfidence && this.calibrationNearCorrect(confidence)) {
+      this.progress.calibrationEvidence.restoredNearCorrect = true;
+    }
+    const wasComplete = this.progress.calibrationComplete;
+    this.progress.calibrationComplete = calibrationIsComplete(this.progress.calibrationEvidence);
+    this.updateCalibrationStatus(confidence);
+    if (wasComplete !== this.progress.calibrationComplete || this.progress.calibrationEvidence.movedAwayFromDefault) {
       this.save();
     }
+  }
+
+  updateCalibrationStatus(confidence) {
+    const status = this.root.querySelector('#pcCalibrationStatus');
+    if (!status) return;
+    if (this.progress.calibrationComplete) {
+      status.textContent = 'Calibration review complete: you degraded the schematic pattern center and then restored or reset to a high-confidence condition.';
+      return;
+    }
+    if (!this.progress.calibrationEvidence.movedAwayFromDefault) {
+      status.textContent = 'Move PCx, PCy, or detector scale far enough to see the confidence drop.';
+      return;
+    }
+    if (!this.progress.calibrationEvidence.observedDegradedConfidence) {
+      status.textContent = `Keep adjusting until the confidence clearly degrades; current simplified confidence is ${confidence}%.`;
+      return;
+    }
+    status.textContent = 'Now restore near the correct pattern center, or use Reset after seeing the degraded confidence.';
   }
 
   drawCalibration() {
@@ -675,7 +804,9 @@ export class IndexingStudio {
           <option value="difficulty" ${this.reviewOverlay === 'difficulty' ? 'selected' : ''}>Indexing difficulty notes</option>
         </select></label>
         <p><b>Source note:</b> ${pattern?.credit || 'No source note supplied yet.'}</p>
-        <p><b>Review note:</b> ${this.realPatterns.length ? 'This is a real local image with educational overlays only.' : 'No loaded image is available, so the studio is showing metadata and schematic fallback guidance.'}</p>
+        <p><b>Pattern note:</b> ${pattern?.orientationLabel || 'Example pattern; orientation and phase are not confirmed in this app.'}</p>
+        <p><b>Review note:</b> ${this.realPatterns.length ? 'This is a local example image with educational overlays only.' : 'No loaded image is available, so the studio is showing metadata and schematic fallback guidance.'}</p>
+        <p class="lab-note">Overlay guides are conceptual and may not align with every real Kikuchi band in the image.</p>
       </div>
     `;
     container.querySelector('#realPatternSelect').addEventListener('change', (event) => {
@@ -698,10 +829,14 @@ export class IndexingStudio {
     const patterns = this.realPatterns.length ? this.realPatterns : kikuchiPatterns;
     const pattern = patterns[this.reviewIndex % patterns.length];
     ctx.clearRect(0, 0, w, h);
+    let imageRect = { x: 0, y: 0, width: w, height: h };
     if (pattern?.image) {
+      imageRect = imageContainRect(pattern.image, w, h);
       ctx.save();
+      ctx.fillStyle = '#050708';
+      ctx.fillRect(0, 0, w, h);
       ctx.filter = 'grayscale(100%) contrast(1.08)';
-      ctx.drawImage(pattern.image, 0, 0, w, h);
+      ctx.drawImage(pattern.image, imageRect.x, imageRect.y, imageRect.width, imageRect.height);
       ctx.restore();
     } else {
       drawPatternBase(ctx, w, h, 0.2, true);
@@ -710,7 +845,7 @@ export class IndexingStudio {
     if (this.reviewOverlay === 'bands') {
       (pattern?.bandCenters || bands).forEach((band) => {
         const normalized = { ...band, width: band.width || 20, color: band.color || '#ffe7b1' };
-        drawBand(ctx, normalized, w, h, { alpha: 0.84, color: '#ffe7b1', widthScale: 0.45 });
+        drawBandInRect(ctx, normalized, imageRect, { alpha: 0.84, color: '#ffe7b1', widthScale: 0.45 });
       });
     }
     if (this.reviewOverlay === 'quality' || this.reviewOverlay === 'difficulty') {

@@ -5,8 +5,10 @@ import { formulaReference } from './data/formulas.js';
 import { learningModules } from './data/learningModules.js';
 import { DetectorRenderer, detectorCaption } from './detector.js';
 import { IndexingStudio } from './indexingStudio.js';
+import { InterpretationStudio } from './interpretationStudio.js';
 import { LearningPath } from './learningPath.js';
 import { loadLearningProgress } from './learningProgress.js';
+import { acquisitionParameterGuides, learningPipeline, patternQualityCases, troubleshootingSymptoms } from './phase3Data.js';
 import { EbsdScene } from './scene.js';
 import { braggThetaDeg, electronWavelengthPm, planes, stages, state } from './state.js';
 
@@ -17,6 +19,11 @@ const acquisition = new AcquisitionRenderer(qs('scanMap'), qs('patternPreview'))
 const indexingStudio = new IndexingStudio({
   root: qs('indexingStudio'),
   getReduceMotion: () => reduceMotion
+});
+const interpretationStudio = new InterpretationStudio({
+  root: qs('interpretationStudio'),
+  getReduceMotion: () => reduceMotion,
+  onNavigate: (view) => setActiveView(view)
 });
 const learningPath = new LearningPath({
   moduleList: qs('moduleList'),
@@ -36,12 +43,12 @@ let reduceMotion = savedReduceMotion === null
   ? window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
   : savedReduceMotion === 'true';
 
-const TEACHING_DEFAULT_ACQUISITION = { gain: 1.2, binning: 2, exposureMs: 28, beamCurrent: 55, frameAverage: 2, scanSpeed: 1.0, stepSize: 0.25, drift: 0, bandDetection: 65, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
-const HIGH_QUALITY_PRESET = { gain: 1.0, binning: 2, exposureMs: 80, beamCurrent: 60, frameAverage: 5, scanSpeed: 0.55, stepSize: 0.12, drift: 5, bandDetection: 58, indexingThreshold: 55, indexingMode: 'dictionary', qualityOverlay: 'confidence', mapUpdate: 'line', autoIndex: true, confirmLowConfidence: true, backgroundCorrection: true };
-const FAST_SURVEY_PRESET = { gain: 1.8, binning: 4, exposureMs: 10, beamCurrent: 70, frameAverage: 1, scanSpeed: 1.8, stepSize: 0.55, drift: 8, bandDetection: 72, indexingThreshold: 36, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
-const NOISY_PATTERN_PRESET = { gain: 1.4, binning: 1, exposureMs: 6, beamCurrent: 25, frameAverage: 1, scanSpeed: 1.7, stepSize: 0.35, drift: 0, bandDetection: 55, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'unindexed', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
-const SATURATED_PATTERN_PRESET = { gain: 2.8, binning: 1, exposureMs: 22, beamCurrent: 95, frameAverage: 1, scanSpeed: 1.1, stepSize: 0.25, drift: 0, bandDetection: 80, indexingThreshold: 52, indexingMode: 'hough', qualityOverlay: 'confidence', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: false };
-const DRIFT_MAP_PRESET = { gain: 1.1, binning: 2, exposureMs: 42, beamCurrent: 55, frameAverage: 3, scanSpeed: 0.75, stepSize: 0.25, drift: 55, bandDetection: 65, indexingThreshold: 45, indexingMode: 'hough', qualityOverlay: 'boundaries', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
+const TEACHING_DEFAULT_ACQUISITION = { gain: 1.2, acceleratingVoltage: 20, workingDistance: 15, detectorDistance: 1.0, noiseLevel: 12, binning: 2, exposureMs: 28, beamCurrent: 55, frameAverage: 2, scanSpeed: 1.0, stepSize: 0.25, drift: 0, bandDetection: 65, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
+const HIGH_QUALITY_PRESET = { gain: 1.0, acceleratingVoltage: 20, workingDistance: 15, detectorDistance: 0.95, noiseLevel: 4, binning: 2, exposureMs: 80, beamCurrent: 60, frameAverage: 5, scanSpeed: 0.55, stepSize: 0.12, drift: 5, bandDetection: 58, indexingThreshold: 55, indexingMode: 'dictionary', qualityOverlay: 'confidence', mapUpdate: 'line', autoIndex: true, confirmLowConfidence: true, backgroundCorrection: true };
+const FAST_SURVEY_PRESET = { gain: 1.8, acceleratingVoltage: 25, workingDistance: 16, detectorDistance: 1.1, noiseLevel: 22, binning: 4, exposureMs: 10, beamCurrent: 70, frameAverage: 1, scanSpeed: 1.8, stepSize: 0.55, drift: 8, bandDetection: 72, indexingThreshold: 36, indexingMode: 'hough', qualityOverlay: 'none', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
+const NOISY_PATTERN_PRESET = { gain: 1.4, acceleratingVoltage: 12, workingDistance: 18, detectorDistance: 1.15, noiseLevel: 56, binning: 1, exposureMs: 6, beamCurrent: 25, frameAverage: 1, scanSpeed: 1.7, stepSize: 0.35, drift: 0, bandDetection: 55, indexingThreshold: 42, indexingMode: 'hough', qualityOverlay: 'unindexed', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
+const SATURATED_PATTERN_PRESET = { gain: 2.8, acceleratingVoltage: 25, workingDistance: 15, detectorDistance: 0.9, noiseLevel: 6, binning: 1, exposureMs: 22, beamCurrent: 95, frameAverage: 1, scanSpeed: 1.1, stepSize: 0.25, drift: 0, bandDetection: 80, indexingThreshold: 52, indexingMode: 'hough', qualityOverlay: 'confidence', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: false };
+const DRIFT_MAP_PRESET = { gain: 1.1, acceleratingVoltage: 20, workingDistance: 15, detectorDistance: 1.0, noiseLevel: 14, binning: 2, exposureMs: 42, beamCurrent: 55, frameAverage: 3, scanSpeed: 0.75, stepSize: 0.25, drift: 55, bandDetection: 65, indexingThreshold: 45, indexingMode: 'hough', qualityOverlay: 'boundaries', mapUpdate: 'live', autoIndex: true, confirmLowConfidence: false, backgroundCorrection: true };
 
 function deg(value) {
   return `${value}°`;
@@ -128,6 +135,10 @@ function updateAcquisitionReadouts() {
   qs('patternPreview').classList.toggle('paused', !state.acquisition.live);
 
   qs('gainValue').textContent = `${state.acquisition.gain.toFixed(1)}x`;
+  qs('acqVoltageValue').textContent = `${state.acquisition.acceleratingVoltage} kV`;
+  qs('workingDistanceValue').textContent = `${state.acquisition.workingDistance} mm`;
+  qs('acqDetectorDistanceValue').textContent = `${state.acquisition.detectorDistance.toFixed(2)}x`;
+  qs('noiseLevelValue').textContent = `${state.acquisition.noiseLevel}%`;
   qs('binningValue').textContent = `${state.acquisition.binning} x ${state.acquisition.binning}`;
   qs('exposureValue').textContent = `${state.acquisition.exposureMs} ms`;
   qs('beamCurrentValue').textContent = `${state.acquisition.beamCurrent}%`;
@@ -155,7 +166,8 @@ function updateAcquisitionReadouts() {
   qs('patternSource').textContent = metrics.patternSource;
   qs('acquisitionState').textContent = metrics.warning;
   qs('scanDwell').textContent = metrics.dwell;
-  qs('scanMode').textContent = state.acquisition.mapMode;
+  const mapModeLabels = { orientation: 'orientation', quality: 'pattern quality', confidence: 'confidence cue' };
+  qs('scanMode').textContent = mapModeLabels[state.acquisition.mapMode] || state.acquisition.mapMode;
   qs('scaleBarText').textContent = metrics.scaleBar;
   setBar('noiseBar', metrics.pattern.noise, true);
   setBar('clippingBar', metrics.pattern.saturation, true);
@@ -169,6 +181,7 @@ function updateAcquisitionReadouts() {
   updateWarningBadges(metrics);
   updateQualityChecklist(metrics);
   updateDiagnosis();
+  updateParameterGuide();
 }
 
 function setBar(id, value, invert = false) {
@@ -190,7 +203,7 @@ function updateCoach(metrics) {
   }
   if (metrics.warning === 'noisy indexing') {
     qs('coachTitle').textContent = 'Add electrons per pixel';
-    qs('coachText').textContent = 'The scan is fast but weak. Increase exposure, beam current, binning, or averaging and watch the confidence map stabilize.';
+    qs('coachText').textContent = 'The scan is fast but weak. Increase exposure, beam current, binning, or averaging and watch the confidence-like map cue stabilize.';
     return;
   }
   if (metrics.warning === 'coarse pixels') {
@@ -208,6 +221,11 @@ function updateCoach(metrics) {
     qs('coachText').textContent = 'The pattern may contain useful bands, but the indexing step is not finding enough of them. Raise band detection before increasing exposure.';
     return;
   }
+  if (metrics.warning === 'geometry mismatch') {
+    qs('coachTitle').textContent = 'Check geometry before forcing indexing';
+    qs('coachText').textContent = 'Working distance or detector distance is away from the balanced study setup. The bands may be visible, but projection geometry is less trustworthy.';
+    return;
+  }
   if (metrics.warning === 'strict threshold') {
     qs('coachTitle').textContent = 'Lower the index threshold or improve signal';
     qs('coachText').textContent = 'The threshold is rejecting patterns that are close to usable. Lower it for exploration, or improve exposure/current for stricter indexing.';
@@ -220,6 +238,12 @@ function updateCoach(metrics) {
 function acquisitionStory() {
   if (state.acquisition.drift > 35) {
     return 'Stage drift is intentionally high here. Watch the raster bend the grain boundaries: the pattern at each point may be good, but the scan no longer represents the true position cleanly.';
+  }
+  if (Math.abs(state.acquisition.workingDistance - 15) > 5 || Math.abs(state.acquisition.detectorDistance - 1) > 0.25) {
+    return 'Geometry is away from the study optimum. In real EBSD, working distance and detector distance affect pattern projection and calibration reliability before indexing begins.';
+  }
+  if (state.acquisition.noiseLevel > 40) {
+    return 'Added noise is high. Students should see speckle hide weak bands and reduce confidence-like map stability even before changing the indexing threshold.';
   }
   if (!state.acquisition.autoIndex) {
     return 'Auto-indexing is paused. This is useful for learning: students can see that pattern formation and indexing are separate steps in the EBSD workflow.';
@@ -240,7 +264,7 @@ function acquisitionStory() {
     return 'High gain can make bands look bright, but the brightest pixels saturate. Students should notice that clipping destroys band detail instead of improving indexing.';
   }
   if (state.acquisition.exposureMs < 14) {
-    return 'Short exposure scans quickly, but each pixel gets fewer electrons. The map becomes lively and fast, with noisy colors and weaker pattern confidence.';
+    return 'Short exposure scans quickly, but each pixel gets fewer electrons. The map becomes lively and fast, with noisy colors and weaker confidence-like pattern cues.';
   }
   if (state.acquisition.binning >= 5) {
     return 'Large binning combines many detector pixels. Noise drops, but fine spatial detail is sacrificed, so grain boundaries look blocky.';
@@ -258,6 +282,7 @@ function bindAcquisitionRange(id, key, parse = Number) {
   const el = qs(id);
   el.addEventListener('input', () => {
     state.acquisition[key] = parse(el.value);
+    if (acquisitionParameterGuides[key] && qs('parameterFocus')) qs('parameterFocus').value = key;
     acquisition.drawPatternPreview();
     updateAcquisitionReadouts();
   });
@@ -285,6 +310,10 @@ function toggleLiveAcquisition() {
 function setAcquisitionPreset(values) {
   Object.assign(state.acquisition, values);
   qs('gain').value = state.acquisition.gain;
+  qs('acqVoltage').value = state.acquisition.acceleratingVoltage;
+  qs('workingDistance').value = state.acquisition.workingDistance;
+  qs('acqDetectorDistance').value = state.acquisition.detectorDistance;
+  qs('noiseLevel').value = state.acquisition.noiseLevel;
   qs('binning').value = state.acquisition.binning;
   qs('exposureMs').value = state.acquisition.exposureMs;
   qs('beamCurrent').value = state.acquisition.beamCurrent;
@@ -303,6 +332,14 @@ function setAcquisitionPreset(values) {
   acquisition.reset();
   acquisition.drawPatternPreview();
   updateAcquisitionReadouts();
+}
+
+function updateParameterGuide() {
+  const focus = qs('parameterFocus')?.value || 'acceleratingVoltage';
+  const guide = acquisitionParameterGuides[focus] || acquisitionParameterGuides.acceleratingVoltage;
+  qs('parameterVisual').textContent = guide.visual;
+  qs('parameterPhysical').textContent = guide.physical;
+  qs('parameterTradeoff').textContent = guide.tradeoff;
 }
 
 const scenarioKey = 'ebsdTeachingStudio.scenarios.v1';
@@ -403,6 +440,8 @@ function updateWarningBadges(metrics) {
   if (metrics.pattern.noise > 50 || metrics.warning === 'noisy indexing') badges.push(['low signal', 'Add exposure, current, or averaging.']);
   if (state.acquisition.binning >= 4 || state.acquisition.stepSize >= 0.55) badges.push(['coarse spatial sampling', 'Reduce binning or step size for fine grains.']);
   if (state.acquisition.drift > 30) badges.push(['drift risk', 'Stabilize or scan faster.']);
+  if (metrics.warning === 'geometry mismatch') badges.push(['geometry mismatch', 'Revisit working distance or detector distance.']);
+  if (state.acquisition.noiseLevel > 40) badges.push(['added noise', 'Improve signal before trusting weak bands.']);
   if (state.acquisition.indexingThreshold > metrics.quality) badges.push(['strict threshold', 'Improve signal or lower threshold for exploration.']);
   if (!badges.length) badges.push(['balanced setup healthy', 'Balanced signal, detail, and speed.']);
   qs('warningBadges').innerHTML = badges.map(([label, title]) => `<span title="${escapeHtml(title)}">${escapeHtml(label)}</span>`).join('');
@@ -413,6 +452,7 @@ function updateQualityChecklist(metrics) {
     ['sharp bands', metrics.pattern.sharpness >= 55, 'Raise exposure/current or reduce binning if bands are blurred.'],
     ['no clipping', metrics.pattern.saturation <= 8, 'Lower gain before increasing other signal controls.'],
     ['enough contrast', metrics.quality >= 50, 'Use background correction and enough electrons per pixel.'],
+    ['geometry near setup', metrics.warning !== 'geometry mismatch', 'Working distance and detector distance affect projection and calibration reliability.'],
     ['stable map', state.acquisition.drift <= 25, 'Drift can bend boundaries even with usable patterns.'],
     ['reasonable threshold', state.acquisition.indexingThreshold <= metrics.quality + 12, 'Thresholds should match the study goal and data quality.']
   ];
@@ -424,14 +464,15 @@ function updateQualityChecklist(metrics) {
 function updateDiagnosis() {
   const symptom = qs('diagnoseSymptom')?.value || 'noisy';
   const fixes = {
-    noisy: ['Very noisy pattern', 'Likely low exposure/current or too little averaging.', 'Increase exposure or frame averaging, then compare confidence.'],
-    saturated: ['Bright clipped pattern', 'Likely excessive detector gain or beam current.', 'Reduce gain first; recover signal with exposure only if needed.'],
-    coarse: ['Blocky map detail', 'Likely large binning or step size.', 'Reduce binning or step size when grain-boundary detail matters.'],
-    drift: ['Bent grain boundaries', 'Likely stage drift during acquisition.', 'Stabilize the sample/stage or use a faster survey scan.'],
-    threshold: ['Many rejected pixels', 'Likely threshold stricter than current pattern quality.', 'Improve signal before lowering threshold for final interpretation.']
+    noisy: ['Very noisy pattern', 'Possible low exposure/current or too little averaging.', 'Increase exposure or frame averaging, then compare confidence-like cues.'],
+    saturated: ['Bright clipped pattern', 'Possible excessive detector gain or beam current.', 'Reduce gain first; recover signal with exposure only if needed.'],
+    coarse: ['Blocky map detail', 'Possible large binning or step size.', 'Reduce binning or step size when grain-boundary detail matters.'],
+    drift: ['Bent grain boundaries', 'Possible stage drift during acquisition.', 'Stabilize the sample/stage or use a faster survey scan.'],
+    threshold: ['Many rejected pixels', 'Possible threshold stricter than current pattern quality.', 'Improve signal before lowering threshold for final interpretation.'],
+    geometry: ['Bands visible but fit feels unstable', 'Working distance, detector distance, or pattern center may be inconsistent with the projection model.', 'Return geometry to the study setup before adjusting confidence-like thresholds.']
   };
   const [title, cause, fix] = fixes[symptom];
-  qs('diagnoseResult').innerHTML = `<strong>${escapeHtml(title)}</strong><p>${escapeHtml(cause)}</p><p><b>Recommended fix:</b> ${escapeHtml(fix)}</p>`;
+  qs('diagnoseResult').innerHTML = `<strong>${escapeHtml(title)}</strong><p>${escapeHtml(cause)}</p><p><b>First check:</b> ${escapeHtml(fix)}</p>`;
 }
 
 function setControlLevel(level) {
@@ -467,12 +508,14 @@ function setActiveView(view) {
   const isGeometry = view === 'geometry';
   const isAcquisition = view === 'acquisition';
   const isIndexing = view === 'indexing';
+  const isInterpretation = view === 'interpretation';
   const isLearning = view === 'learning';
   const isResources = view === 'resources';
   qs('startView').classList.toggle('active', isStart);
   qs('geometryView').classList.toggle('active', isGeometry);
   qs('acquisitionView').classList.toggle('active', isAcquisition);
   qs('indexingView').classList.toggle('active', isIndexing);
+  qs('interpretationView').classList.toggle('active', isInterpretation);
   qs('learningView').classList.toggle('active', isLearning);
   qs('resourcesView').classList.toggle('active', isResources);
   [
@@ -480,6 +523,7 @@ function setActiveView(view) {
     ['geometryView', isGeometry],
     ['acquisitionView', isAcquisition],
     ['indexingView', isIndexing],
+    ['interpretationView', isInterpretation],
     ['learningView', isLearning],
     ['resourcesView', isResources]
   ].forEach(([id, isActive]) => {
@@ -489,6 +533,7 @@ function setActiveView(view) {
   qs('tabGeometry').classList.toggle('active', isGeometry);
   qs('tabAcquisition').classList.toggle('active', isAcquisition);
   qs('tabIndexing').classList.toggle('active', isIndexing);
+  qs('tabInterpretation').classList.toggle('active', isInterpretation);
   qs('tabLearning').classList.toggle('active', isLearning);
   qs('tabResources').classList.toggle('active', isResources);
   qs('geometryLegend').classList.toggle('hidden', !isGeometry);
@@ -496,6 +541,7 @@ function setActiveView(view) {
   qs('tabGeometry').setAttribute('aria-selected', String(isGeometry));
   qs('tabAcquisition').setAttribute('aria-selected', String(isAcquisition));
   qs('tabIndexing').setAttribute('aria-selected', String(isIndexing));
+  qs('tabInterpretation').setAttribute('aria-selected', String(isInterpretation));
   qs('tabLearning').setAttribute('aria-selected', String(isLearning));
   qs('tabResources').setAttribute('aria-selected', String(isResources));
   document.querySelectorAll('.tab-button').forEach((button) => {
@@ -514,6 +560,10 @@ function setActiveView(view) {
   } else if (isIndexing) {
     qs('explainTitle').textContent = 'How Kikuchi Bands Are Indexed';
     qs('explainText').textContent = 'This foundation module explains the simplified indexing pipeline without adding a full Hough transform simulator.';
+  } else if (isInterpretation) {
+    qs('explainTitle').textContent = 'Interpretation Studio';
+    qs('explainText').textContent = 'Compare preparation, acquisition, pattern quality, confidence-like evidence, and map views before drawing EBSD conclusions.';
+    interpretationStudio.updateAll();
   } else {
     if (isLearning) {
       qs('explainTitle').textContent = 'Learning Path';
@@ -622,10 +672,20 @@ function handleLearningExperiment(action, context = {}) {
     if (action === 'acquisition-map-views') setMapMode('confidence');
     highlightControls(['gain', 'exposureMs', 'beamCurrent', 'binning', 'frameAverage', 'indexingThreshold']);
     showInstruction('Acquisition demo', 'The Learning Path applied a local preset. Compare the pattern preview, map, and coach warning.');
+    return;
+  }
+
+  if (['open-interpretation', 'interpretation-map', 'interpretation-quality', 'interpretation-troubleshooting', 'sample-prep-impact'].includes(action)) {
+    setActiveView('interpretation');
+    showInstruction('Interpretation studio', 'Compare pattern evidence, preparation, acquisition, confidence-like cues, maps, and troubleshooting before drawing conclusions.');
   }
 }
 
 bindAcquisitionRange('gain', 'gain', Number);
+bindAcquisitionRange('acqVoltage', 'acceleratingVoltage', Number);
+bindAcquisitionRange('workingDistance', 'workingDistance', Number);
+bindAcquisitionRange('acqDetectorDistance', 'detectorDistance', Number);
+bindAcquisitionRange('noiseLevel', 'noiseLevel', Number);
 bindAcquisitionRange('binning', 'binning', Number);
 bindAcquisitionRange('exposureMs', 'exposureMs', Number);
 bindAcquisitionRange('beamCurrent', 'beamCurrent', Number);
@@ -644,6 +704,7 @@ bindAcquisitionCheck('liveAcquisition', 'live');
 qs('miniDSpacing').addEventListener('input', updateMiniFormula);
 qs('beginnerMode').addEventListener('click', () => setControlLevel('beginner'));
 qs('advancedMode').addEventListener('click', () => setControlLevel('advanced'));
+qs('parameterFocus').addEventListener('change', updateParameterGuide);
 qs('diagnoseSymptom').addEventListener('change', updateDiagnosis);
 qs('saveScenario').addEventListener('click', saveCurrentScenario);
 qs('loadScenario').addEventListener('click', restoreSelectedScenario);
@@ -670,6 +731,7 @@ qs('tabStart').addEventListener('click', () => setActiveView('start'));
 qs('tabGeometry').addEventListener('click', () => setActiveView('geometry'));
 qs('tabAcquisition').addEventListener('click', () => setActiveView('acquisition'));
 qs('tabIndexing').addEventListener('click', () => setActiveView('indexing'));
+qs('tabInterpretation').addEventListener('click', () => setActiveView('interpretation'));
 qs('tabLearning').addEventListener('click', () => {
   hideDemoBanner();
   setActiveView('learning');
@@ -753,6 +815,7 @@ qs('learningScenariosShortcut').addEventListener('click', () => {
   qs('scenarioName').focus();
 });
 qs('learningIndexingShortcut').addEventListener('click', () => setActiveView('indexing'));
+qs('learningInterpretationShortcut').addEventListener('click', () => setActiveView('interpretation'));
 qs('screenshotButton').addEventListener('click', exportCurrentScreenshot);
 qs('exportButton').addEventListener('click', () => {
   openResource(activeView === 'learning' ? 'worksheet-view' : 'self-study-view');
@@ -778,6 +841,10 @@ document.querySelectorAll('[data-start-target]').forEach((button) => {
     }
     if (target === 'indexing') {
       setActiveView('indexing');
+      return;
+    }
+    if (target === 'interpretation') {
+      setActiveView('interpretation');
       return;
     }
     if (target === 'revise') {
@@ -899,6 +966,8 @@ function exportCurrentScreenshot() {
     downloadCanvas(qs('detector'), 'ebsd-geometry-pattern.png');
   } else if (activeView === 'acquisition') {
     downloadCanvas(qs('scanMap'), 'ebsd-acquisition-map.png');
+  } else if (activeView === 'interpretation') {
+    downloadCanvas(qs('mapStudioCanvas'), 'ebsd-interpretation-map.png');
   } else {
     downloadCanvas(learningSnapshotCanvas(), 'ebsd-learning-path.png');
   }
@@ -1011,6 +1080,17 @@ function resourceMarkup(action) {
       body: `
         <section><h2>Local synthetic scan presets</h2><ul><li>Fast survey</li><li>Balanced</li><li>High quality slow scan</li><li>Noisy pattern</li><li>Saturated pattern</li><li>Drift-distorted map</li></ul></section>
         <section><h2>Real Kikuchi image folder</h2><p><code>public/kikuchi-patterns</code></p><p>Add local assets there, then update <code>src/data/kikuchiPatterns.js</code>.</p></section>
+      `
+    };
+  }
+  if (action === 'interpretation-guide-view') {
+    return {
+      title: 'Phase 3 interpretation guide',
+      body: `
+        <section><h2>Connected EBSD workflow</h2><ol>${learningPipeline.map(([title, text]) => `<li><b>${escapeHtml(title)}:</b> ${escapeHtml(text)}</li>`).join('')}</ol></section>
+        <section><h2>Pattern-quality cases</h2><ul>${patternQualityCases.map((item) => `<li><b>${escapeHtml(item.title)}:</b> ${escapeHtml(item.indexingImpact)}</li>`).join('')}</ul></section>
+        <section><h2>Troubleshooting prompts</h2><ul>${troubleshootingSymptoms.map((item) => `<li><b>${escapeHtml(item.label)}:</b> check acquisition, preparation, and geometry before trusting a map.</li>`).join('')}</ul></section>
+        <section><h2>Scientific honesty</h2><p>These prompts are conceptual learning aids. They are not calibrated EBSD quantification, phase identification, crystallographic refinement, or research-grade map analysis.</p></section>
       `
     };
   }

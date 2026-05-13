@@ -2,24 +2,25 @@
 
 An offline-first, browser-based learning studio for students studying Electron Backscatter Diffraction (EBSD) concepts through clear schematic visualization, guided activities, and self-study resources.
 
-This is a conceptual learning simulator, not validated EBSD software. It is designed to help students reason about geometry, Kikuchi patterns, scan quality, indexing confidence, and common acquisition trade-offs. It should not be used for quantitative indexing, phase identification, detector calibration, or research-grade EBSD analysis.
+This is a conceptual learning simulator, not validated EBSD software. It is designed to help students reason about geometry, Kikuchi patterns, scan quality, confidence-like indexing evidence, and common acquisition trade-offs. It should not be used for quantitative indexing, phase identification, detector calibration, or research-grade EBSD analysis.
 
 ## What It Teaches
 
 - EBSD geometry: 70° sample tilt, 20° beam-sample-plane angle, detector facing the tilted sample, and the role of the interaction volume.
 - Bragg law, electron wavelength, schematic Kikuchi cone formation, and cone intersections with the detector.
 - Pattern center and detector calibration as conceptual influences on indexing.
-- Hough band detection, indexing confidence, pattern quality, MAD/fit, CI, and common failure modes.
+- Hough-style band detection, confidence-like indexing evidence, pattern quality, conceptual MAD/fit intuition, CI, and common failure modes.
 - Acquisition trade-offs among gain, exposure, binning, beam current, frame averaging, scan speed, step size, drift, and thresholding.
-- IPF maps, confidence maps, pattern quality maps, grain boundaries, unindexed pixels, pseudosymmetry, and phase-selection ambiguity such as Cu/Ni-like FCC cases.
+- IPF maps, confidence-like maps, pattern quality maps, schematic grain boundaries, unindexed pixels, pseudosymmetry, and phase-selection ambiguity such as Cu/Ni-like FCC cases.
 
 ## Key Features
 
-- Preserved core simulators plus student-first navigation: Start Here, Geometry, Acquisition, Indexing Basics, Learning Path, and Glossary / Resources.
+- Preserved core simulators plus student-first navigation: Start Here, Geometry, Acquisition, Indexing Basics, Interpretation, Learning Path, and Glossary / Resources.
 - Real local Kikuchi image support from `public/kikuchi-patterns`, with graceful schematic fallback when image assets are missing.
 - Interactive Three.js EBSD geometry with guided stages, sample/detector controls, cone magnification, crystal orientation, labels, detector noise, contrast, and pattern inversion.
-- Live scan acquisition trainer with map modes, pause/resume, reset, warning badges, presets, beginner/advanced controls, diagnosis activity, quality checklist, and named scenario save/restore in localStorage.
+- Live scan acquisition trainer with map modes, pause/resume, reset, warning badges, presets, beginner/advanced controls, real-world parameter explorer, diagnosis activity, quality checklist, and named scenario save/restore in localStorage.
 - Interactive Indexing Basics studio with a pausable conceptual walkthrough, pattern-center calibration exercise, band matching practice, real pattern review overlays, and local weak-area review.
+- Phase 3 Interpretation workspace covering pattern-quality failure cases, sample-preparation impact, schematic map interpretation, confidence/fit intuition, and guided troubleshooting.
 - Learning Path modules with quizzes, hints, flashcards, bookmarks, notes, guided demos, expected observations, and reflection prompts.
 - Top-bar tools for Notes, Screenshot, offline Resource Export, Glossary, Help, and scene reset.
 - Offline HTML/text exports for worksheets, lesson cards, formula sheets, practice questions, preset references, and self-study guides.
@@ -97,7 +98,7 @@ On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd install`, `npm.
 
 1. Start with Start Here to choose a study path.
 2. Use Geometry to inspect the beam, tilted sample, detector, enlarged schematic cones, and Kikuchi band formation.
-3. Move to Acquisition to explore how acquisition parameters influence pattern quality, confidence, unindexed pixels, and map stability.
+3. Move to Acquisition to explore how acquisition parameters influence pattern quality, confidence-like cues, unindexed pixels, and map stability.
 4. Use Learning Path for guided modules, quizzes, notes, flashcards, bookmarks, and mini experiments that jump into the relevant tab with presets applied.
 5. Use Indexing Basics to review the simplified workflow from raw pattern to confidence, practice band matching, and explore pattern-center sensitivity.
 6. Use Resource Export to generate offline worksheets, and Screenshot to capture the current visible study state.
@@ -108,7 +109,8 @@ On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd install`, `npm.
 - Detector bands are schematic projections intended to explain how cone intersections become bands.
 - Acquisition quality, confidence, drift, saturation, and threshold effects are qualitative learning models.
 - IPF maps and grain boundaries are synthetic visuals, not measured microstructure.
-- Hough-style band detection, candidate scoring, pattern-center confidence, and band matching activities are conceptual teaching tools, not actual indexing engines or calibrated refinement software.
+- Hough-style band detection, candidate scoring, pattern-center confidence, and band matching activities are conceptual learning tools, not actual indexing engines or calibrated refinement software.
+- Phase 3 interpretation maps and failure cases are schematic and qualitative. They do not compute grain size, phase fraction, true misorientation, strain, MAD, or research-grade pattern quality metrics.
 
 ## Performance Notes
 
@@ -143,6 +145,7 @@ Implemented and verified:
 - Notes, glossary, screenshot, export/resource view, help, reset, progress, bookmarks, local notes, guided demos, presets, warning badges, scenario save/restore, and offline fallback behavior.
 - EBSD learning modules covering geometry, interaction volume, Bragg law, band formation, pattern center, indexing, confidence, acquisition trade-offs, sample preparation, phase ambiguity, pseudosymmetry, IPF maps, grain boundaries, and troubleshooting.
 - Phase 2 Indexing Basics activities covering conceptual band detection, band position measurement, candidate orientation matching, pattern-center sensitivity, real pattern review, and weak-area self-review.
+- Phase 3 Interpretation activities covering acquisition parameter effects, pattern-quality diagnosis, sample-preparation effects, schematic map interpretation, simplified confidence/fit comparison, and guided troubleshooting.
 - Responsive layout checks for desktop, laptop, tablet, and narrow mobile widths.
 
 Known future ideas:

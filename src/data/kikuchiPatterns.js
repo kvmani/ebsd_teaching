@@ -5,9 +5,9 @@ export const kikuchiPatterns = [
   {
     id: 'ebsd_si_001',
     src: '/kikuchi-patterns/ebsd-si-001.png',
-    label: 'Si (001), 20 kV',
-    grainLabel: 'Silicon grain 1',
-    orientationLabel: 'Near (001) orientation',
+    label: 'Si EBSD example, 20 kV',
+    grainLabel: 'Educational review example 1',
+    orientationLabel: 'Source-provided silicon example; orientation not confirmed in-app',
     credit: 'Wikimedia Commons, FuzzyMagma, CC0',
     bandCenters: [
       { x0: 0, y0: 0.54, x1: 1, y1: 0.49 },
@@ -18,9 +18,9 @@ export const kikuchiPatterns = [
   {
     id: 'ebsd_nist',
     src: '/kikuchi-patterns/ebsd-nist.jpg',
-    label: 'NIST EBSD pattern',
-    grainLabel: 'Reference grain 2',
-    orientationLabel: 'Reference orientation B',
+    label: 'NIST EBSD example pattern',
+    grainLabel: 'Educational review example 2',
+    orientationLabel: 'Source-provided note; orientation not confirmed in-app',
     credit: 'NIST / Wikimedia Commons, public domain',
     bandCenters: [
       { x0: 0.5, y0: 0, x1: 0.5, y1: 1 },
@@ -31,8 +31,8 @@ export const kikuchiPatterns = [
     id: 'ebsd_si_square',
     src: '/kikuchi-patterns/ebsd-si-square.png',
     label: 'Si EBSD detail',
-    grainLabel: 'Silicon grain 3',
-    orientationLabel: 'Orientation C detail',
+    grainLabel: 'Educational review example 3',
+    orientationLabel: 'Possible visual example; orientation not confirmed in-app',
     credit: 'Wikimedia Commons, FuzzyMagma, CC0',
     bandCenters: [
       { x0: 0, y0: 0.5, x1: 1, y1: 0.48 },
