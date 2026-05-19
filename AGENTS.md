@@ -1,159 +1,126 @@
-# Agent Guidelines for EBSD Teaching Simulation
+# Agent Guidelines For EBSD Learning Studio
 
-This document provides guidance for agents (AI assistants) contributing to this codebase. **The core mission is pedagogical: help students understand EBSD concepts through clear, interactive visualization.**
+This repository is an educational EBSD learning environment. The core mission is to help students understand EBSD concepts through clear, interactive, scientifically honest visualization.
+
+Before making substantial changes, read:
+
+- `README.md`
+- `docs/ARCHITECTURE.md`
+- `docs/DEVELOPMENT.md`
+- `docs/SCIENTIFIC_SCOPE.md`
 
 ## Core Principles
 
-### 1. **Pedagogical First, Physics Second**
-- **Prioritize clarity** over realism
-- Use **schematic simplifications** to highlight core concepts
-- Annotate code liberally explaining *why* we simplify physics
-- Example: We use cones for Bragg diffraction, not rigorous dynamical theory
-- **Never silently add complex physics** without discussing educational trade-offs
+### 1. Pedagogy First
 
-### 2. **Simplicity & Maintainability**
-- Keep code readable by students (this is a teaching tool)
-- Avoid advanced techniques that obscure intent
-- Use clear variable names: `electronWavelengthPm`, `braggAngleDeg`, not `lambda`, `theta`
-- Write functions that do one thing well
-- Comment liberally, especially explaining physics mappings
+- Prioritize student understanding over physical completeness.
+- Use schematic simplifications when they make the concept clearer.
+- Explain approximations in visible text, docs, or concise code comments.
+- Never silently add complex physics or real-analysis claims.
 
-### 3. **Interactive 3D Graphics Matter**
-- All changes must render correctly in Three.js
-- Test both guided and manual modes after changes
-- Visual feedback is how students learn—keep it responsive and clear
-- Don't break the detector pattern visualization or 3D scene
+### 2. Scientific Honesty
 
-## Architecture Overview
+The app is not validated EBSD software. It must not imply that it performs calibrated microscope simulation, true indexing, phase identification, grain-size measurement, strain analysis, or research-grade map interpretation.
 
-| Module | Purpose | Educational Goal |
-|--------|---------|------------------|
-| `main.js` | UI event handling, state updates | Show how user inputs drive simulation |
-| `scene.js` | 3D visualization (beam, sample, cones, detector) | Visualize SEM/EBSD geometry |
-| `detector.js` | 2D Kikuchi band pattern on detector | Show real output of diffraction |
-| `state.js` | Physics constants, simulation state | Centralized physical parameters |
-| `styles.css` | Layout and visual design | Clear, accessible interface |
+Use careful labels:
 
-## When Adding Features
+- conceptual
+- schematic
+- simplified
+- qualitative
+- educational guide
+- not calibrated
+- not a solver
+- confidence-like
 
-### ✅ Do This
-- **Add new visualization modes** that clarify concepts (e.g., "show only first-order Bragg cones")
-- **Extend the guided explanation** with more detailed stages
-- **Add interactive controls** for student exploration (voltage, tilt, orientation sliders)
-- **Improve annotations** and labels in the 3D scene
-- **Optimize rendering** while maintaining pedagogical clarity
-- **Refactor** for readability and maintainability
+Avoid unsupported claims:
 
-### ❌ Avoid This
-- **Adding physically realistic dynamics** (e.g., phonon interactions, thermal effects) without clear pedagogical benefit
-- **Complex mathematical formulations** that hide conceptual understanding
-- **Performance optimizations** that sacrifices code clarity
-- **Removing or obscuring the schematic nature** of the simulation
-- **Changes that break the visual feedback loop** between user input and output
+- verified orientation
+- confirmed phase
+- measured strain
+- true grain size
+- real confidence metric
+- validated indexing result
 
-## Code Style
+### 3. Maintainability
 
-### Comments & Explanations
-```javascript
-// ✅ Good: Explains the pedagogical choice
-// We use cone half-angle = 2*braggAngle (schematic) rather than full dynamical theory.
-// This clearly shows diffraction geometry without overwhelming complexity.
-const coneHalfAngle = 2 * braggAngleDeg;
+- Keep modules readable.
+- Prefer explicit names with units, such as `acceleratingVoltageKv` or `braggAngleDeg`.
+- Keep state logic, rendering logic, and data definitions separated where practical.
+- Avoid dependency bloat.
+- Preserve offline-first browser behavior.
 
-// ❌ Avoid: No context, or unexplained simplifications
-const angle = 2 * theta;
-```
+### 4. Visual Feedback Matters
 
-### Variable Naming
-```javascript
-// ✅ Good: Clear, domain-specific names
-const electronWavelengthPm = 0.123; // pm units make small wavelengths intuitive
-const braggAngleDeg = 15.5; // Degrees are familiar to students
-const detectorTiltDeg = 70; // Explicit units and meaning
+- Three.js and canvas visuals are the learning surface.
+- Test changed visual modules at mobile, tablet, desktop, and ultrawide sizes.
+- Keep scientific circles circular by preserving square canvas buffers and square CSS boxes.
+- Do not break detector rendering, acquisition maps, Euler/pole figures, indexing overlays, or interpretation canvases.
 
-// ❌ Avoid: Unclear abbreviations
-const lambda = 0.123;
-const theta = 15.5;
-const tilt = 70;
-```
+## Current Architecture
 
-### Physics Constants
-- Keep all constants in `state.js`
-- Clearly label units and reference papers/textbooks where applicable
-- Add comments explaining approximations or simplifications
+| Module | Purpose |
+| --- | --- |
+| `src/main.js` | App bootstrap, tab navigation, UI wiring, dialogs, exports |
+| `src/state.js` | Shared simulation state and constants |
+| `src/scene.js` | Three.js EBSD geometry scene |
+| `src/detector.js` | Schematic Kikuchi detector bands |
+| `src/acquisition.js` | Conceptual acquisition map and pattern preview |
+| `src/eulerOrientationStudio.js` | Euler angles, unit cell, stereographic projection, pole figure, IPF |
+| `src/indexingStudio.js` | Conceptual indexing studio |
+| `src/realIndexingLab.js` | Optional DA Ni indexing teaching lab |
+| `src/interpretationStudio.js` | Pattern quality, sample prep, maps, confidence intuition, troubleshooting |
+| `src/learningPath.js` | Guided learning modules, quizzes, notes, flashcards |
+| `src/styles.css` | Responsive app layout and visual design |
+
+See `docs/ARCHITECTURE.md` for the fuller map.
+
+## When Adding Or Editing Features
+
+Do:
+
+- keep changes scoped to the requested module
+- preserve localStorage compatibility when possible
+- add student-facing explanations for new controls
+- include scientific-honesty labels where needed
+- test keyboard reachability and responsive layout
+- run `npm.cmd run build`
+
+Avoid:
+
+- hidden server dependencies for core browser flows
+- large rewrites unrelated to the request
+- presenting schematic scores as real measurements
+- changing data labels beyond what source metadata supports
+- removing existing tabs, notes, bookmarks, quizzes, exports, or real-pattern fallback behavior
 
 ## Testing Checklist
 
-When submitting changes:
-- [ ] **Guided mode works**: Step through all 6 stages without errors
-- [ ] **Manual mode works**: All sliders adjust smoothly, detector updates
-- [ ] **3D visualization renders**: No broken geometry or Three.js errors
-- [ ] **Detector pattern updates**: Changes in rotation/voltage affect bands
-- [ ] **Code is readable**: Comments explain pedagogical choices
-- [ ] **No silent physics changes**: Any new complexity is justified educationally
+Before handoff:
 
-## Examples of Good Changes
+- [ ] `npm.cmd run build` passes
+- [ ] affected tab renders without console errors
+- [ ] 320 px mobile layout has no horizontal overflow
+- [ ] tablet/desktop/ultrawide layouts avoid awkward empty space
+- [ ] controls remain keyboard reachable
+- [ ] canvases keep intended aspect ratios
+- [ ] notes/bookmarks/localStorage behavior is not broken
+- [ ] exports and resource dialogs still open if touched
+- [ ] scientific labels remain honest and non-misleading
 
-### Adding a Feature
-```javascript
-// In state.js - add a new control for students to explore
-// Purpose: Let students see how Bragg angle changes with electron wavelength
-export const minVoltage = 5;  // kV, typical SEM range
-export const maxVoltage = 30;
+## Documentation Checklist
 
-// In main.js - bind voltage slider
-bindRange('voltageSlider', 'voltage', Number);
+Update docs when you:
 
-// In detector.js - update pattern when voltage changes
-// This teaches: shorter wavelength → smaller Bragg angle → narrower bands
-function updateBandsForVoltage(voltage) {
-  const lambda = electronWavelengthPm(voltage);
-  const braggAngle = braggThetaDeg(voltage, planes[0].d);
-  // Render bands with new angles...
-}
-```
-
-### Improving Code Clarity
-```javascript
-// ❌ Before: Unclear what this does
-const p = Math.sin(r * Math.PI / 180) * d;
-
-// ✅ After: Clear pedagogical meaning
-// Project the lattice plane spacing onto the Bragg diffraction direction
-// Using Bragg's law: nλ = 2d*sin(θ)
-const effectiveSpacing = Math.sin(braggAngleDeg * Math.PI / 180) * latticeSpacing;
-```
-
-## Communication with Contributors
-
-When reviewing or suggesting changes:
-- **Ask why**: "Does this simplification help or hurt understanding?"
-- **Clarify intent**: "Is this for students to explore, or to show a specific concept?"
-- **Test pedagogically**: "Did you verify both guided and manual modes work well?"
-- **Document choices**: "Why did you choose this physics model over that one?"
-
-## Questions to Ask About Any Change
-
-1. **Does this help students understand EBSD better?**
-2. **Is it simple enough for students to follow the code?**
-3. **Does it render correctly in Three.js?**
-4. **Is the educational trade-off (if any) clearly documented?**
-5. **Does it work in both guided and manual modes?**
-
----
+- add a new tab or learning module
+- add a new data source
+- add a backend endpoint
+- change setup commands or dependencies
+- change localStorage behavior
+- change scientific scope
+- add a new renderer or canvas-heavy layout
 
 ## Summary
 
-This is an **educational tool**, not a research simulator. Code should be:
-- **Clear** over clever
-- **Pedagogical** over realistic
-- **Maintainable** over optimized
-- **Visual** and interactive
-- **Honest** about simplifications
+This is a conceptual learning studio, not research software. Code and documentation should be clear, visual, maintainable, accessible, and honest about simplifications.
 
-When in doubt, prioritize student understanding.
-
----
-
-**Last Updated**: April 2026  
-**Audience**: Future developers, contributors, and AI agents working on this codebase

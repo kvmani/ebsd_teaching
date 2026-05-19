@@ -1,134 +1,36 @@
 # EBSD Learning Studio
 
-An offline-first, browser-based learning studio for students studying Electron Backscatter Diffraction (EBSD) concepts through clear schematic visualization, guided activities, and self-study resources.
+EBSD Learning Studio is an offline-first browser app for learning Electron Backscatter Diffraction concepts through schematic visualization, guided activities, curated examples, and self-study resources.
 
-This is a conceptual learning simulator, not validated EBSD software. It is designed to help students reason about geometry, Kikuchi patterns, scan quality, confidence-like indexing evidence, and common acquisition trade-offs. It should not be used for quantitative indexing, phase identification, detector calibration, or research-grade EBSD analysis.
+This is an educational learning environment, not validated EBSD analysis software. It helps students reason about EBSD geometry, Kikuchi patterns, acquisition tradeoffs, conceptual indexing, confidence-like evidence, map interpretation, sample preparation, and common failure modes. It must not be used for quantitative indexing, phase identification, detector calibration, grain-size measurement, strain analysis, or research-grade EBSD interpretation.
 
-## What It Teaches
-
-- EBSD geometry: 70° sample tilt, 20° beam-sample-plane angle, detector facing the tilted sample, and the role of the interaction volume.
-- Bragg law, electron wavelength, schematic Kikuchi cone formation, and cone intersections with the detector.
-- Pattern center and detector calibration as conceptual influences on indexing.
-- Hough-style band detection, confidence-like indexing evidence, pattern quality, conceptual MAD/fit intuition, CI, and common failure modes.
-- Acquisition trade-offs among gain, exposure, binning, beam current, frame averaging, scan speed, step size, drift, and thresholding.
-- IPF maps, confidence-like maps, pattern quality maps, schematic grain boundaries, unindexed pixels, pseudosymmetry, and phase-selection ambiguity such as Cu/Ni-like FCC cases.
-
-## Key Features
-
-- Preserved core simulators plus student-first navigation: Start Here, Geometry, Acquisition, Indexing Basics, Interpretation, Learning Path, and Glossary / Resources.
-- Real local Kikuchi image support from `public/kikuchi-patterns`, with graceful schematic fallback when image assets are missing.
-- Interactive Three.js EBSD geometry with guided stages, sample/detector controls, cone magnification, crystal orientation, labels, detector noise, contrast, and pattern inversion.
-- Live scan acquisition trainer with map modes, pause/resume, reset, warning badges, presets, beginner/advanced controls, real-world parameter explorer, diagnosis activity, quality checklist, and named scenario save/restore in localStorage.
-- Interactive Indexing Basics studio with a pausable conceptual walkthrough, pattern-center calibration exercise, band matching practice, real pattern review overlays, and local weak-area review.
-- Phase 3 Interpretation workspace covering pattern-quality failure cases, sample-preparation impact, schematic map interpretation, confidence/fit intuition, and guided troubleshooting.
-- Real DA Ni indexing lab using copied `DA.oh5` data, generated two-pattern teaching assets, manual band picking, pattern-center sliders, and an optional local Python backend that re-runs `kikuchipy`.
-- Learning Path modules with quizzes, hints, flashcards, bookmarks, notes, guided demos, expected observations, and reflection prompts.
-- Top-bar tools for Notes, Screenshot, offline Resource Export, Glossary, Help, and scene reset.
-- Offline HTML/text exports for worksheets, lesson cards, formula sheets, practice questions, preset references, and self-study guides.
-
-## Local Kikuchi Images
-
-Place curated study images in:
-
-```text
-public/kikuchi-patterns
-```
-
-The app preloads the local pattern catalog and reports whether the current view is using a real local Kikuchi image or the fallback schematic pattern. Keep image files small enough for student laptops and document sources in `public/kikuchi-patterns/README.md` when adding new assets.
-
-## Project Structure
-
-```text
-.
-|-- index.html
-|-- package.json
-|-- public/
-|   |-- kikuchi-patterns/
-|   `-- teaching-data/
-|       `-- da-ni/
-|-- data/
-|   `-- da-ni/
-|       |-- DA.oh5
-|       `-- bandDetectorOptionsDebug.yml
-|-- python_backend/
-|   |-- indexing_core.py
-|   `-- server.py
-|-- scripts/
-|   `-- extract_da_indexing_examples.py
-|-- src/
-|   |-- acquisition.js
-|   |-- detector.js
-|   |-- learningPath.js
-|   |-- learningProgress.js
-|   |-- indexingStudio.js
-|   |-- main.js
-|   |-- patternLibrary.js
-|   |-- realIndexingLab.js
-|   |-- scene.js
-|   |-- state.js
-|   |-- styles.css
-|   `-- data/
-|       |-- formulas.js
-|       |-- glossary.js
-|       |-- kikuchiPatterns.js
-|       `-- learningModules.js
-```
-
-## Setup
+## Quick Start
 
 Prerequisites:
 
 - Node.js 16 or newer
 - npm
-- Python with `kikuchipy`, `h5py`, `numpy`, `pyyaml`, `matplotlib`, `scikit-image`, `orix`, `diffsims`, and `diffpy.structure` for the real DA Ni indexing lab
 
-Install dependencies:
+Install and run:
 
 ```bash
 npm install
-```
-
-Run the development server:
-
-```bash
 npm run dev
 ```
 
-Open the URL printed by Vite, usually:
+Open the Vite URL, usually:
 
 ```text
 http://127.0.0.1:5173
 ```
 
-If that port is occupied, run Vite on another port:
+On Windows PowerShell systems that block `npm.ps1`, use:
 
 ```bash
-npm.cmd run dev -- --host 127.0.0.1 --port 5174 --strictPort
+npm.cmd install
+npm.cmd run dev
+npm.cmd run build
 ```
-
-## Real DA Ni Indexing Lab
-
-The project includes a self-contained copy of the DA Ni example data under `data/da-ni`. To regenerate the browser teaching assets:
-
-```bash
-npm.cmd run extract:da
-```
-
-To enable live pattern-center re-indexing from the browser:
-
-```bash
-npm.cmd run backend
-```
-
-Then run the Vite app in another terminal. In Indexing Basics, open the “Interactive Pattern Center and Band Picking Lab”. Students can:
-
-- select one of two real DA Ni patterns
-- click two points along a band to add manual centerlines
-- compare manual bands with Hough-detected bands
-- change `PC x-star`, `PC y-star`, and `PC z-star`
-- click `Re-index with PC` to send the current PC to the local Python backend
-
-Teaching boundary: the backend re-runs real `kikuchipy` Hough indexing with the supplied pattern center. Student-picked bands are compared visually in the browser; they are not yet injected directly into PyEBSDIndex as replacement band detections.
 
 Build for production:
 
@@ -136,37 +38,129 @@ Build for production:
 npm run build
 ```
 
-On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd install`, `npm.cmd run dev`, and `npm.cmd run build`.
+The production build may report a large chunk warning because Three.js and the offline learning studio ship together. That warning is currently expected.
 
-## Self-Study Use
+## Main Learning Areas
 
-1. Start with Start Here to choose a study path.
-2. Use Geometry to inspect the beam, tilted sample, detector, enlarged schematic cones, and Kikuchi band formation.
-3. Move to Acquisition to explore how acquisition parameters influence pattern quality, confidence-like cues, unindexed pixels, and map stability.
-4. Use Learning Path for guided modules, quizzes, notes, flashcards, bookmarks, and mini experiments that jump into the relevant tab with presets applied.
-5. Use Indexing Basics to review the simplified workflow from raw pattern to confidence, practice band matching, and explore pattern-center sensitivity.
-6. Use Resource Export to generate offline worksheets, and Screenshot to capture the current visible study state.
+- **Start Here**: student pathways for geometry, acquisition, indexing, interpretation, and revision.
+- **Geometry**: Three.js beam/sample/detector scene, schematic Bragg cones, detector bands, guided stages, and manual controls.
+- **Acquisition**: conceptual scan map, pattern preview, detector settings, parameter explorer, presets, quality checklist, troubleshooting prompts, and saved scenarios.
+- **Euler / Pole Figures**: Bunge ZXZ angle controls, unit cell orientation, stereographic projection, pole figure, and IPF views.
+- **Indexing Basics**: conceptual indexing walkthrough, calibration exercise, band matching, real pattern review, weak-area review, and the optional real DA Ni lab.
+- **Interpretation**: pattern-quality cases, sample-preparation impact, map interpretation, confidence/MAD/fit intuition, and guided troubleshooting.
+- **Learning Path**: modules, quizzes, hints, flashcards, bookmarks, notes, guided demos, and reflection prompts.
+- **Glossary / Resources**: local glossary, worksheets, lesson cards, formula sheet, practice questions, datasets, interpretation guide, and export tools.
 
-## Conceptual Simplifications
+## Scientific Scope
 
-- Kikuchi cones are enlarged for learning clarity and are not a full dynamical electron diffraction model.
-- Detector bands are schematic projections intended to explain how cone intersections become bands.
-- Acquisition quality, confidence, drift, saturation, and threshold effects are qualitative learning models.
-- IPF maps and grain boundaries are synthetic visuals, not measured microstructure.
-- Hough-style band detection, candidate scoring, pattern-center confidence, and band matching activities are conceptual learning tools, not actual indexing engines or calibrated refinement software.
-- Phase 3 interpretation maps and failure cases are schematic and qualitative. They do not compute grain size, phase fraction, true misorientation, strain, MAD, or research-grade pattern quality metrics.
+The app deliberately favors conceptual clarity over full physical realism.
 
-## Performance Notes
+- Kikuchi cones and detector bands are schematic teaching visuals.
+- Acquisition quality, drift, saturation, noise, and threshold effects are qualitative learning models.
+- Confidence, fit, MAD, and CI are taught as intuition, not as commercial-system metrics.
+- IPF maps, phase maps, grain boundaries, twins, deformation gradients, and pattern-quality cases are schematic unless explicitly labeled as real source data.
+- Real Kikuchi examples are local study images with source notes; the browser overlays are conceptual guides.
+- The optional Python backend can re-run a small real DA Ni indexing example, but the browser app is still an educational interface, not a replacement for Oxford Aztec, EDAX OIM, Bruker ESPRIT, CHANNEL5, or research workflows.
 
-The production build may report a large Vite chunk warning because Three.js and the learning studio ship together for offline use. This is acceptable for the current app. Future code-splitting may be useful if the studio grows substantially, but it is not necessary for the present workflow.
+For more detail, see [Scientific Scope](docs/SCIENTIFIC_SCOPE.md).
 
-## Development Guidelines
+## Project Structure
 
-- Preserve the core simulator behavior and existing localStorage behavior.
-- Preserve real local Kikuchi image support and the schematic fallback.
-- Keep new features directly useful for EBSD learning.
-- Prefer clear pedagogical comments over unvalidated physics complexity.
-- Test geometry controls, acquisition controls, learning progress, notes, glossary, screenshots, exports, and responsive layouts before release.
+```text
+.
+|-- index.html                         # Main app shell and tab markup
+|-- package.json                       # npm scripts and browser dependencies
+|-- src/
+|   |-- main.js                        # App wiring, tab navigation, exports, dialogs
+|   |-- state.js                       # Shared simulation state and constants
+|   |-- scene.js                       # Three.js geometry simulator
+|   |-- detector.js                    # Schematic Kikuchi detector renderer
+|   |-- acquisition.js                 # Acquisition map and pattern preview renderer
+|   |-- eulerOrientationStudio.js      # Euler angles, pole figure, and IPF studio
+|   |-- indexingStudio.js              # Conceptual indexing activities
+|   |-- realIndexingLab.js             # Optional DA Ni real indexing teaching lab
+|   |-- interpretationStudio.js        # Phase 3 interpretation workspace
+|   |-- phase3Data.js                  # Interpretation cases and guide data
+|   |-- learningPath.js                # Learning modules UI and practice tools
+|   |-- learningProgress.js            # localStorage progress persistence
+|   |-- patternLibrary.js              # Real/fallback Kikuchi pattern loading
+|   |-- styles.css                     # Responsive app styling
+|   `-- data/
+|       |-- formulas.js
+|       |-- glossary.js
+|       |-- kikuchiPatterns.js
+|       `-- learningModules.js
+|-- public/
+|   |-- kikuchi-patterns/              # Local real-pattern examples and source notes
+|   `-- teaching-data/da-ni/           # Browser-ready DA Ni teaching assets
+|-- data/da-ni/                        # Source DA Ni data used by extraction script
+|-- python_backend/                    # Optional local indexing backend
+|-- scripts/                           # Data extraction utilities
+|-- docs/                              # Maintainer documentation
+`-- references/                        # Local reference material
+```
+
+See [Architecture](docs/ARCHITECTURE.md) for module responsibilities and data flow.
+
+## Real Kikuchi Images
+
+Curated local Kikuchi images live in:
+
+```text
+public/kikuchi-patterns
+```
+
+The app preloads the catalog in `src/data/kikuchiPatterns.js` and falls back to schematic patterns when an image asset is missing. When adding images:
+
+- Keep files small enough for student laptops.
+- Document source and usage notes in `public/kikuchi-patterns/README.md`.
+- Avoid unverified labels such as confirmed phase, verified orientation, or indexed result unless those claims are supported by source metadata.
+
+## Optional Real DA Ni Indexing Lab
+
+The repository includes a small DA Ni teaching dataset under `data/da-ni` and browser-ready derived assets under `public/teaching-data/da-ni`.
+
+Regenerate browser teaching assets:
+
+```bash
+npm.cmd run extract:da
+```
+
+Run the optional local Python backend:
+
+```bash
+npm.cmd run backend
+```
+
+Python dependencies for the backend include `kikuchipy`, `h5py`, `numpy`, `pyyaml`, `matplotlib`, `scikit-image`, `orix`, `diffsims`, and `diffpy.structure`.
+
+Teaching boundary: the backend re-runs real `kikuchipy` Hough indexing with supplied pattern-center values. Browser-picked bands are compared visually; they are not injected directly into PyEBSDIndex as replacement detections.
+
+## Development Workflow
+
+Common commands:
+
+```bash
+npm.cmd install
+npm.cmd run dev
+npm.cmd run build
+npm.cmd run backend
+npm.cmd run extract:da
+```
+
+Before handing off changes:
+
+- Run `npm.cmd run build`.
+- Check the changed tab at mobile, tablet, desktop, and ultrawide widths.
+- Confirm no horizontal overflow or distorted canvases.
+- Smoke-test affected controls, localStorage paths, notes/bookmarks, resources, and exports.
+- Keep new labels scientifically honest: conceptual, schematic, simplified, qualitative, not calibrated, not a solver.
+
+See [Development Guide](docs/DEVELOPMENT.md) for a longer checklist.
+
+## Local Persistence
+
+The app stores learning progress, notes, bookmarks, scenario presets, help dismissal, reduced-motion state, and some activity state in browser `localStorage`. Keep storage keys stable when possible so student progress is not lost between versions.
 
 ## Repository
 
@@ -176,26 +170,5 @@ Clone:
 git clone https://github.com/kvmani/ebsd_teaching.git
 ```
 
-Use GitHub Issues or Discussions on the repository for questions, study feedback, and future feature requests.
+This checkout may be used as a local teaching build. Add a license file before public redistribution or reuse outside the project owner's intended setting.
 
-## License
-
-No license file is currently included. Add a license before public redistribution or reuse outside the project owner's intended setting.
-
-## Audit Report - May 2026
-
-Implemented and verified:
-
-- Notes, glossary, screenshot, export/resource view, help, reset, progress, bookmarks, local notes, guided demos, presets, warning badges, scenario save/restore, and offline fallback behavior.
-- EBSD learning modules covering geometry, interaction volume, Bragg law, band formation, pattern center, indexing, confidence, acquisition trade-offs, sample preparation, phase ambiguity, pseudosymmetry, IPF maps, grain boundaries, and troubleshooting.
-- Phase 2 Indexing Basics activities covering conceptual band detection, band position measurement, candidate orientation matching, pattern-center sensitivity, real pattern review, and weak-area self-review.
-- Phase 3 Interpretation activities covering acquisition parameter effects, pattern-quality diagnosis, sample-preparation effects, schematic map interpretation, simplified confidence/fit comparison, and guided troubleshooting.
-- Responsive layout checks for desktop, laptop, tablet, and narrow mobile widths.
-
-Known future ideas:
-
-- Optional student lesson packs.
-- More curated real Kikuchi images with source notes.
-- A printable multi-week lab worksheet sequence.
-- Import/export of complete practice scenario bundles.
-- Optional advanced indexing comparison activities, still clearly labeled as conceptual unless a real solver is implemented.

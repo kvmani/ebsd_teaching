@@ -219,6 +219,19 @@ function drawPoint(ctx, plot, point, color, label) {
   }
 }
 
+function prepareSquareCanvas(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const cssSize = Math.max(180, Math.round(Math.min(
+    rect.width || canvas.clientWidth || 360,
+    rect.height || canvas.clientHeight || rect.width || 360
+  )));
+  if (canvas.width !== cssSize || canvas.height !== cssSize) {
+    canvas.width = cssSize;
+    canvas.height = cssSize;
+  }
+  return canvas.getContext('2d');
+}
+
 function makeLine(points, color) {
   const geometry = new THREE.BufferGeometry().setFromPoints(points.map((p) => new THREE.Vector3(p[0], p[1], p[2])));
   return new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.95 }));
@@ -402,8 +415,8 @@ export class EulerOrientationStudio {
   setupScene() {
     this.sceneRoot = this.root.querySelector('#eulerScene');
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    this.camera.position.set(0, -0.08, 4.2);
+    this.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    this.camera.position.set(0, -0.08, 3.05);
     this.camera.up.set(0, 1, 0);
     this.camera.lookAt(0, 0, 0);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -572,7 +585,7 @@ export class EulerOrientationStudio {
   drawStereographicConstruction() {
     const canvas = this.root.querySelector('#stereoCanvas');
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = prepareSquareCanvas(canvas);
     const plot = drawCirclePlot(ctx, 'Stereographic projection');
     const g = bungeMatrix(this.state.phi1, this.state.Phi, this.state.phi2);
     const pole = matVec(g, normalize(this.currentPolePreset().vector));
@@ -601,7 +614,7 @@ export class EulerOrientationStudio {
   drawPoleFigure() {
     const canvas = this.root.querySelector('#poleFigureCanvas');
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = prepareSquareCanvas(canvas);
     const plot = drawCirclePlot(ctx, `Pole figure ${this.currentPolePreset().label}`);
     const g = bungeMatrix(this.state.phi1, this.state.Phi, this.state.phi2);
     poleFamily(this.state.system, this.currentPolePreset()).forEach((pole, index) => {
@@ -613,7 +626,7 @@ export class EulerOrientationStudio {
   drawIpf() {
     const canvas = this.root.querySelector('#ipfCanvas');
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = prepareSquareCanvas(canvas);
     const plot = drawCirclePlot(ctx, `IPF ${this.state.sampleDirection}`);
     const g = bungeMatrix(this.state.phi1, this.state.Phi, this.state.phi2);
     const crystalDirection = normalize(matVec(transpose(g), SAMPLE_DIRECTIONS[this.state.sampleDirection]));
