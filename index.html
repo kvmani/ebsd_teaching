@@ -35,6 +35,7 @@
         <button class="tab-button" id="tabGeometry" type="button" role="tab" aria-controls="geometryView" aria-selected="false">Geometry</button>
         <button class="tab-button" id="tabAcquisition" type="button" role="tab" aria-controls="acquisitionView" aria-selected="false">Acquisition</button>
         <button class="tab-button" id="tabIndexing" type="button" role="tab" aria-controls="indexingView" aria-selected="false">Indexing Basics</button>
+        <button class="tab-button" id="tabEuler" type="button" role="tab" aria-controls="eulerView" aria-selected="false">Euler / Pole Figures</button>
         <button class="tab-button" id="tabInterpretation" type="button" role="tab" aria-controls="interpretationView" aria-selected="false">Interpretation</button>
         <button class="tab-button" id="tabLearning" type="button" role="tab" aria-controls="learningView" aria-selected="false">Learning Path</button>
         <button class="tab-button" id="tabResources" type="button" role="tab" aria-controls="resourcesView" aria-selected="false">Glossary / Resources</button>
@@ -577,87 +578,96 @@
             <p>This module is a simplified indexing workflow, not a full commercial indexing engine. It shows why indexing depends on pattern quality, calibration, phase selection, band geometry, and confidence metrics.</p>
             <p class="scientific-warning">This studio explains EBSD indexing logic using schematic overlays and simplified scoring. It is not a real Hough transform, crystallographic solver, or calibrated indexing engine.</p>
           </div>
-          <div class="indexing-pipeline" aria-label="Simplified indexing workflow">
-            <article class="indexing-step-card">
-              <div class="indexing-visual raw-pattern" aria-hidden="true"></div>
-              <span>1. Raw Kikuchi pattern</span>
-              <p>The detector records a diffraction pattern with bands, background intensity, noise, and possible saturation.</p>
-              <small>What can go wrong: weak bands, damaged surfaces, poor exposure, drift, or clipping can hide useful features.</small>
-              <div class="mini-checkpoint">
-                <p>Checkpoint: Can a bright raw pattern still be hard to index?</p>
-                <button type="button" data-indexing-answer="correct">Yes</button>
-                <button type="button" data-indexing-answer="wrong">No</button>
-              </div>
-            </article>
-            <article class="indexing-step-card">
-              <div class="indexing-visual background-correction" aria-hidden="true"></div>
-              <span>2. Background correction</span>
-              <p>Smooth background is reduced so Kikuchi bands stand out more clearly from diffuse intensity.</p>
-              <small>What can go wrong: over-correction can distort bands; under-correction leaves bands hard to detect.</small>
-              <div class="mini-checkpoint">
-                <p>Checkpoint: Why remove smooth background?</p>
-                <button type="button" data-indexing-answer="correct">To reveal band contrast</button>
-                <button type="button" data-indexing-answer="wrong">To change the crystal phase</button>
-              </div>
-            </article>
-            <article class="indexing-step-card">
-              <div class="indexing-visual band-detection" aria-hidden="true"></div>
-              <span>3. Band detection</span>
-              <p>Real EBSD software can search for band-like line features; this app only illustrates conceptual positions, widths, and angles.</p>
-              <small>What can go wrong: low thresholds find false bands; high thresholds miss weak real bands.</small>
-              <div class="mini-checkpoint">
-                <p>Checkpoint: What is being detected?</p>
-                <button type="button" data-indexing-answer="correct">Band positions and angles</button>
-                <button type="button" data-indexing-answer="wrong">Sample temperature</button>
-              </div>
-            </article>
-            <article class="indexing-step-card">
-              <div class="indexing-visual hough-transform" aria-hidden="true"></div>
-              <span>4. Hough transform</span>
-              <p>A Hough-style transform can help detect Kikuchi bands as lines or line-like features by mapping image features into a voting space.</p>
-              <small>What can go wrong: noise, overlap, and bad background correction can create ambiguous peaks.</small>
-              <div class="mini-checkpoint">
-                <p>Checkpoint: What does the Hough transform help find?</p>
-                <button type="button" data-indexing-answer="correct">Line features from bands</button>
-                <button type="button" data-indexing-answer="wrong">Chemical composition directly</button>
-              </div>
-            </article>
-            <article class="indexing-step-card">
-              <div class="indexing-visual angle-matching" aria-hidden="true"></div>
-              <span>5. Band angle matching</span>
-              <p>Conceptual band positions and angles are compared with theoretical crystal plane geometry for the selected phase.</p>
-              <small>What can go wrong: wrong phase choice, pseudosymmetry, or bad detector calibration can produce plausible but wrong matches.</small>
-              <div class="mini-checkpoint">
-                <p>Checkpoint: What is compared during matching?</p>
-                <button type="button" data-indexing-answer="correct">Detected bands with theoretical plane geometry</button>
-                <button type="button" data-indexing-answer="wrong">Only the map colors</button>
-              </div>
-            </article>
-            <article class="indexing-step-card">
-              <div class="indexing-visual orientation-solution" aria-hidden="true"></div>
-              <span>6. Orientation solution</span>
-              <p>The schematic best match illustrates a candidate crystal orientation, often expressed in real workflows through Euler angles, matrices, or IPF map colors.</p>
-              <small>What can go wrong: a solution can look tidy but still be wrong if the setup or phase model is wrong.</small>
-              <div class="mini-checkpoint">
-                <p>Checkpoint: Does a good-looking map prove the solution is correct?</p>
-                <button type="button" data-indexing-answer="wrong">Always</button>
-                <button type="button" data-indexing-answer="correct">No, confidence and context matter</button>
-              </div>
-            </article>
-            <article class="indexing-step-card wide-step">
-              <div class="indexing-visual confidence-failures" aria-hidden="true"></div>
-              <span>7. Confidence and failure modes</span>
-              <p>Indexing is not magic. Confidence-like metrics help judge decision strength, but they are not proof of physical truth. Pattern quality, calibration, phase selection, and thresholds all matter.</p>
-              <small>What can go wrong: good-looking EBSD maps can still be wrong, especially with wrong phase lists, damaged patterns, pseudosymmetry, or poor calibration.</small>
-              <div class="mini-checkpoint">
-                <p>Checkpoint: Which evidence should you inspect before trusting a map?</p>
-                <button type="button" data-indexing-answer="correct">Pattern quality, confidence, phase choice, and calibration</button>
-                <button type="button" data-indexing-answer="wrong">IPF color alone</button>
-              </div>
-            </article>
+          <div class="indexing-mode-tabs" role="tablist" aria-label="Indexing module views">
+            <button id="indexingConceptTab" class="active" type="button" role="tab" aria-controls="indexingConceptPanel" aria-selected="true">Schematic indexing</button>
+            <button id="indexingRealTab" type="button" role="tab" aria-controls="indexingRealPanel" aria-selected="false">Real Ni worked example</button>
           </div>
-          <p id="indexingCheckpointFeedback" class="checkpoint-feedback" aria-live="polite"></p>
-          <div id="indexingStudio" class="indexing-studio" aria-label="Interactive indexing understanding module"></div>
+          <div id="indexingConceptPanel" class="indexing-mode-panel active" role="tabpanel" aria-labelledby="indexingConceptTab">
+            <div class="indexing-pipeline" aria-label="Simplified indexing workflow">
+              <article class="indexing-step-card">
+                <div class="indexing-visual raw-pattern" aria-hidden="true"></div>
+                <span>1. Raw Kikuchi pattern</span>
+                <p>The detector records a diffraction pattern with bands, background intensity, noise, and possible saturation.</p>
+                <small>What can go wrong: weak bands, damaged surfaces, poor exposure, drift, or clipping can hide useful features.</small>
+                <div class="mini-checkpoint">
+                  <p>Checkpoint: Can a bright raw pattern still be hard to index?</p>
+                  <button type="button" data-indexing-answer="correct">Yes</button>
+                  <button type="button" data-indexing-answer="wrong">No</button>
+                </div>
+              </article>
+              <article class="indexing-step-card">
+                <div class="indexing-visual background-correction" aria-hidden="true"></div>
+                <span>2. Background correction</span>
+                <p>Smooth background is reduced so Kikuchi bands stand out more clearly from diffuse intensity.</p>
+                <small>What can go wrong: over-correction can distort bands; under-correction leaves bands hard to detect.</small>
+                <div class="mini-checkpoint">
+                  <p>Checkpoint: Why remove smooth background?</p>
+                  <button type="button" data-indexing-answer="correct">To reveal band contrast</button>
+                  <button type="button" data-indexing-answer="wrong">To change the crystal phase</button>
+                </div>
+              </article>
+              <article class="indexing-step-card">
+                <div class="indexing-visual band-detection" aria-hidden="true"></div>
+                <span>3. Band detection</span>
+                <p>Real EBSD software can search for band-like line features; this app only illustrates conceptual positions, widths, and angles.</p>
+                <small>What can go wrong: low thresholds find false bands; high thresholds miss weak real bands.</small>
+                <div class="mini-checkpoint">
+                  <p>Checkpoint: What is being detected?</p>
+                  <button type="button" data-indexing-answer="correct">Band positions and angles</button>
+                  <button type="button" data-indexing-answer="wrong">Sample temperature</button>
+                </div>
+              </article>
+              <article class="indexing-step-card">
+                <div class="indexing-visual hough-transform" aria-hidden="true"></div>
+                <span>4. Hough transform</span>
+                <p>A Hough-style transform can help detect Kikuchi bands as lines or line-like features by mapping image features into a voting space.</p>
+                <small>What can go wrong: noise, overlap, and bad background correction can create ambiguous peaks.</small>
+                <div class="mini-checkpoint">
+                  <p>Checkpoint: What does the Hough transform help find?</p>
+                  <button type="button" data-indexing-answer="correct">Line features from bands</button>
+                  <button type="button" data-indexing-answer="wrong">Chemical composition directly</button>
+                </div>
+              </article>
+              <article class="indexing-step-card">
+                <div class="indexing-visual angle-matching" aria-hidden="true"></div>
+                <span>5. Band angle matching</span>
+                <p>Conceptual band positions and angles are compared with theoretical crystal plane geometry for the selected phase.</p>
+                <small>What can go wrong: wrong phase choice, pseudosymmetry, or bad detector calibration can produce plausible but wrong matches.</small>
+                <div class="mini-checkpoint">
+                  <p>Checkpoint: What is compared during matching?</p>
+                  <button type="button" data-indexing-answer="correct">Detected bands with theoretical plane geometry</button>
+                  <button type="button" data-indexing-answer="wrong">Only the map colors</button>
+                </div>
+              </article>
+              <article class="indexing-step-card">
+                <div class="indexing-visual orientation-solution" aria-hidden="true"></div>
+                <span>6. Orientation solution</span>
+                <p>The schematic best match illustrates a candidate crystal orientation, often expressed in real workflows through Euler angles, matrices, or IPF map colors.</p>
+                <small>What can go wrong: a solution can look tidy but still be wrong if the setup or phase model is wrong.</small>
+                <div class="mini-checkpoint">
+                  <p>Checkpoint: Does a good-looking map prove the solution is correct?</p>
+                  <button type="button" data-indexing-answer="wrong">Always</button>
+                  <button type="button" data-indexing-answer="correct">No, confidence and context matter</button>
+                </div>
+              </article>
+              <article class="indexing-step-card wide-step">
+                <div class="indexing-visual confidence-failures" aria-hidden="true"></div>
+                <span>7. Confidence and failure modes</span>
+                <p>Indexing is not magic. Confidence-like metrics help judge decision strength, but they are not proof of physical truth. Pattern quality, calibration, phase selection, and thresholds all matter.</p>
+                <small>What can go wrong: good-looking EBSD maps can still be wrong, especially with wrong phase lists, damaged patterns, pseudosymmetry, or poor calibration.</small>
+                <div class="mini-checkpoint">
+                  <p>Checkpoint: Which evidence should you inspect before trusting a map?</p>
+                  <button type="button" data-indexing-answer="correct">Pattern quality, confidence, phase choice, and calibration</button>
+                  <button type="button" data-indexing-answer="wrong">IPF color alone</button>
+                </div>
+              </article>
+            </div>
+            <p id="indexingCheckpointFeedback" class="checkpoint-feedback" aria-live="polite"></p>
+            <div id="indexingStudio" class="indexing-studio" aria-label="Interactive indexing understanding module"></div>
+          </div>
+          <div id="indexingRealPanel" class="indexing-mode-panel" role="tabpanel" aria-labelledby="indexingRealTab" hidden>
+            <div id="realIndexingLab" class="indexing-studio" aria-label="Real Ni EBSD indexing lab"></div>
+          </div>
         </section>
       </main>
 
@@ -718,6 +728,10 @@
           <article><span>Interpretation guide</span><p>Phase 3 diagnostic workflow prompts.</p><button data-resource="interpretation-guide-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="interpretation-guide-view" type="button" title="Download interpretation guide HTML">Export</button></article>
           <article><span>Self-study guide</span><p>Suggested practice order and reflection prompts.</p><button data-resource="self-study-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="self-study-view" type="button" title="Download self-study guide HTML">Export</button></article>
         </section>
+      </main>
+
+      <main class="euler-workspace view-pane" id="eulerView" role="tabpanel" aria-labelledby="tabEuler" aria-hidden="true">
+        <div id="eulerOrientationStudio" class="euler-studio"></div>
       </main>
 
       <main class="resources-workspace view-pane" id="resourcesView" role="tabpanel" aria-labelledby="tabResources" aria-hidden="true">

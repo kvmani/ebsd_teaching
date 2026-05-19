@@ -394,10 +394,10 @@ export class IndexingStudio {
 
         <article class="indexing-lab-card real-review-card">
           <div class="lab-card-heading">
-            <span class="fidelity-label">Conceptual guide only</span>
-            <h3>Real Kikuchi Pattern Review</h3>
-            <p>Inspect local example patterns with optional conceptual overlays and quality notes.</p>
-            <p class="lab-note">Conceptual overlays are learning guides only; they are not measured band detections.</p>
+          <span class="fidelity-label">Reference images only</span>
+          <h3>Reference Kikuchi Pattern Review</h3>
+          <p>Inspect separate Si/NIST example images with optional conceptual overlays and quality notes.</p>
+          <p class="lab-note">This review is not the Ni worked example below. Its overlays are learning guides only, not measured band detections.</p>
           </div>
           <div class="real-review-layout" id="realPatternReview"></div>
         </article>
@@ -806,7 +806,7 @@ export class IndexingStudio {
         <p><b>Source note:</b> ${pattern?.credit || 'No source note supplied yet.'}</p>
         <p><b>Pattern note:</b> ${pattern?.orientationLabel || 'Example pattern; orientation and phase are not confirmed in this app.'}</p>
         <p><b>Review note:</b> ${this.realPatterns.length ? 'This is a local example image with educational overlays only.' : 'No loaded image is available, so the studio is showing metadata and schematic fallback guidance.'}</p>
-        <p class="lab-note">Overlay guides are conceptual and may not align with every real Kikuchi band in the image.</p>
+        <p class="lab-note">Overlay guides are conceptual and may not align with every real Kikuchi band in the image. The publication-quality Ni indexing audit is the dedicated DA Ni section below.</p>
       </div>
     `;
     container.querySelector('#realPatternSelect').addEventListener('change', (event) => {

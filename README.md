@@ -21,6 +21,7 @@ This is a conceptual learning simulator, not validated EBSD software. It is desi
 - Live scan acquisition trainer with map modes, pause/resume, reset, warning badges, presets, beginner/advanced controls, real-world parameter explorer, diagnosis activity, quality checklist, and named scenario save/restore in localStorage.
 - Interactive Indexing Basics studio with a pausable conceptual walkthrough, pattern-center calibration exercise, band matching practice, real pattern review overlays, and local weak-area review.
 - Phase 3 Interpretation workspace covering pattern-quality failure cases, sample-preparation impact, schematic map interpretation, confidence/fit intuition, and guided troubleshooting.
+- Real DA Ni indexing lab using copied `DA.oh5` data, generated two-pattern teaching assets, manual band picking, pattern-center sliders, and an optional local Python backend that re-runs `kikuchipy`.
 - Learning Path modules with quizzes, hints, flashcards, bookmarks, notes, guided demos, expected observations, and reflection prompts.
 - Top-bar tools for Notes, Screenshot, offline Resource Export, Glossary, Help, and scene reset.
 - Offline HTML/text exports for worksheets, lesson cards, formula sheets, practice questions, preset references, and self-study guides.
@@ -42,7 +43,18 @@ The app preloads the local pattern catalog and reports whether the current view 
 |-- index.html
 |-- package.json
 |-- public/
-|   `-- kikuchi-patterns/
+|   |-- kikuchi-patterns/
+|   `-- teaching-data/
+|       `-- da-ni/
+|-- data/
+|   `-- da-ni/
+|       |-- DA.oh5
+|       `-- bandDetectorOptionsDebug.yml
+|-- python_backend/
+|   |-- indexing_core.py
+|   `-- server.py
+|-- scripts/
+|   `-- extract_da_indexing_examples.py
 |-- src/
 |   |-- acquisition.js
 |   |-- detector.js
@@ -51,6 +63,7 @@ The app preloads the local pattern catalog and reports whether the current view 
 |   |-- indexingStudio.js
 |   |-- main.js
 |   |-- patternLibrary.js
+|   |-- realIndexingLab.js
 |   |-- scene.js
 |   |-- state.js
 |   |-- styles.css
@@ -67,6 +80,7 @@ Prerequisites:
 
 - Node.js 16 or newer
 - npm
+- Python with `kikuchipy`, `h5py`, `numpy`, `pyyaml`, `matplotlib`, `scikit-image`, `orix`, `diffsims`, and `diffpy.structure` for the real DA Ni indexing lab
 
 Install dependencies:
 
@@ -85,6 +99,36 @@ Open the URL printed by Vite, usually:
 ```text
 http://127.0.0.1:5173
 ```
+
+If that port is occupied, run Vite on another port:
+
+```bash
+npm.cmd run dev -- --host 127.0.0.1 --port 5174 --strictPort
+```
+
+## Real DA Ni Indexing Lab
+
+The project includes a self-contained copy of the DA Ni example data under `data/da-ni`. To regenerate the browser teaching assets:
+
+```bash
+npm.cmd run extract:da
+```
+
+To enable live pattern-center re-indexing from the browser:
+
+```bash
+npm.cmd run backend
+```
+
+Then run the Vite app in another terminal. In Indexing Basics, open the “Interactive Pattern Center and Band Picking Lab”. Students can:
+
+- select one of two real DA Ni patterns
+- click two points along a band to add manual centerlines
+- compare manual bands with Hough-detected bands
+- change `PC x-star`, `PC y-star`, and `PC z-star`
+- click `Re-index with PC` to send the current PC to the local Python backend
+
+Teaching boundary: the backend re-runs real `kikuchipy` Hough indexing with the supplied pattern center. Student-picked bands are compared visually in the browser; they are not yet injected directly into PyEBSDIndex as replacement band detections.
 
 Build for production:
 

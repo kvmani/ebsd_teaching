@@ -4,11 +4,13 @@ import { AcquisitionRenderer } from './acquisition.js';
 import { formulaReference } from './data/formulas.js';
 import { learningModules } from './data/learningModules.js';
 import { DetectorRenderer, detectorCaption } from './detector.js';
+import { EulerOrientationStudio } from './eulerOrientationStudio.js';
 import { IndexingStudio } from './indexingStudio.js';
 import { InterpretationStudio } from './interpretationStudio.js';
 import { LearningPath } from './learningPath.js';
 import { loadLearningProgress } from './learningProgress.js';
 import { acquisitionParameterGuides, learningPipeline, patternQualityCases, troubleshootingSymptoms } from './phase3Data.js';
+import { RealIndexingLab } from './realIndexingLab.js';
 import { EbsdScene } from './scene.js';
 import { braggThetaDeg, electronWavelengthPm, planes, stages, state } from './state.js';
 
@@ -25,6 +27,13 @@ const interpretationStudio = new InterpretationStudio({
   getReduceMotion: () => reduceMotion,
   onNavigate: (view) => setActiveView(view)
 });
+const realIndexingLab = new RealIndexingLab({
+  root: qs('realIndexingLab')
+});
+const eulerOrientationStudio = new EulerOrientationStudio({
+  root: qs('eulerOrientationStudio'),
+  getReduceMotion: () => reduceMotion
+});
 const learningPath = new LearningPath({
   moduleList: qs('moduleList'),
   lessonWorkspace: qs('lessonWorkspace'),
@@ -36,6 +45,7 @@ const learningPath = new LearningPath({
 let playAccum = 0;
 let last = performance.now();
 let activeView = 'start';
+let indexingMode = 'concept';
 let currentResourceAction = 'worksheet-view';
 let controlLevel = localStorage.getItem('ebsdTeachingStudio.controlLevel.v1') || 'beginner';
 const savedReduceMotion = localStorage.getItem('ebsdLearningStudio.reduceMotion.v1');
@@ -508,6 +518,7 @@ function setActiveView(view) {
   const isGeometry = view === 'geometry';
   const isAcquisition = view === 'acquisition';
   const isIndexing = view === 'indexing';
+  const isEuler = view === 'euler';
   const isInterpretation = view === 'interpretation';
   const isLearning = view === 'learning';
   const isResources = view === 'resources';
@@ -515,6 +526,7 @@ function setActiveView(view) {
   qs('geometryView').classList.toggle('active', isGeometry);
   qs('acquisitionView').classList.toggle('active', isAcquisition);
   qs('indexingView').classList.toggle('active', isIndexing);
+  qs('eulerView').classList.toggle('active', isEuler);
   qs('interpretationView').classList.toggle('active', isInterpretation);
   qs('learningView').classList.toggle('active', isLearning);
   qs('resourcesView').classList.toggle('active', isResources);
@@ -523,6 +535,7 @@ function setActiveView(view) {
     ['geometryView', isGeometry],
     ['acquisitionView', isAcquisition],
     ['indexingView', isIndexing],
+    ['eulerView', isEuler],
     ['interpretationView', isInterpretation],
     ['learningView', isLearning],
     ['resourcesView', isResources]
@@ -533,6 +546,7 @@ function setActiveView(view) {
   qs('tabGeometry').classList.toggle('active', isGeometry);
   qs('tabAcquisition').classList.toggle('active', isAcquisition);
   qs('tabIndexing').classList.toggle('active', isIndexing);
+  qs('tabEuler').classList.toggle('active', isEuler);
   qs('tabInterpretation').classList.toggle('active', isInterpretation);
   qs('tabLearning').classList.toggle('active', isLearning);
   qs('tabResources').classList.toggle('active', isResources);
@@ -541,6 +555,7 @@ function setActiveView(view) {
   qs('tabGeometry').setAttribute('aria-selected', String(isGeometry));
   qs('tabAcquisition').setAttribute('aria-selected', String(isAcquisition));
   qs('tabIndexing').setAttribute('aria-selected', String(isIndexing));
+  qs('tabEuler').setAttribute('aria-selected', String(isEuler));
   qs('tabInterpretation').setAttribute('aria-selected', String(isInterpretation));
   qs('tabLearning').setAttribute('aria-selected', String(isLearning));
   qs('tabResources').setAttribute('aria-selected', String(isResources));
@@ -560,6 +575,11 @@ function setActiveView(view) {
   } else if (isIndexing) {
     qs('explainTitle').textContent = 'How Kikuchi Bands Are Indexed';
     qs('explainText').textContent = 'This foundation module explains the simplified indexing pipeline without adding a full Hough transform simulator.';
+  } else if (isEuler) {
+    qs('explainTitle').textContent = 'Euler Angles / Pole Figures';
+    qs('explainText').textContent = 'Rotate cubic and hexagonal cells with Bunge ZXZ angles, then connect the 3D pole to pole figure and inverse pole figure views.';
+    eulerOrientationStudio.init();
+    eulerOrientationStudio.resize();
   } else if (isInterpretation) {
     qs('explainTitle').textContent = 'Interpretation Studio';
     qs('explainText').textContent = 'Compare preparation, acquisition, pattern quality, confidence-like evidence, and map views before drawing EBSD conclusions.';
@@ -731,12 +751,15 @@ qs('tabStart').addEventListener('click', () => setActiveView('start'));
 qs('tabGeometry').addEventListener('click', () => setActiveView('geometry'));
 qs('tabAcquisition').addEventListener('click', () => setActiveView('acquisition'));
 qs('tabIndexing').addEventListener('click', () => setActiveView('indexing'));
+qs('tabEuler').addEventListener('click', () => setActiveView('euler'));
 qs('tabInterpretation').addEventListener('click', () => setActiveView('interpretation'));
 qs('tabLearning').addEventListener('click', () => {
   hideDemoBanner();
   setActiveView('learning');
 });
 qs('tabResources').addEventListener('click', () => setActiveView('resources'));
+qs('indexingConceptTab').addEventListener('click', () => setIndexingMode('concept'));
+qs('indexingRealTab').addEventListener('click', () => setIndexingMode('real'));
 document.querySelector('.view-tabs').addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight') {
     event.preventDefault();
@@ -1242,6 +1265,19 @@ qs('playStage').addEventListener('click', () => {
 function resize() {
   sceneView.resize();
   detector.draw();
+  if (indexingMode === 'real') realIndexingLab.draw();
+}
+
+function setIndexingMode(mode) {
+  indexingMode = mode === 'real' ? 'real' : 'concept';
+  const isReal = indexingMode === 'real';
+  qs('indexingConceptTab').classList.toggle('active', !isReal);
+  qs('indexingRealTab').classList.toggle('active', isReal);
+  qs('indexingConceptTab').setAttribute('aria-selected', String(!isReal));
+  qs('indexingRealTab').setAttribute('aria-selected', String(isReal));
+  qs('indexingConceptPanel').hidden = isReal;
+  qs('indexingRealPanel').hidden = !isReal;
+  if (isReal) requestAnimationFrame(() => realIndexingLab.draw());
 }
 
 window.addEventListener('resize', resize);
@@ -1281,6 +1317,7 @@ if (reduceMotion) {
   qs('liveAcquisition').checked = false;
 }
 renderScenarioSelect();
+realIndexingLab.init();
 resize();
 updateAll();
 acquisition.drawPatternPreview();

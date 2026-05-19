@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
+    "backend": "python python_backend/server.py",
+    "extract:da": "python scripts/extract_da_indexing_examples.py",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
