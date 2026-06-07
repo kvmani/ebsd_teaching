@@ -272,7 +272,7 @@ export class InterpretationStudio {
           <div class="lab-card-heading">
             <span class="fidelity-label">Connected learning pipeline</span>
             <h3>From Sample Surface to Interpretation</h3>
-            <p>Follow the conceptual chain from preparation through acquisition, pattern evidence, indexing, confidence, maps, interpretation, and troubleshooting.</p>
+            <p>Follow the conceptual chain from preparation through acquisition, pattern evidence, indexing, confidence-like cues, maps, interpretation, and troubleshooting.</p>
           </div>
           <div class="pipeline-strip">${learningPipeline.map(([title, text]) => `
             <button type="button" data-pipeline="${escapeHtml(title)}"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(text)}</span></button>
@@ -313,7 +313,7 @@ export class InterpretationStudio {
 
         <article class="interpretation-card sample-prep-card">
           <div class="lab-card-heading">
-            <span class="fidelity-label">Surface sensitive</span>
+            <span class="fidelity-label">Near-surface sensitive</span>
             <h3>Sample Preparation Impact</h3>
             <p>Compare poor and improved preparation to see why near-surface condition controls EBSD pattern quality.</p>
           </div>
@@ -356,12 +356,12 @@ export class InterpretationStudio {
         <article class="interpretation-card confidence-card">
           <div class="lab-card-heading">
             <span class="fidelity-label">Simplified scoring</span>
-            <h3>Confidence / MAD / Fit Intuition</h3>
+            <h3>Confidence-like / MAD / Fit Intuition</h3>
             <p>Compare candidate fits without treating the numbers as real confidence metrics.</p>
             <p class="lab-note">Commercial EBSD systems define and report these metrics differently. This module teaches intuition only.</p>
           </div>
           <div class="confidence-layout">
-            <canvas id="confidenceCanvas" width="520" height="320" aria-label="Conceptual confidence and fit comparison"></canvas>
+            <canvas id="confidenceCanvas" width="520" height="320" aria-label="Conceptual confidence-like and fit comparison"></canvas>
             <div>
               <div id="confidenceTabs" class="case-tabs"></div>
               <h4 id="confidenceTitle"></h4>

@@ -29,7 +29,7 @@ Most modules are plain JavaScript classes or data files. There is no frontend fr
 | `src/eulerOrientationStudio.js` | Euler angles, unit cell, stereographic projection, pole figure, and IPF views | Uses square canvases for pole-figure correctness and Three.js for the unit-sphere view. |
 | `src/indexingStudio.js` | Conceptual indexing walkthrough and activities | Includes calibration, band matching, real pattern review, and weak-area review. |
 | `src/realIndexingLab.js` | Browser UI for DA Ni indexing examples | Can call optional Python backend when available. |
-| `src/interpretationStudio.js` | Interpretation workspace | Pattern quality, sample prep, maps, confidence intuition, and troubleshooting. |
+| `src/interpretationStudio.js` | Interpretation workspace | Pattern quality, sample prep, maps, confidence-like intuition, and troubleshooting. |
 | `src/learningPath.js` | Self-study module UI | Quizzes, flashcards, notes, bookmarks, guided demos, and glossary links. |
 | `src/learningProgress.js` | localStorage persistence helpers | Keep storage keys stable. |
 | `src/patternLibrary.js` | Real/fallback Kikuchi image loading | Handles local pattern catalog and graceful schematic fallback. |
@@ -43,7 +43,7 @@ Most modules are plain JavaScript classes or data files. There is no frontend fr
 | `src/data/glossary.js` | Glossary terms and related modules |
 | `src/data/formulas.js` | Formula/reference content for resource exports |
 | `src/data/kikuchiPatterns.js` | Local real-pattern catalog and source notes |
-| `src/phase3Data.js` | Interpretation cases, map activities, confidence examples, troubleshooting symptoms |
+| `src/phase3Data.js` | Interpretation cases, map activities, confidence-like examples, troubleshooting symptoms |
 
 Data files should use cautious scientific language. If a label is not backed by source metadata, prefer "example pattern", "source-provided note", "possible visual example", or "conceptual guide only".
 
@@ -87,9 +87,8 @@ The code should not imply:
 - calibrated microscope simulation
 - true crystallographic solving
 - verified phase identification
-- real confidence/MAD/fit computation
+- commercial-system confidence/MAD/fit computation
 - true misorientation, phase fraction, grain size, or strain measurement
 - research-grade map analysis
 
 Use explicit language such as conceptual, schematic, qualitative, simplified, not calibrated, not a solver, and educational overlay.
-

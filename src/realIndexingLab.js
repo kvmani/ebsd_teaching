@@ -309,7 +309,7 @@ export class RealIndexingLab {
     return `
       <div class="stage-fact-grid">
         ${this.metric('Mean angular fit', `${this.formatNumber(solution.fit, 3)} deg`)}
-        ${this.metric('Confidence', this.formatNumber(solution.confidence, 3))}
+        ${this.metric('Solver confidence', this.formatNumber(solution.confidence, 3))}
         ${this.metric('Matched bands', solution.nmatch ?? '-')}
         ${this.metric('(phi1, Phi, phi2)', this.formatEuler(solution.eulerDeg))}
       </div>

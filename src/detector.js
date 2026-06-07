@@ -189,5 +189,5 @@ export function detectorCaption() {
   const lambda = electronWavelengthPm(state.voltage);
   const theta = braggThetaDeg(state.voltage, planes[0].d);
   const visualTheta = visualThetaDeg(state.voltage, planes[0].d);
-  return `Each pair of thin colored lines marks the two cone-cut band edges for one lattice-plane family. At ${state.voltage} kV, lambda is approximately ${lambda.toFixed(2)} pm; for ${planes[0].hkl}, physical theta is ${theta.toFixed(2)}° and the enlarged visual cone angle is ${visualTheta.toFixed(1)}°.`;
+  return `Each pair of thin colored line guides marks the two cone-cut band edges for one lattice-plane family. Real EBSD bands are gnomonic projections, so their edges can be slightly curved or hyperbolic; this detector view keeps them straight for Hough-style teaching. At ${state.voltage} kV, lambda is approximately ${lambda.toFixed(2)} pm; for ${planes[0].hkl}, physical theta is ${theta.toFixed(2)} deg and the enlarged visual cone angle is ${visualTheta.toFixed(1)} deg.`;
 }

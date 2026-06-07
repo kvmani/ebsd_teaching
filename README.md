@@ -47,7 +47,7 @@ The production build may report a large chunk warning because Three.js and the o
 - **Acquisition**: conceptual scan map, pattern preview, detector settings, parameter explorer, presets, quality checklist, troubleshooting prompts, and saved scenarios.
 - **Euler / Pole Figures**: Bunge ZXZ angle controls, unit cell orientation, stereographic projection, pole figure, and IPF views.
 - **Indexing Basics**: conceptual indexing walkthrough, calibration exercise, band matching, real pattern review, weak-area review, and the optional real DA Ni lab.
-- **Interpretation**: pattern-quality cases, sample-preparation impact, map interpretation, confidence/MAD/fit intuition, and guided troubleshooting.
+- **Interpretation**: pattern-quality cases, sample-preparation impact, map interpretation, confidence-like/MAD/fit intuition, and guided troubleshooting.
 - **Learning Path**: modules, quizzes, hints, flashcards, bookmarks, notes, guided demos, and reflection prompts.
 - **Glossary / Resources**: local glossary, worksheets, lesson cards, formula sheet, practice questions, datasets, interpretation guide, and export tools.
 
@@ -57,7 +57,7 @@ The app deliberately favors conceptual clarity over full physical realism.
 
 - Kikuchi cones and detector bands are schematic teaching visuals.
 - Acquisition quality, drift, saturation, noise, and threshold effects are qualitative learning models.
-- Confidence, fit, MAD, and CI are taught as intuition, not as commercial-system metrics.
+- Confidence-like cues, fit, MAD, and CI are taught as intuition, not as commercial-system metrics.
 - IPF maps, phase maps, grain boundaries, twins, deformation gradients, and pattern-quality cases are schematic unless explicitly labeled as real source data.
 - Real Kikuchi examples are local study images with source notes; the browser overlays are conceptual guides.
 - The optional Python backend can re-run a small real DA Ni indexing example, but the browser app is still an educational interface, not a replacement for Oxford Aztec, EDAX OIM, Bruker ESPRIT, CHANNEL5, or research workflows.
@@ -171,4 +171,3 @@ git clone https://github.com/kvmani/ebsd_teaching.git
 ```
 
 This checkout may be used as a local teaching build. Add a license file before public redistribution or reuse outside the project owner's intended setting.
-

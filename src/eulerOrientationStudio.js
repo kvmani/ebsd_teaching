@@ -608,7 +608,7 @@ export class EulerOrientationStudio {
     ctx.fill();
     ctx.fillStyle = '#a9b9bd';
     ctx.font = '12px Segoe UI, Arial';
-    ctx.fillText(`south-pole ray crosses the equatorial plane at (${projected.x.toFixed(3)}, ${projected.y.toFixed(3)})`, 12, canvas.height - 16);
+    ctx.fillText(`projected (${projected.x.toFixed(3)}, ${projected.y.toFixed(3)})`, 12, canvas.height - 16);
   }
 
   drawPoleFigure() {
@@ -658,6 +658,6 @@ export class EulerOrientationStudio {
     drawPoint(ctx, plot, point, '#92d46f', 'IPF');
     ctx.fillStyle = '#a9b9bd';
     ctx.font = '12px Segoe UI, Arial';
-    ctx.fillText(`crystal direction [${crystalDirection.map((v) => v.toFixed(3)).join(', ')}]`, 12, canvas.height - 16);
+    ctx.fillText(`dir [${crystalDirection.map((v) => v.toFixed(3)).join(', ')}]`, 12, canvas.height - 16);
   }
 }

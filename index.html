@@ -64,17 +64,17 @@
             </article>
             <article class="start-path-card">
               <span>I know EBSD basics and want acquisition practice</span>
-              <p>Use the live acquisition simulator to compare exposure, gain, binning, drift, confidence, and map quality.</p>
+              <p>Use the live acquisition simulator to compare exposure, gain, binning, drift, confidence-like cues, and map quality.</p>
               <button type="button" data-start-target="acquisition">Practice acquisition</button>
             </article>
             <article class="start-path-card">
-              <span>I want to understand indexing and confidence</span>
-              <p>Review the simplified indexing workflow before experimenting with confidence and failure modes.</p>
+              <span>I want to understand indexing evidence</span>
+              <p>Review the simplified indexing workflow before experimenting with confidence-like evidence and failure modes.</p>
               <button type="button" data-start-target="indexing">Open indexing basics</button>
             </article>
             <article class="start-path-card">
               <span>I want to interpret EBSD evidence</span>
-              <p>Practice conceptual pattern quality diagnosis, sample preparation effects, map interpretation, confidence, and troubleshooting.</p>
+              <p>Practice conceptual pattern quality diagnosis, sample preparation effects, map interpretation, confidence-like evidence, and troubleshooting.</p>
               <button type="button" data-start-target="interpretation">Open interpretation studio</button>
             </article>
             <article class="start-path-card">
@@ -102,7 +102,7 @@
           <div class="annotation numbered-label" id="annPlanes"><b>4</b> Crystal planes {hkl}</div>
           <div class="annotation numbered-label" id="annCones"><b>5</b> Bragg/Kikuchi cones</div>
           <div class="annotation numbered-label" id="annDetector"><b>6</b> Detector/phosphor screen</div>
-          <div class="annotation" id="annSample">Sample surface: 70° from -X axis</div>
+          <div class="annotation" id="annSample">Sample surface: ~70° tilt</div>
           <canvas id="scene"></canvas>
         </section>
 
@@ -246,7 +246,7 @@
           </article>
           <article class="teaching-card">
             <span>Common misconception</span>
-            <p>Kikuchi bands are not caused by surface roughness or contamination. They arise from coherent diffraction within the crystal according to Bragg’s law.</p>
+            <p>Kikuchi bands are not caused by surface roughness or contamination. They form when near-surface backscattered electrons satisfy Bragg diffraction conditions for crystal lattice planes.</p>
           </article>
           <article class="teaching-card checkpoint-card">
             <span>Checkpoint question</span>
@@ -480,12 +480,12 @@
             </label>
             <div class="checks advanced-control">
               <label><input id="autoIndex" type="checkbox" checked /> Auto-index</label>
-              <label><input id="confirmLowConfidence" type="checkbox" /> Confirm low confidence</label>
+              <label><input id="confirmLowConfidence" type="checkbox" /> Confirm low-confidence cues</label>
             </div>
             <div class="map-mode-grid" role="group" aria-label="Map view mode">
               <button class="mode-button active" id="modeOrientation" type="button">Orientation</button>
               <button class="mode-button" id="modeQuality" type="button">Pattern quality</button>
-              <button class="mode-button" id="modeConfidence" type="button">Confidence cue</button>
+              <button class="mode-button" id="modeConfidence" type="button">Confidence-like cue</button>
             </div>
           </section>
 
@@ -575,7 +575,7 @@
           <div class="indexing-heading">
             <span class="fidelity-label">Conceptual explanation</span>
             <h2>How Kikuchi Bands Are Indexed</h2>
-            <p>This module is a simplified indexing workflow, not a full commercial indexing engine. It shows why indexing depends on pattern quality, calibration, phase selection, band geometry, and confidence metrics.</p>
+            <p>This module is a simplified indexing workflow, not a full commercial indexing engine. It shows why indexing depends on pattern quality, calibration, phase selection, band geometry, and confidence-like metrics.</p>
             <p class="scientific-warning">This studio explains EBSD indexing logic using schematic overlays and simplified scoring. It is not a real Hough transform, crystallographic solver, or calibrated indexing engine.</p>
           </div>
           <div class="indexing-mode-tabs" role="tablist" aria-label="Indexing module views">
@@ -620,7 +620,7 @@
               <article class="indexing-step-card">
                 <div class="indexing-visual hough-transform" aria-hidden="true"></div>
                 <span>4. Hough transform</span>
-                <p>A Hough-style transform can help detect Kikuchi bands as lines or line-like features by mapping image features into a voting space.</p>
+                <p>A Hough-style transform can help detect Kikuchi bands as line-like features by mapping image features into a voting space. Real projected band edges can be curved, so these line guides are a teaching approximation.</p>
                 <small>What can go wrong: noise, overlap, and bad background correction can create ambiguous peaks.</small>
                 <div class="mini-checkpoint">
                   <p>Checkpoint: What does the Hough transform help find?</p>
@@ -647,17 +647,17 @@
                 <div class="mini-checkpoint">
                   <p>Checkpoint: Does a good-looking map prove the solution is correct?</p>
                   <button type="button" data-indexing-answer="wrong">Always</button>
-                  <button type="button" data-indexing-answer="correct">No, confidence and context matter</button>
+                  <button type="button" data-indexing-answer="correct">No, confidence-like evidence and context matter</button>
                 </div>
               </article>
               <article class="indexing-step-card wide-step">
                 <div class="indexing-visual confidence-failures" aria-hidden="true"></div>
-                <span>7. Confidence and failure modes</span>
+                <span>7. Confidence-like evidence and failure modes</span>
                 <p>Indexing is not magic. Confidence-like metrics help judge decision strength, but they are not proof of physical truth. Pattern quality, calibration, phase selection, and thresholds all matter.</p>
                 <small>What can go wrong: good-looking EBSD maps can still be wrong, especially with wrong phase lists, damaged patterns, pseudosymmetry, or poor calibration.</small>
                 <div class="mini-checkpoint">
                   <p>Checkpoint: Which evidence should you inspect before trusting a map?</p>
-                  <button type="button" data-indexing-answer="correct">Pattern quality, confidence, phase choice, and calibration</button>
+                  <button type="button" data-indexing-answer="correct">Pattern quality, confidence-like evidence, phase choice, and calibration</button>
                   <button type="button" data-indexing-answer="wrong">IPF color alone</button>
                 </div>
               </article>

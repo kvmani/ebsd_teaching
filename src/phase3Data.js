@@ -107,7 +107,7 @@ export const patternQualityCases = [
     tag: 'Broad bands',
     kind: 'deformation',
     wentWrong: 'Broad weak bands may indicate a damaged near-surface layer.',
-    indexingImpact: 'Band centers become uncertain and low-confidence regions cluster near damaged areas.',
+    indexingImpact: 'Band centers become uncertain and low-confidence-like regions cluster near damaged areas.',
     corrections: 'Improve final polish, remove deformation layer, or use an appropriate low-damage preparation method.'
   },
   {
@@ -172,7 +172,7 @@ export const samplePrepScenarios = [
     title: 'Grinding damage',
     before: 'Deep deformation layer and scratches',
     after: 'Damage reduced by progressive polishing',
-    note: 'EBSD is surface sensitive, so the last damaged layer can dominate pattern quality.',
+    note: 'EBSD is near-surface sensitive, so the last damaged layer can dominate pattern quality.',
     mistake: 'Stopping after the surface looks shiny under low magnification.'
   },
   {
@@ -246,7 +246,7 @@ export const mapModes = [
     id: 'deformation',
     label: 'Deformation',
     notice: 'Orientation gradients are schematic clues, not measured strain or HR-EBSD.',
-    prompt: 'Look for smooth color changes inside grains and noisy low-confidence bands.'
+    prompt: 'Look for smooth color changes inside grains and noisy low-confidence-like bands.'
   }
 ];
 
@@ -274,7 +274,7 @@ export const mapActivities = [
   {
     id: 'bad-indexing',
     label: 'Flag bad indexing',
-    feedback: 'Bad indexing is likely where low band contrast, abrupt isolated colors, and low simplified confidence occur together.'
+    feedback: 'Bad indexing is likely where low band contrast, abrupt isolated colors, and low simplified confidence-like cues occur together.'
   }
 ];
 
@@ -287,7 +287,7 @@ export const confidenceExamples = [
       ['Candidate B', 58, 'Several bands offset'],
       ['Candidate C', 34, 'Weak angular match']
     ],
-    lesson: 'A large separation between candidates supports confidence, but it still depends on the right phase and calibration.'
+    lesson: 'A large separation between candidates supports confidence-like evidence, but it still depends on the right phase and calibration.'
   },
   {
     id: 'noisy',
@@ -382,7 +382,7 @@ export const troubleshootingSymptoms = [
     id: 'strange-map',
     label: 'Strange grain map',
     causes: ['Possible drift', 'Possible bad indexing areas', 'Step size may be too coarse', 'Possible preparation artefacts'],
-    acquisition: 'Compare IPF, band contrast, confidence, and unindexed views.',
+    acquisition: 'Compare IPF, band contrast, confidence-like, and unindexed views.',
     preparation: 'Look for scratches, relief, contamination, or deformation bands.',
     geometry: 'Check whether apparent features line up with scan direction or detector artefacts.'
   }
@@ -394,7 +394,7 @@ export const learningPipeline = [
   ['Pattern Quality', 'Pattern evidence determines how many reliable bands can be used.'],
   ['Band Detection', 'Conceptual band guides turn image features into geometry.'],
   ['Indexing', 'Candidate orientations compete against the observed band geometry.'],
-  ['Confidence', 'Simplified scores indicate decision strength, not truth.'],
+  ['Confidence-like cues', 'Simplified scores indicate decision strength, not truth.'],
   ['Maps', 'Pixels become orientation, phase, quality, and boundary views.'],
   ['Interpretation', 'Experienced users compare all evidence before drawing conclusions.'],
   ['Troubleshooting', 'Symptoms point back to preparation, acquisition, geometry, indexing, or interpretation checks.']

@@ -176,7 +176,7 @@ function updateAcquisitionReadouts() {
   qs('patternSource').textContent = metrics.patternSource;
   qs('acquisitionState').textContent = metrics.warning;
   qs('scanDwell').textContent = metrics.dwell;
-  const mapModeLabels = { orientation: 'orientation', quality: 'pattern quality', confidence: 'confidence cue' };
+  const mapModeLabels = { orientation: 'orientation', quality: 'pattern quality', confidence: 'confidence-like cue' };
   qs('scanMode').textContent = mapModeLabels[state.acquisition.mapMode] || state.acquisition.mapMode;
   qs('scaleBarText').textContent = metrics.scaleBar;
   setBar('noiseBar', metrics.pattern.noise, true);
@@ -259,7 +259,7 @@ function acquisitionStory() {
     return 'Auto-indexing is paused. This is useful for learning: students can see that pattern formation and indexing are separate steps in the EBSD workflow.';
   }
   if (state.acquisition.confirmLowConfidence) {
-    return 'Low-confidence confirmation is enabled. Borderline pixels are held back so students can discuss whether strict rejection improves trust or simply creates more unindexed area.';
+    return 'Low-confidence cue confirmation is enabled. Borderline pixels are held back so students can discuss whether strict rejection improves trust or simply creates more unindexed area.';
   }
   if (state.acquisition.bandDetection < 35) {
     return 'Band detection is too conservative. The simulated indexing step misses weak Kikuchi bands, so otherwise usable pixels may fail to index.';
@@ -882,7 +882,7 @@ document.querySelectorAll('[data-indexing-answer]').forEach((button) => {
   button.addEventListener('click', () => {
     const correct = button.dataset.indexingAnswer === 'correct';
     qs('indexingCheckpointFeedback').textContent = correct
-      ? 'Correct. Indexing is a decision process that depends on band evidence, geometry, phase choice, and confidence.'
+      ? 'Correct. Indexing is a decision process that depends on band evidence, geometry, phase choice, and confidence-like cues.'
       : 'Try again. Look for the answer that treats indexing as evidence-based rather than automatic truth.';
     const card = button.closest('.indexing-step-card');
     const cards = Array.from(document.querySelectorAll('.indexing-step-card'));

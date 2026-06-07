@@ -233,25 +233,25 @@ const activityDefaults = {
   },
   'open-acquisition-balanced': {
     aim: 'Start from a balanced acquisition condition and inspect all quality readouts.',
-    steps: ['Open Live Scan Acquisition.', 'Apply the balanced preset.', 'Compare pattern quality, confidence, and source label.', 'Switch map overlays.'],
+    steps: ['Open Live Scan Acquisition.', 'Apply the balanced preset.', 'Compare pattern quality, confidence-like cues, and source label.', 'Switch map overlays.'],
     prediction: 'Which metric should improve when signal is balanced without clipping?',
     explanation: 'Balanced settings produce recognizable bands with moderate scan speed, so students can study signal, detail, speed, and risk together.'
   },
   'acquisition-compare-quality': {
     aim: 'Compare fast survey and high-quality acquisition trade-offs.',
-    steps: ['Open Live Scan Acquisition.', 'Apply a high-quality preset.', 'Compare speed and confidence.', 'Then try Fast survey from the preset buttons.'],
+    steps: ['Open Live Scan Acquisition.', 'Apply a high-quality preset.', 'Compare speed and confidence-like cues.', 'Then try Fast survey from the preset buttons.'],
     prediction: 'Which setting should scan faster, and which should show cleaner patterns?',
     explanation: 'Exposure and averaging can improve signal but cost time. Good EBSD acquisition is a trade-off, not a single best slider value.'
   },
   'acquisition-map-views': {
-    aim: 'Interpret IPF, quality, confidence, and unindexed maps together.',
-    steps: ['Open Live Scan Acquisition.', 'Switch map view to confidence.', 'Compare it with orientation and quality.', 'Look for regions where maps disagree.'],
+    aim: 'Interpret IPF, quality, confidence-like, and unindexed maps together.',
+    steps: ['Open Live Scan Acquisition.', 'Switch map view to confidence-like cue.', 'Compare it with orientation and quality.', 'Look for regions where maps disagree.'],
     prediction: 'Can IPF color alone prove the data are reliable?',
-    explanation: 'IPF color should be interpreted with pattern quality and confidence. A colorful map is not automatically a correct map.'
+    explanation: 'IPF color should be interpreted with pattern quality and confidence-like cues. A colorful map is not automatically a correct map.'
   },
   'acquisition-noisy': {
     aim: 'Diagnose weak signal and noisy indexing.',
-    steps: ['Open Live Scan Acquisition.', 'Apply the noisy setup.', 'Increase exposure or averaging.', 'Watch noise and confidence change.'],
+    steps: ['Open Live Scan Acquisition.', 'Apply the noisy setup.', 'Increase exposure or averaging.', 'Watch noise and confidence-like cues change.'],
     prediction: 'Which change should reduce random noise most clearly?',
     explanation: 'Low exposure/current gives weak patterns. Averaging and longer exposure improve signal but slow the scan.'
   },
@@ -287,7 +287,7 @@ const mapModes = {
   confidence: {
     label: 'Confidence-like map',
     meaning: 'Brightness shows conceptual indexing decision strength.',
-    observe: 'Low-confidence regions can appear where bands are weak, clipped, or phase choice is wrong.',
+    observe: 'Low confidence-like cue regions can appear where bands are weak, clipped, or phase choice is wrong.',
     mistake: 'Confidence-like cues are not proof of physical truth.',
     question: 'What would you check first if confidence-like cues are low but the pattern is visible?'
   },
@@ -301,7 +301,7 @@ const mapModes = {
   boundaries: {
     label: 'Grain boundary overlay',
     meaning: 'Lines schematically mark orientation discontinuities.',
-    observe: 'Compare boundary locations with quality and confidence before interpreting fine features.',
+    observe: 'Compare boundary locations with quality and confidence-like cues before interpreting fine features.',
     mistake: 'Every boundary-like line is not automatically a real microstructural boundary.',
     question: 'Which overlay would reveal if a boundary is caused by poor indexing?'
   }
@@ -328,7 +328,7 @@ const diagnosticCases = {
     causes: ['Exposure too short', 'Beam current too low', 'Frame averaging too low'],
     firstFix: 'Increase exposure or averaging, then check scan speed.',
     preset: 'acquisition-noisy',
-    expected: 'Noise should drop and confidence should become less speckled.',
+    expected: 'Noise should drop and confidence-like cues should become less speckled.',
     warning: 'Increasing band detection too much may detect false bands instead of fixing the signal.'
   },
   'saturated-pattern': {
@@ -342,7 +342,7 @@ const diagnosticCases = {
   'many-unindexed': {
     symptom: 'Many unindexed pixels',
     causes: ['Weak or clipped bands', 'Indexing threshold too strict', 'Wrong phase selection'],
-    firstFix: 'Compare quality and confidence, then improve pattern or lower threshold.',
+    firstFix: 'Compare quality and confidence-like cues, then improve pattern or lower threshold.',
     preset: 'acquisition-map-views',
     expected: 'Unindexed regions should shrink after signal or threshold is corrected.',
     warning: 'Do not simply hide failed pixels from the map.'
@@ -366,14 +366,14 @@ const diagnosticCases = {
   'wrong-phase': {
     symptom: 'Pattern visible but indexing unstable',
     causes: ['Incorrect phase selection', 'Wrong lattice parameters', 'Bad detector geometry'],
-    firstFix: 'Check phase choice and detector calibration before forcing confidence.',
+    firstFix: 'Check phase choice and detector calibration before forcing a confidence-like result.',
     preset: 'open-acquisition-balanced',
-    expected: 'A plausible phase/indexing setup should increase confidence without inventing bands.',
-    warning: 'High confidence can still be misleading if the candidate phase is wrong.'
+    expected: 'A plausible phase/indexing setup should increase confidence-like evidence without inventing bands.',
+    warning: 'High confidence-like evidence can still be misleading if the candidate phase is wrong.'
   },
   'strict-threshold': {
     symptom: 'Too strict indexing threshold',
-    causes: ['Threshold above current pattern quality', 'Low confidence accepted too aggressively or rejected too harshly'],
+    causes: ['Threshold above current pattern quality', 'Low confidence-like cues accepted too aggressively or rejected too harshly'],
     firstFix: 'Lower threshold for exploration, or improve signal for stricter maps.',
     preset: 'acquisition-map-views',
     expected: 'Rejected pixels should decrease, but students must discuss trust.',
@@ -774,7 +774,7 @@ export class LearningPath {
       ['FCC Cu/Ni-like phases', 'Cu and Ni have similar FCC band geometry, so EBSD band positions alone may not separate them reliably.'],
       ['Binning vs exposure vs gain', 'Binning and exposure collect more usable signal; gain amplifies what is already there and can clip detail.'],
       ['Step size relative to grain size', 'Step size should be small enough to sample grains and boundaries; oversized steps can miss fine structure.'],
-      ['Confidence vs pattern quality', 'Pattern quality describes image clarity; confidence describes the indexing decision. They should be interpreted together.'],
+      ['Confidence-like cues vs pattern quality', 'Pattern quality describes image clarity; confidence-like cues describe the indexing decision. They should be interpreted together.'],
       ['Grain boundary misorientation', 'Boundaries are orientation changes. Low-angle and high-angle boundaries mean different microstructural stories.'],
       ['IPF color interpretation', 'IPF color encodes crystal direction relative to a sample axis, not composition by itself.']
     ];

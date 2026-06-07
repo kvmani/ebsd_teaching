@@ -133,7 +133,7 @@ Avoid overclaims:
 - "confirmed phase"
 - "measured strain"
 - "true grain size"
-- "real confidence"
+- "commercial-system confidence"
 - "validated indexing"
 - "definitely charging"
 - "proves poor polishing"
@@ -169,4 +169,3 @@ git push origin main
 ```
 
 Review untracked files carefully. Local-only dev configs, logs, and generated folders should usually stay uncommitted.
-

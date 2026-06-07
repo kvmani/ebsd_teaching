@@ -29,7 +29,7 @@ const walkthroughSteps = [
     title: 'Band detection',
     tag: 'Hough-style conceptual detection',
     notice: 'Band guides appear one by one to show how line-like features can be selected.',
-    matters: 'This is not a real Hough implementation. It shows why Hough-style voting is useful for finding band centerlines.',
+    matters: 'This is not a real Hough implementation. It shows why Hough-style voting is useful for finding band centerlines, while real projected band edges can be curved or hyperbolic.',
     caption: 'Detected bands are highlighted as educational overlays.'
   },
   {
@@ -47,18 +47,18 @@ const walkthroughSteps = [
     caption: 'Scores are schematic decision-strength values, not real solver output.'
   },
   {
-    title: 'Best schematic match and confidence',
+    title: 'Best schematic match and confidence-like cue',
     tag: 'Not a real indexing engine',
-    notice: 'The strongest schematic candidate is highlighted, but confidence is a simplified score, not proof of truth.',
-    matters: 'Multiple candidates can be close. Fit, confidence, phase knowledge, and pattern quality should be interpreted together.',
+    notice: 'The strongest schematic candidate is highlighted, but the confidence-like score is simplified and not proof of truth.',
+    matters: 'Multiple candidates can be close. Fit, confidence-like evidence, phase knowledge, and pattern quality should be interpreted together.',
     caption: 'The selected orientation is educational, not measured.'
   },
   {
     title: 'Failure modes',
     tag: 'Failure-mode review',
-    notice: 'Too few bands, poor pattern center, wrong phase, overlap, deformation, noise, and pseudosymmetry can all reduce confidence.',
+    notice: 'Too few bands, poor pattern center, wrong phase, overlap, deformation, noise, and pseudosymmetry can all reduce confidence-like evidence.',
     matters: 'Good-looking maps can still be wrong when the pattern evidence or calibration model is weak.',
-    caption: 'Failure labels show why indexing can fail or return low confidence.'
+    caption: 'Failure labels show why indexing can fail or return low confidence-like evidence.'
   }
 ];
 
@@ -120,7 +120,7 @@ const matchingScenarios = [
     prompt: 'Two candidates are close. Which response is best?',
     difficulty: 'Pseudosymmetry / similar structures',
     correct: 'b',
-    notes: 'Candidate B is slightly better, but the close scores mean you should inspect confidence, fit, phase knowledge, and neighboring pixels.',
+    notes: 'Candidate B is slightly better, but the close scores mean you should inspect confidence-like evidence, fit, phase knowledge, and neighboring pixels.',
     misleading: 'Small score differences can be misleading in pseudosymmetric or similar crystal structures.',
     noise: 0.18,
     candidates: [
@@ -357,7 +357,7 @@ export class IndexingStudio {
           <div class="lab-card-heading">
             <span class="fidelity-label">Conceptual calibration exercise</span>
             <h3>Pattern Center / Calibration</h3>
-            <p>Move the pattern center and detector scale to see why calibration affects band matching confidence.</p>
+            <p>Move the pattern center and detector scale to see why calibration affects band matching confidence-like evidence.</p>
           </div>
           <div class="calibration-layout">
             <canvas id="patternCenterCanvas" width="620" height="420" aria-label="Conceptual pattern center exercise canvas"></canvas>
@@ -367,7 +367,7 @@ export class IndexingStudio {
               <label class="slider-row"><span>Detector scale <output id="pcScaleValue">1.00x</output></span><input id="pcScaleControl" type="range" min="0.82" max="1.18" step="0.01" value="1.00" aria-label="Detector distance or scale"></label>
               <label class="compact-check"><input id="pcNoiseToggle" type="checkbox" /> Add noise / poor calibration</label>
               <button id="pcResetButton" type="button">Reset to correct pattern center</button>
-              <div class="confidence-meter" role="status" aria-live="polite" aria-label="Conceptual confidence meter"><b id="pcConfidenceBar"></b><span id="pcConfidenceText">High confidence</span></div>
+              <div class="confidence-meter" role="status" aria-live="polite" aria-label="Conceptual confidence-like meter"><b id="pcConfidenceBar"></b><span id="pcConfidenceText">High confidence-like cue</span></div>
               <p id="pcCalibrationStatus" class="calibration-status" aria-live="polite"></p>
             </div>
           </div>
@@ -662,7 +662,7 @@ export class IndexingStudio {
     this.root.querySelector('#pcScaleValue').textContent = `${this.pc.scale.toFixed(2)}x`;
     this.drawCalibration();
     const confidence = this.calibrationConfidence();
-    const label = confidence > 78 ? 'High confidence' : confidence > 46 ? 'Medium confidence' : 'Low confidence';
+    const label = confidence > 78 ? 'High confidence-like cue' : confidence > 46 ? 'Medium confidence-like cue' : 'Low confidence-like cue';
     this.root.querySelector('#pcConfidenceBar').style.width = `${confidence}%`;
     this.root.querySelector('#pcConfidenceText').textContent = `${label} (${confidence}%)`;
     if (this.calibrationMovedAway()) {
@@ -686,18 +686,18 @@ export class IndexingStudio {
     const status = this.root.querySelector('#pcCalibrationStatus');
     if (!status) return;
     if (this.progress.calibrationComplete) {
-      status.textContent = 'Calibration review complete: you degraded the schematic pattern center and then restored or reset to a high-confidence condition.';
+      status.textContent = 'Calibration review complete: you degraded the schematic pattern center and then restored or reset to a high-confidence-like condition.';
       return;
     }
     if (!this.progress.calibrationEvidence.movedAwayFromDefault) {
-      status.textContent = 'Move PCx, PCy, or detector scale far enough to see the confidence drop.';
+      status.textContent = 'Move PCx, PCy, or detector scale far enough to see the confidence-like cue drop.';
       return;
     }
     if (!this.progress.calibrationEvidence.observedDegradedConfidence) {
-      status.textContent = `Keep adjusting until the confidence clearly degrades; current simplified confidence is ${confidence}%.`;
+      status.textContent = `Keep adjusting until the confidence-like cue clearly degrades; current simplified cue is ${confidence}%.`;
       return;
     }
-    status.textContent = 'Now restore near the correct pattern center, or use Reset after seeing the degraded confidence.';
+    status.textContent = 'Now restore near the correct pattern center, or use Reset after seeing the degraded confidence-like cue.';
   }
 
   drawCalibration() {
@@ -858,7 +858,7 @@ export class IndexingStudio {
       ctx.fillStyle = '#a9b9bd';
       ctx.font = '13px Segoe UI, Arial';
       const text = this.reviewOverlay === 'quality'
-        ? 'Inspect band sharpness, background, saturation, and noise before trusting confidence.'
+        ? 'Inspect band sharpness, background, saturation, and noise before trusting confidence-like cues.'
         : 'Possible issues: weak bands, wrong phase, poor pattern center, overlap, or pseudosymmetry.';
       ctx.fillText(text, 34, 72);
       ctx.restore();
@@ -876,7 +876,7 @@ export class IndexingStudio {
     if (this.progress.completedSteps.length < walkthroughSteps.length || checkpointAnswers.includes(false)) weak.push('band detection');
     if (!this.progress.calibrationComplete) weak.push('pattern center');
     if ((this.progress.matchingAnswers['wrong-phase'] || '') !== 'c') weak.push('phase selection');
-    if (answered && correct < answered) weak.push('confidence/fit');
+    if (answered && correct < answered) weak.push('confidence-like cues / fit');
     if (this.progress.completedSteps.length < 7) weak.push('failure modes');
     container.innerHTML = `
       <div class="weak-review-grid">
@@ -888,7 +888,7 @@ export class IndexingStudio {
       </div>
       <section class="weak-concepts">
         <strong>Weak concepts to revisit</strong>
-        <p>${weak.length ? weak.join(', ') : 'No weak areas flagged yet. Keep comparing confidence, pattern quality, and phase choice.'}</p>
+        <p>${weak.length ? weak.join(', ') : 'No weak areas flagged yet. Keep comparing confidence-like evidence, pattern quality, and phase choice.'}</p>
       </section>
     `;
   }
