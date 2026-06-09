@@ -736,21 +736,67 @@
 
       <main class="resources-workspace view-pane" id="resourcesView" role="tabpanel" aria-labelledby="tabResources" aria-hidden="true">
         <section class="panel resources-panel" aria-label="Glossary and resources">
-          <div class="resources-heading">
-            <span class="fidelity-label">Local resources</span>
-            <h2>Glossary / Resources</h2>
-            <p>Use these for self-study exports, revision, and quick term lookup. Everything is generated from local app content.</p>
+          <div class="resources-overview">
+            <div class="resources-heading">
+              <span class="fidelity-label">Local resources</span>
+              <h2>Glossary / Resources</h2>
+              <p>Use these for self-study exports, revision, and quick term lookup. Everything is generated from local app content.</p>
+            </div>
+            <div class="resource-quick-actions" aria-label="Primary resource actions">
+              <button id="resourcesGlossaryButton" type="button">Open glossary</button>
+              <button id="resourcesNotesButton" type="button">Open notes</button>
+              <button data-resource-export="all-modules-view" type="button">Export all modules</button>
+            </div>
           </div>
-          <div class="resource-launch-grid">
-            <button id="resourcesGlossaryButton" type="button">Open glossary</button>
-            <button id="resourcesNotesButton" type="button">Open notes</button>
-            <button data-resource="worksheet-view" type="button">Worksheet</button>
-            <button data-resource="practice-view" type="button">Practice questions</button>
-            <button data-resource="formula-view" type="button">Formula sheet</button>
-            <button data-resource="datasets-view" type="button">Sample datasets</button>
-            <button data-resource="interpretation-guide-view" type="button">Interpretation guide</button>
-            <button data-resource="self-study-view" type="button">Self-study guide</button>
-            <button data-resource-export="all-modules-view" type="button">Export all modules</button>
+          <div class="resource-card-grid" aria-label="Resource cards">
+            <article class="resource-card">
+              <span>Worksheet</span>
+              <p>Printable self-study prompts for guided EBSD practice.</p>
+              <div class="resource-card-actions">
+                <button data-resource="worksheet-view" type="button">View</button>
+                <button data-resource-export="worksheet-view" type="button">Export</button>
+              </div>
+            </article>
+            <article class="resource-card">
+              <span>Practice questions</span>
+              <p>Local checkpoint questions gathered from the learning modules.</p>
+              <div class="resource-card-actions">
+                <button data-resource="practice-view" type="button">View</button>
+                <button data-resource-export="practice-view" type="button">Export</button>
+              </div>
+            </article>
+            <article class="resource-card">
+              <span>Formula sheet</span>
+              <p>Bragg law, electron wavelength, constants, and notes.</p>
+              <div class="resource-card-actions">
+                <button data-resource="formula-view" type="button">View</button>
+                <button data-resource-export="formula-view" type="button">Export</button>
+              </div>
+            </article>
+            <article class="resource-card">
+              <span>Sample datasets</span>
+              <p>Local synthetic acquisition presets for comparison exercises.</p>
+              <div class="resource-card-actions">
+                <button data-resource="datasets-view" type="button">View</button>
+                <button data-resource-export="datasets-view" type="button">Export</button>
+              </div>
+            </article>
+            <article class="resource-card">
+              <span>Interpretation guide</span>
+              <p>Diagnostic workflow prompts for map and pattern review.</p>
+              <div class="resource-card-actions">
+                <button data-resource="interpretation-guide-view" type="button">View</button>
+                <button data-resource-export="interpretation-guide-view" type="button">Export</button>
+              </div>
+            </article>
+            <article class="resource-card">
+              <span>Self-study guide</span>
+              <p>Suggested practice order with reflection prompts for revision.</p>
+              <div class="resource-card-actions">
+                <button data-resource="self-study-view" type="button">View</button>
+                <button data-resource-export="self-study-view" type="button">Export</button>
+              </div>
+            </article>
           </div>
         </section>
       </main>

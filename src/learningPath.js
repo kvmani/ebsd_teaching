@@ -575,7 +575,6 @@ export class LearningPath {
           <button type="button" class="${this.progress.selectedMode === mode ? 'active' : ''}" data-learning-mode="${mode}">${mode[0].toUpperCase() + mode.slice(1)}</button>
         `).join('')}
       </div>
-      <div class="lesson-diagram">${diagramForModule(learningModules.indexOf(module), module)}</div>
       ${this.progress.weakReviewOpen ? this.renderWeakAreas() : ''}
       ${this.renderModeContent(module)}
       ${this.progress.selectedMode === 'learn' ? '' : this.renderSpecialModuleContent(module)}
@@ -674,7 +673,7 @@ export class LearningPath {
     return `
       <section class="mode-panel">
         <strong>Learn mode</strong>
-        <p>Start with the concept, inspect the diagram, then try one simulator action and answer the checkpoint.</p>
+        <p>Start with the concept, then try one simulator action and answer the checkpoint.</p>
       </section>
       <div class="lesson-grid learn-grid">
         <article class="lesson-card concept">
