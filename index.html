@@ -52,32 +52,50 @@
       <main class="start-workspace view-pane active" id="startView" role="tabpanel" aria-labelledby="tabStart">
         <section class="panel start-panel" aria-label="Start here">
           <div class="start-hero">
-            <span class="fidelity-label">Student-first</span>
-            <h2>Choose your EBSD study path</h2>
-            <p>Start from where you are. The studio keeps the simulators, notes, quizzes, glossary, real Kikuchi examples, and local progress tracking together for self-study.</p>
+            <div class="start-hero-copy">
+              <span class="fidelity-label">Student-first</span>
+              <h2>Choose your EBSD study path</h2>
+              <p>Start from where you are. The studio keeps the simulators, notes, quizzes, glossary, real Kikuchi examples, and local progress tracking together for self-study.</p>
+              <div class="start-hero-actions" aria-label="Fast start actions">
+                <button type="button" data-start-target="learning-intro">Begin guided path</button>
+                <button type="button" data-start-target="acquisition">Open live simulator</button>
+              </div>
+            </div>
+            <div class="start-signal-map" aria-label="EBSD learning map">
+              <div class="signal-stage signal-stage-prep"><span>Prep</span><b>Surface</b></div>
+              <div class="signal-stage signal-stage-pattern"><span>Pattern</span><b>Bands</b></div>
+              <div class="signal-stage signal-stage-index"><span>Index</span><b>Evidence</b></div>
+              <div class="signal-stage signal-stage-map"><span>Map</span><b>Meaning</b></div>
+              <div class="signal-detector" aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
           </div>
           <div class="start-path-grid" aria-label="Student onboarding paths">
-            <article class="start-path-card">
+            <article class="start-path-card start-path-primary">
+              <small>01</small>
               <span>I am new to EBSD</span>
               <p>Begin with the learning path, then open Geometry to connect beam, sample tilt, cones, and detector bands.</p>
               <button type="button" data-start-target="learning-intro">Start beginner path</button>
             </article>
             <article class="start-path-card">
+              <small>02</small>
               <span>I know EBSD basics and want acquisition practice</span>
               <p>Use the live acquisition simulator to compare exposure, gain, binning, drift, confidence-like cues, and map quality.</p>
               <button type="button" data-start-target="acquisition">Practice acquisition</button>
             </article>
             <article class="start-path-card">
+              <small>03</small>
               <span>I want to understand indexing evidence</span>
               <p>Review the simplified indexing workflow before experimenting with confidence-like evidence and failure modes.</p>
               <button type="button" data-start-target="indexing">Open indexing basics</button>
             </article>
             <article class="start-path-card">
+              <small>04</small>
               <span>I want to interpret EBSD evidence</span>
               <p>Practice conceptual pattern quality diagnosis, sample preparation effects, map interpretation, confidence-like evidence, and troubleshooting.</p>
               <button type="button" data-start-target="interpretation">Open interpretation studio</button>
             </article>
             <article class="start-path-card">
+              <small>05</small>
               <span>I want to revise using quizzes</span>
               <p>Jump to checkpoints, flashcards, weak-area review, notes, and glossary links.</p>
               <button type="button" data-start-target="revise">Revise with quizzes</button>

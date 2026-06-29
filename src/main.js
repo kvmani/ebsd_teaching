@@ -522,6 +522,7 @@ function setActiveView(view) {
   const isInterpretation = view === 'interpretation';
   const isLearning = view === 'learning';
   const isResources = view === 'resources';
+  document.body.classList.toggle('start-active', isStart);
   document.body.classList.toggle('resources-active', isResources);
   qs('startView').classList.toggle('active', isStart);
   qs('geometryView').classList.toggle('active', isGeometry);

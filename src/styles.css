@@ -678,6 +678,7 @@ input[type="range"] {
   padding: 0 10px 10px;
 }
 
+body.start-active .lesson,
 body.resources-active .lesson {
   display: none;
 }
@@ -772,6 +773,16 @@ body.resources-active .lesson {
   padding: 24px;
 }
 
+.start-panel {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  background:
+    linear-gradient(135deg, rgba(98, 215, 240, 0.08), transparent 34%),
+    linear-gradient(165deg, transparent 42%, rgba(230, 181, 90, 0.075)),
+    var(--surface);
+}
+
 .resources-panel {
   display: grid;
   gap: 16px;
@@ -787,6 +798,137 @@ body.resources-active .lesson {
   gap: 10px;
   max-width: 900px;
   margin-bottom: 18px;
+}
+
+.start-hero {
+  max-width: none;
+  grid-template-columns: minmax(360px, 0.85fr) minmax(360px, 1fr);
+  align-items: stretch;
+  gap: 18px;
+  margin-bottom: 2px;
+}
+
+.start-hero-copy {
+  display: grid;
+  gap: 14px;
+  align-content: center;
+  min-height: 300px;
+  padding: 24px;
+  border: 1px solid rgba(221, 235, 239, 0.17);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.start-hero-copy p {
+  font-size: 14.5px;
+}
+
+.start-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.start-hero-actions button {
+  min-height: 42px;
+  padding: 0 14px;
+}
+
+.start-signal-map {
+  position: relative;
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid rgba(98, 215, 240, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(98, 215, 240, 0.12), transparent 46%),
+    #070b10;
+  background-size: 36px 36px, 36px 36px, auto, auto;
+}
+
+.start-signal-map::before,
+.start-signal-map::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(98, 215, 240, 0.2);
+  transform: rotate(-17deg);
+  animation: signalSweep 7s ease-in-out infinite;
+}
+
+.start-signal-map::before {
+  top: 38%;
+}
+
+.start-signal-map::after {
+  top: 58%;
+  background: rgba(230, 181, 90, 0.22);
+  transform: rotate(14deg);
+  animation-delay: -2.3s;
+}
+
+.signal-stage {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 2px;
+  min-width: 112px;
+  padding: 10px;
+  border: 1px solid rgba(221, 235, 239, 0.18);
+  border-radius: 8px;
+  background: rgba(8, 13, 18, 0.86);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+  animation: floatPanel 6s ease-in-out infinite;
+}
+
+.signal-stage span {
+  color: var(--amber);
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.signal-stage b {
+  color: #f8ffff;
+  font-size: 15px;
+}
+
+.signal-stage-prep { left: 8%; top: 16%; }
+.signal-stage-pattern { right: 10%; top: 13%; animation-delay: -1.4s; }
+.signal-stage-index { left: 14%; bottom: 15%; animation-delay: -2.5s; }
+.signal-stage-map { right: 9%; bottom: 13%; animation-delay: -3.2s; }
+
+.signal-detector {
+  position: absolute;
+  z-index: 1;
+  inset: 26% 28%;
+  border: 1px solid rgba(98, 215, 240, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  transform: perspective(600px) rotateX(58deg) rotateZ(-12deg);
+}
+
+.signal-detector i {
+  position: absolute;
+  inset: 18% 9%;
+  border-top: 2px solid rgba(146, 212, 111, 0.6);
+  transform: rotate(24deg);
+}
+
+.signal-detector i:nth-child(2) {
+  border-color: rgba(174, 152, 232, 0.62);
+  transform: rotate(-18deg);
+}
+
+.signal-detector i:nth-child(3) {
+  border-color: rgba(230, 181, 90, 0.6);
+  transform: rotate(58deg);
 }
 
 .resources-overview {
@@ -1091,9 +1233,9 @@ body.resources-active .lesson {
 
 .start-path-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  max-width: 1480px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  max-width: none;
 }
 
 .start-path-card,
@@ -1105,17 +1247,49 @@ body.resources-active .lesson {
 }
 
 .start-path-card {
+  position: relative;
   display: grid;
   gap: 10px;
   align-content: start;
-  min-height: 210px;
-  padding: 16px;
+  min-height: 196px;
+  padding: 18px;
+  overflow: hidden;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.start-path-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--amber));
+  opacity: 0.72;
+}
+
+.start-path-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(98, 215, 240, 0.42);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.start-path-primary {
+  background: rgba(98, 215, 240, 0.07);
+}
+
+.start-path-card small {
+  width: fit-content;
+  padding: 3px 7px;
+  border: 1px solid rgba(230, 181, 90, 0.34);
+  border-radius: 999px;
+  color: #ffe7b1;
+  font-size: 11px;
+  font-weight: 850;
 }
 
 .start-path-card span,
 .indexing-step-card span {
   color: var(--cyan);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 850;
   text-transform: uppercase;
 }
@@ -1125,20 +1299,39 @@ body.resources-active .lesson {
 .indexing-step-card small {
   margin: 0;
   color: var(--muted);
-  line-height: 1.48;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .start-path-card button {
+  min-height: 40px;
   margin-top: auto;
   align-self: end;
+  font-size: 13px;
 }
 
 .start-integrity-note {
   display: grid;
   gap: 8px;
-  max-width: 980px;
-  margin-top: 16px;
+  max-width: none;
+  margin-top: 0;
   padding: 14px;
+}
+
+@keyframes signalSweep {
+  0%, 100% { opacity: 0.42; transform: translateY(-4px) rotate(-17deg); }
+  50% { opacity: 0.78; transform: translateY(5px) rotate(-17deg); }
+}
+
+@keyframes floatPanel {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+body.reduce-motion .start-signal-map::before,
+body.reduce-motion .start-signal-map::after,
+body.reduce-motion .signal-stage {
+  animation: none;
 }
 
 .indexing-pipeline {
@@ -4119,6 +4312,10 @@ dialog:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .start-path-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .case-layout,
   .map-studio-layout,
   .confidence-layout,
@@ -4233,6 +4430,7 @@ dialog:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .start-hero,
   .teaching-card-row,
   .start-path-grid,
   .indexing-pipeline,
@@ -4314,6 +4512,11 @@ dialog:focus-visible {
   .interpretation-panel,
   .resources-panel {
     padding: 14px;
+  }
+
+  .start-hero-copy,
+  .start-signal-map {
+    min-height: 240px;
   }
 
   .start-path-card {
