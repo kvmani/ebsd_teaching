@@ -66,7 +66,7 @@ function deg(value) {
 
 function updateReadouts() {
   qs('tiltValue').textContent = deg(state.tilt);
-  qs('annSample').textContent = `Sample surface: ${state.tilt}° from -X axis`;
+  qs('annSample').textContent = `Sample tilt: ${state.tilt}° toward detector (schematic)`;
   qs('distanceValue').textContent = state.distance.toFixed(1);
   qs('detectorHeightValue').textContent = state.detectorHeight.toFixed(2);
   qs('voltageValue').textContent = `${state.voltage} kV`;

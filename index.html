@@ -55,49 +55,56 @@
             <div class="start-hero-copy">
               <span class="fidelity-label">Student-first</span>
               <h2>Choose your EBSD study path</h2>
-              <p>Start from where you are. The studio keeps the simulators, notes, quizzes, glossary, real Kikuchi examples, and local progress tracking together for self-study.</p>
+              <p>Pick the path that matches your task, then move into the simulator, lessons, notes, or review tools.</p>
               <div class="start-hero-actions" aria-label="Fast start actions">
                 <button type="button" data-start-target="learning-intro">Begin guided path</button>
                 <button type="button" data-start-target="acquisition">Open live simulator</button>
               </div>
             </div>
-            <div class="start-signal-map" aria-label="EBSD learning map">
-              <div class="signal-stage signal-stage-prep"><span>Prep</span><b>Surface</b></div>
-              <div class="signal-stage signal-stage-pattern"><span>Pattern</span><b>Bands</b></div>
-              <div class="signal-stage signal-stage-index"><span>Index</span><b>Evidence</b></div>
-              <div class="signal-stage signal-stage-map"><span>Map</span><b>Meaning</b></div>
-              <div class="signal-detector" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="start-signal-map" aria-label="EBSD pattern review preview">
+              <figure class="start-pattern-frame">
+                <img src="/kikuchi-patterns/ebsd-si-square.png" width="2555" height="2555" decoding="async" alt="Real EBSD Kikuchi pattern example with conceptual learning overlays" />
+                <span class="pattern-band band-cyan" aria-hidden="true"></span>
+                <span class="pattern-band band-amber" aria-hidden="true"></span>
+                <span class="pattern-band band-green" aria-hidden="true"></span>
+                <figcaption>Real Kikuchi pattern example with conceptual band and evidence overlays.</figcaption>
+              </figure>
+              <div class="start-pattern-readout" aria-label="Pattern evidence checklist">
+                <span>Pattern quality</span><strong>Sharp bands</strong>
+                <span>Indexing cue</span><strong>Geometry match</strong>
+                <span>Interpretation</span><strong>Review context</strong>
+              </div>
             </div>
           </div>
           <div class="start-path-grid" aria-label="Student onboarding paths">
             <article class="start-path-card start-path-primary">
               <small>01</small>
-              <span>I am new to EBSD</span>
-              <p>Begin with the learning path, then open Geometry to connect beam, sample tilt, cones, and detector bands.</p>
-              <button type="button" data-start-target="learning-intro">Start beginner path</button>
+              <span>New to EBSD</span>
+              <p>Start with geometry, tilt, cones, and detector bands.</p>
+              <button type="button" data-start-target="learning-intro">Start path</button>
             </article>
             <article class="start-path-card">
               <small>02</small>
-              <span>I know EBSD basics and want acquisition practice</span>
-              <p>Use the live acquisition simulator to compare exposure, gain, binning, drift, confidence-like cues, and map quality.</p>
-              <button type="button" data-start-target="acquisition">Practice acquisition</button>
+              <span>Acquisition practice</span>
+              <p>Tune exposure, gain, binning, drift, and map quality.</p>
+              <button type="button" data-start-target="acquisition">Practice</button>
             </article>
             <article class="start-path-card">
               <small>03</small>
-              <span>I want to understand indexing evidence</span>
-              <p>Review the simplified indexing workflow before experimenting with confidence-like evidence and failure modes.</p>
-              <button type="button" data-start-target="indexing">Open indexing basics</button>
+              <span>Indexing evidence</span>
+              <p>Connect bands, phase choice, calibration, and confidence-like cues.</p>
+              <button type="button" data-start-target="indexing">Indexing</button>
             </article>
             <article class="start-path-card">
               <small>04</small>
-              <span>I want to interpret EBSD evidence</span>
-              <p>Practice conceptual pattern quality diagnosis, sample preparation effects, map interpretation, confidence-like evidence, and troubleshooting.</p>
-              <button type="button" data-start-target="interpretation">Open interpretation studio</button>
+              <span>Interpret results</span>
+              <p>Review pattern quality, maps, artifacts, and troubleshooting.</p>
+              <button type="button" data-start-target="interpretation">Interpret</button>
             </article>
             <article class="start-path-card">
               <small>05</small>
-              <span>I want to revise using quizzes</span>
-              <p>Jump to checkpoints, flashcards, weak-area review, notes, and glossary links.</p>
+              <span>Revise with quizzes</span>
+              <p>Use checkpoints, flashcards, notes, and glossary links.</p>
               <button type="button" data-start-target="revise">Revise with quizzes</button>
             </article>
           </div>
@@ -120,7 +127,7 @@
           <div class="annotation numbered-label" id="annPlanes"><b>4</b> Crystal planes {hkl}</div>
           <div class="annotation numbered-label" id="annCones"><b>5</b> Bragg/Kikuchi cones</div>
           <div class="annotation numbered-label" id="annDetector"><b>6</b> Detector/phosphor screen</div>
-          <div class="annotation" id="annSample">Sample surface: ~70° tilt</div>
+          <div class="annotation" id="annSample">Sample surface: ~70&deg; tilt</div>
           <canvas id="scene"></canvas>
         </section>
 
@@ -175,7 +182,7 @@
             <summary>Geometry</summary>
             <p class="control-note">Geometry controls change where diffracted directions meet the detector; they do not make the model physically validated.</p>
             <label class="slider-row">
-              <span>Sample tilt <output class="value" id="tiltValue">70°</output></span>
+              <span>Sample tilt <output class="value" id="tiltValue">70&deg;</output></span>
               <input id="tilt" type="range" min="0" max="80" step="1" value="70" aria-label="Sample tilt in degrees" />
             </label>
             <label class="slider-row">
@@ -196,15 +203,15 @@
             <summary>Crystal Orientation</summary>
             <p class="control-note">Rotating the crystal moves bands because the lattice-plane normals rotate relative to the detector.</p>
             <label class="slider-row">
-              <span>Rotate X <output class="value" id="rxValue">0°</output></span>
+              <span>Rotate X <output class="value" id="rxValue">0&deg;</output></span>
               <input id="rx" type="range" min="-45" max="45" step="1" value="0" />
             </label>
             <label class="slider-row">
-              <span>Rotate Y <output class="value" id="ryValue">0°</output></span>
+              <span>Rotate Y <output class="value" id="ryValue">0&deg;</output></span>
               <input id="ry" type="range" min="-45" max="45" step="1" value="0" />
             </label>
             <label class="slider-row">
-              <span>Rotate Z <output class="value" id="rzValue">0°</output></span>
+              <span>Rotate Z <output class="value" id="rzValue">0&deg;</output></span>
               <input id="rz" type="range" min="-70" max="70" step="1" value="0" />
             </label>
           </details>
@@ -237,8 +244,8 @@
             <h3>Readout</h3>
             <div class="readout">
               <div class="metric"><b id="lambdaValue">8.59 pm</b><span>electron wavelength</span></div>
-              <div class="metric"><b id="thetaValue">1.23°</b><span>example Bragg angle</span></div>
-              <div class="metric"><b id="bandValue">2.46°</b><span>approx. band width</span></div>
+              <div class="metric"><b id="thetaValue">1.23&deg;</b><span>example Bragg angle</span></div>
+              <div class="metric"><b id="bandValue">2.46&deg;</b><span>approx. band width</span></div>
               <div class="metric"><b id="modeValue">All visible</b><span>current stage</span></div>
             </div>
           </section>
@@ -252,14 +259,14 @@
             </label>
             <div class="readout mini-readout">
               <div class="metric"><b id="miniLambdaValue">8.59 pm</b><span>from current voltage</span></div>
-              <div class="metric"><b id="miniThetaValue">2.05°</b><span>Bragg angle theta</span></div>
+              <div class="metric"><b id="miniThetaValue">2.05&deg;</b><span>Bragg angle theta</span></div>
             </div>
           </section>
         </aside>
 
         <section class="teaching-card-row" aria-label="Geometry learning cards">
           <article class="teaching-card">
-            <span>What’s happening right now?</span>
+            <span>What&rsquo;s happening right now?</span>
             <p id="nowCard">Multiple plane families produce a network of Kikuchi bands on the detector.</p>
           </article>
           <article class="teaching-card">
@@ -283,7 +290,7 @@
           </article>
           <article class="teaching-card">
             <span>Mini glossary</span>
-            <p><b>Bragg angle</b>: angle satisfying nλ = 2d sinθ. <b>Pattern center</b>: projected detector reference point used for indexing.</p>
+            <p><b>Bragg angle</b>: angle satisfying n&lambda; = 2d sin&theta;. <b>Pattern center</b>: projected detector reference point used for indexing.</p>
           </article>
         </section>
       </main>
@@ -309,7 +316,7 @@
           <div class="scale-bar" aria-label="Scale bar"><b></b><span id="scaleBarText">10 um</span></div>
           <div class="scan-overlay">
             <div><b id="scanQuality">82%</b><span>pattern quality</span></div>
-            <div><b id="scanIndexRate">78%</b><span>confidence-like score</span></div>
+            <div><b id="scanIndexRate">78%</b><span>indexed pixels</span></div>
             <div><b id="scanResolution">360 x 260</b><span>effective pixels</span></div>
             <div><b id="scanSpeed">35.7 px/ms</b><span>relative speed</span></div>
             <div><b id="scanWarning">stable scan</b><span>indexing state</span></div>

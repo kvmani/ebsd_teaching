@@ -201,9 +201,19 @@ select {
   box-shadow: 0 0 24px rgba(98, 215, 240, 0.13);
 }
 
+.demo-banner {
+  grid-row: 3;
+}
+
 .view-pane {
   display: none;
+  grid-row: 4;
   min-height: 0;
+  align-self: stretch;
+}
+
+.lesson {
+  grid-row: 5;
 }
 
 .view-pane.active {
@@ -758,6 +768,11 @@ body.resources-active .lesson {
   align-content: start;
 }
 
+.start-workspace {
+  height: 100%;
+  align-content: stretch;
+}
+
 .euler-workspace {
   height: 100%;
   overflow-y: auto;
@@ -775,8 +790,9 @@ body.resources-active .lesson {
 
 .start-panel {
   display: grid;
-  gap: 18px;
-  align-content: start;
+  gap: clamp(12px, 1.6vh, 20px);
+  height: 100%;
+  align-content: space-between;
   background:
     linear-gradient(135deg, rgba(98, 215, 240, 0.08), transparent 34%),
     linear-gradient(165deg, transparent 42%, rgba(230, 181, 90, 0.075)),
@@ -802,133 +818,161 @@ body.resources-active .lesson {
 
 .start-hero {
   max-width: none;
-  grid-template-columns: minmax(360px, 0.85fr) minmax(360px, 1fr);
+  grid-template-columns: minmax(420px, 0.82fr) minmax(620px, 1.18fr);
   align-items: stretch;
-  gap: 18px;
-  margin-bottom: 2px;
+  gap: 12px;
+  margin-bottom: 0;
 }
 
 .start-hero-copy {
   display: grid;
-  gap: 14px;
+  gap: 10px;
   align-content: center;
-  min-height: 300px;
-  padding: 24px;
+  height: clamp(220px, 26vh, 270px);
+  min-height: 0;
+  padding: 22px 24px;
   border: 1px solid rgba(221, 235, 239, 0.17);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.16);
 }
 
 .start-hero-copy p {
-  font-size: 14.5px;
+  max-width: 62ch;
+  font-size: 14px;
 }
 
 .start-hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .start-hero-actions button {
-  min-height: 42px;
-  padding: 0 14px;
+  min-height: 38px;
+  padding: 0 13px;
 }
 
 .start-signal-map {
   position: relative;
-  min-height: 300px;
+  display: block;
+  height: clamp(225px, 27vh, 280px);
+  min-height: 0;
   overflow: hidden;
-  border: 1px solid rgba(98, 215, 240, 0.24);
+  border: 1px solid rgba(98, 215, 240, 0.22);
   border-radius: 8px;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(98, 215, 240, 0.12), transparent 46%),
-    #070b10;
-  background-size: 36px 36px, 36px 36px, auto, auto;
+  background: #070b10;
 }
 
-.start-signal-map::before,
-.start-signal-map::after {
+.start-pattern-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  background: #030506;
+}
+
+.start-pattern-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  filter: grayscale(0.22) contrast(1.12) brightness(0.8);
+}
+
+.start-pattern-frame::after {
   content: "";
   position: absolute;
-  left: -8%;
-  right: -8%;
-  height: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(98, 215, 240, 0.2);
-  transform: rotate(-17deg);
-  animation: signalSweep 7s ease-in-out infinite;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(7, 11, 15, 0.46), transparent 42%),
+    linear-gradient(0deg, rgba(7, 11, 15, 0.45), transparent 36%);
+  pointer-events: none;
 }
 
-.start-signal-map::before {
-  top: 38%;
+.start-pattern-frame figcaption {
+  position: absolute;
+  z-index: 3;
+  left: 10px;
+  bottom: 10px;
+  max-width: min(76%, 420px);
+  margin: 0;
+  padding: 6px 9px;
+  border: 1px solid rgba(221, 235, 239, 0.16);
+  border-radius: 8px;
+  background: rgba(6, 10, 14, 0.78);
+  color: #d8e6e9;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
-.start-signal-map::after {
-  top: 58%;
-  background: rgba(230, 181, 90, 0.22);
-  transform: rotate(14deg);
-  animation-delay: -2.3s;
-}
-
-.signal-stage {
+.pattern-band {
   position: absolute;
   z-index: 2;
-  display: grid;
-  gap: 2px;
-  min-width: 112px;
-  padding: 10px;
-  border: 1px solid rgba(221, 235, 239, 0.18);
-  border-radius: 8px;
-  background: rgba(8, 13, 18, 0.86);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
-  animation: floatPanel 6s ease-in-out infinite;
+  left: -12%;
+  right: -12%;
+  top: 42%;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(98, 215, 240, 0.28);
+  transform: rotate(-18deg);
+  mix-blend-mode: screen;
+  animation: patternBandPulse 5.5s ease-in-out infinite;
 }
 
-.signal-stage span {
+.band-amber {
+  top: 55%;
+  background: rgba(230, 181, 90, 0.28);
+  transform: rotate(17deg);
+  animation-delay: -1.8s;
+}
+
+.band-green {
+  top: 36%;
+  background: rgba(146, 212, 111, 0.22);
+  transform: rotate(5deg);
+  animation-delay: -3s;
+}
+
+.start-pattern-readout {
+  position: absolute;
+  z-index: 4;
+  right: 10px;
+  top: 10px;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  column-gap: 14px;
+  row-gap: 5px;
+  max-width: min(330px, 46%);
+  padding: 9px 10px;
+  border: 1px solid rgba(221, 235, 239, 0.14);
+  border-radius: 8px;
+  background: rgba(5, 8, 11, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.start-pattern-readout span {
+  margin-top: 0;
   color: var(--amber);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 850;
   text-transform: uppercase;
 }
 
-.signal-stage b {
+.start-pattern-readout span:first-child {
+  margin-top: 0;
+}
+
+.start-pattern-readout strong {
+  padding-bottom: 0;
+  border-bottom: 0;
   color: #f8ffff;
-  font-size: 15px;
-}
-
-.signal-stage-prep { left: 8%; top: 16%; }
-.signal-stage-pattern { right: 10%; top: 13%; animation-delay: -1.4s; }
-.signal-stage-index { left: 14%; bottom: 15%; animation-delay: -2.5s; }
-.signal-stage-map { right: 9%; bottom: 13%; animation-delay: -3.2s; }
-
-.signal-detector {
-  position: absolute;
-  z-index: 1;
-  inset: 26% 28%;
-  border: 1px solid rgba(98, 215, 240, 0.18);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.025);
-  transform: perspective(600px) rotateX(58deg) rotateZ(-12deg);
-}
-
-.signal-detector i {
-  position: absolute;
-  inset: 18% 9%;
-  border-top: 2px solid rgba(146, 212, 111, 0.6);
-  transform: rotate(24deg);
-}
-
-.signal-detector i:nth-child(2) {
-  border-color: rgba(174, 152, 232, 0.62);
-  transform: rotate(-18deg);
-}
-
-.signal-detector i:nth-child(3) {
-  border-color: rgba(230, 181, 90, 0.6);
-  transform: rotate(58deg);
+  font-size: 13px;
 }
 
 .resources-overview {
@@ -965,6 +1009,12 @@ body.resources-active .lesson {
   margin: 0;
   font-size: clamp(26px, 3vw, 42px);
   letter-spacing: 0;
+}
+
+.start-hero h2 {
+  max-width: 100%;
+  font-size: clamp(28px, 2vw, 36px);
+  line-height: 1.12;
 }
 
 .start-hero p,
@@ -1233,8 +1283,8 @@ body.resources-active .lesson {
 
 .start-path-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
   max-width: none;
 }
 
@@ -1249,10 +1299,10 @@ body.resources-active .lesson {
 .start-path-card {
   position: relative;
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-content: start;
-  min-height: 196px;
-  padding: 18px;
+  min-height: 148px;
+  padding: 13px;
   overflow: hidden;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
@@ -1278,7 +1328,7 @@ body.resources-active .lesson {
 
 .start-path-card small {
   width: fit-content;
-  padding: 3px 7px;
+  padding: 2px 6px;
   border: 1px solid rgba(230, 181, 90, 0.34);
   border-radius: 999px;
   color: #ffe7b1;
@@ -1289,7 +1339,7 @@ body.resources-active .lesson {
 .start-path-card span,
 .indexing-step-card span {
   color: var(--cyan);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 850;
   text-transform: uppercase;
 }
@@ -1299,38 +1349,34 @@ body.resources-active .lesson {
 .indexing-step-card small {
   margin: 0;
   color: var(--muted);
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: 13px;
+  line-height: 1.42;
 }
 
 .start-path-card button {
-  min-height: 40px;
+  min-height: 34px;
   margin-top: auto;
   align-self: end;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .start-integrity-note {
   display: grid;
-  gap: 8px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
   max-width: none;
   margin-top: 0;
-  padding: 14px;
+  padding: 9px 12px;
 }
 
-@keyframes signalSweep {
-  0%, 100% { opacity: 0.42; transform: translateY(-4px) rotate(-17deg); }
-  50% { opacity: 0.78; transform: translateY(5px) rotate(-17deg); }
+@keyframes patternBandPulse {
+  0%, 100% { opacity: 0.44; }
+  50% { opacity: 0.78; }
 }
 
-@keyframes floatPanel {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-body.reduce-motion .start-signal-map::before,
-body.reduce-motion .start-signal-map::after,
-body.reduce-motion .signal-stage {
+body.reduce-motion .pattern-band,
+body.reduce-motion .start-path-card {
   animation: none;
 }
 
@@ -4214,13 +4260,23 @@ dialog:focus-visible {
   }
 }
 
+@media (max-width: 1760px) {
+  .start-path-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .start-path-card {
+    min-height: 150px;
+  }
+}
+
 @media (max-width: 1540px) {
   .teaching-card-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .start-path-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .pipeline-strip {
@@ -4516,132 +4572,12 @@ dialog:focus-visible {
 
   .start-hero-copy,
   .start-signal-map {
+    height: auto;
     min-height: 240px;
   }
 
-  .start-path-card {
-    min-height: auto;
-  }
-
-  .scan-panel {
-    min-height: auto;
-    padding: 10px;
-    overflow: visible;
-  }
-
-  #scanMap {
-    height: auto;
-    aspect-ratio: 720 / 520;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-  }
-
-  .scan-status-strip {
-    position: static;
-    grid-template-columns: 1fr;
-    grid-column: 1 / -1;
-    margin: 0 0 8px;
-  }
-
-  .scan-status-strip span {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .scan-status-strip b {
-    display: inline;
-    max-width: 48%;
-  }
-
-  .scan-overlay {
-    position: static;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 10px;
-    padding-left: 0;
-    pointer-events: auto;
-  }
-
-  .ipf-key,
-  .scale-bar {
-    position: static;
-  }
-
-  .live-toggle-pill,
-  .pattern-toggle,
-  .scan-panel .panel-title,
-  .pattern-lab .panel-title {
-    grid-column: 1 / -1;
-  }
-
-  .ipf-key {
-    width: 104px;
-  }
-
-  .ipf-key i {
-    height: 48px;
-  }
-
-  .lesson {
+  .start-signal-map {
     display: block;
-  }
-
-  .legend {
-    margin-top: 10px;
-  }
-
-  .annotation,
-  .zoom-inset {
-    display: none;
-  }
-
-  .detector-toolbar {
-    position: static;
-    max-width: none;
-    padding: 48px 12px 0;
-    justify-content: flex-end;
-  }
-
-  .curriculum-sidebar {
-    min-height: auto;
-    order: -1;
-    padding-top: 50px;
-  }
-
-  .lesson-workspace {
-    min-height: auto;
-    order: -2;
-  }
-
-  .module-list {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    scroll-snap-type: x proximity;
-  }
-
-  .learning-progress-card {
-    min-width: 260px;
-  }
-
-  .module-card {
-    min-width: 230px;
-    scroll-snap-align: start;
-  }
-
-  .offline-download {
-    min-height: 34px;
-  }
-
-  .euler-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .euler-visuals {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(360px, 52vh) repeat(3, minmax(260px, auto));
   }
 }
 
