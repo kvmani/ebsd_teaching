@@ -1290,12 +1290,12 @@ body.resources-active .lesson {
 
 .start-path-card,
 .indexing-step-card,
+.start-home-guide,
 .start-integrity-note {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface-soft);
 }
-
 .start-path-card {
   position: relative;
   display: grid;
@@ -1360,6 +1360,34 @@ body.resources-active .lesson {
   font-size: 12px;
 }
 
+.start-home-guide {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+  padding: 10px;
+}
+
+.start-guide-heading,
+.start-home-guide > div:not(.start-guide-heading) {
+  display: grid;
+  gap: 5px;
+  align-content: start;
+  min-width: 0;
+}
+
+.start-guide-heading p,
+.start-home-guide span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.start-home-guide strong {
+  color: #eef6f7;
+  font-size: 12.5px;
+}
 .start-integrity-note {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -4271,6 +4299,16 @@ dialog:focus-visible {
 }
 
 @media (max-width: 1540px) {
+  .start-home-guide {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .start-guide-heading {
+    grid-column: 1 / -1;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+
   .teaching-card-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -4489,6 +4527,7 @@ dialog:focus-visible {
   .start-hero,
   .teaching-card-row,
   .start-path-grid,
+  .start-home-guide,
   .indexing-pipeline,
   .pipeline-strip {
     grid-template-columns: 1fr;

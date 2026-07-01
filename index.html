@@ -108,10 +108,17 @@
               <button type="button" data-start-target="revise">Revise with quizzes</button>
             </article>
           </div>
-          <div class="start-integrity-note">
-            <span class="fidelity-label">Scientific honesty</span>
-            <p>This is a conceptual learning studio. Some visuals are schematic, simplified, or not physically calibrated so the core EBSD ideas remain visible.</p>
-          </div>
+          <section class="start-home-guide" aria-label="Using EBSD Learning Studio">
+            <div class="start-guide-heading">
+              <span class="fidelity-label">Using the studio</span>
+              <p>Quick guide for self-study without a first-visit popup.</p>
+            </div>
+            <div><strong>Teaches</strong><span>Geometry, Kikuchi bands, indexing, acquisition trade-offs, pattern quality, preparation, and maps.</span></div>
+            <div><strong>Start</strong><span>Begin in Learning Path, then open linked simulator activities and checkpoints.</span></div>
+            <div><strong>Self-study</strong><span>Use notes, quizzes, glossary links, and weak-area review for revision.</span></div>
+            <div><strong>Offline</strong><span>No cloud assets are required; this is conceptual, not validated EBSD analysis software.</span></div>
+            <div><strong>Images</strong><span>Real Kikuchi examples are stored locally for teaching and comparison.</span></div>
+          </section>
         </section>
       </main>
 
@@ -922,7 +929,6 @@
               <p>Local images are stored in the project-relative <code>public/kikuchi-patterns</code> folder. Update <code>src/data/kikuchiPatterns.js</code> after adding more files.</p>
             </section>
           </div>
-          <label class="compact-check"><input id="dontShowHelpAgain" type="checkbox" /> Do not show this again automatically</label>
         </form>
       </dialog>
     </div>

@@ -1215,8 +1215,6 @@ qs('exportNotesButton').addEventListener('click', () => {
 });
 qs('topGlossarySearch').addEventListener('input', renderTopGlossary);
 
-const helpKey = 'ebsdTeachingStudio.helpDismissed.v1';
-let helpInteractionStarted = false;
 
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape') return;
@@ -1227,25 +1225,8 @@ document.addEventListener('keydown', (event) => {
 });
 
 qs('helpButton').addEventListener('click', () => {
-  helpInteractionStarted = true;
   if (!qs('helpOverlay').open) qs('helpOverlay').showModal();
 });
-qs('helpOverlay').addEventListener('close', () => {
-  helpInteractionStarted = true;
-});
-qs('helpOverlay').addEventListener('cancel', () => {
-  helpInteractionStarted = true;
-});
-qs('dontShowHelpAgain').addEventListener('change', (event) => {
-  localStorage.setItem(helpKey, event.target.checked ? 'true' : 'false');
-});
-if (localStorage.getItem(helpKey) !== 'true') {
-  window.setTimeout(() => {
-    if (helpInteractionStarted || localStorage.getItem(helpKey) === 'true') return;
-    if (document.querySelector('dialog[open]')) return;
-    qs('helpOverlay').showModal();
-  }, 900);
-}
 
 qs('nextStage').addEventListener('click', () => {
   state.stage = Math.min(6, state.stage + 1);
