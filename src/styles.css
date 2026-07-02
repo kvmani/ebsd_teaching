@@ -790,9 +790,10 @@ body.resources-active .lesson {
 
 .start-panel {
   display: grid;
-  gap: clamp(12px, 1.6vh, 20px);
+  grid-template-rows: auto auto minmax(150px, 1fr);
+  gap: clamp(14px, 1.6vh, 20px);
   height: 100%;
-  align-content: space-between;
+  align-content: stretch;
   background:
     linear-gradient(135deg, rgba(98, 215, 240, 0.08), transparent 34%),
     linear-gradient(165deg, transparent 42%, rgba(230, 181, 90, 0.075)),
@@ -818,9 +819,11 @@ body.resources-active .lesson {
 
 .start-hero {
   max-width: none;
+  display: grid;
   grid-template-columns: minmax(420px, 0.82fr) minmax(620px, 1.18fr);
   align-items: stretch;
-  gap: 12px;
+  gap: 14px;
+  height: clamp(230px, 28vh, 300px);
   margin-bottom: 0;
 }
 
@@ -828,7 +831,7 @@ body.resources-active .lesson {
   display: grid;
   gap: 10px;
   align-content: center;
-  height: clamp(220px, 26vh, 270px);
+  height: 100%;
   min-height: 0;
   padding: 22px 24px;
   border: 1px solid rgba(221, 235, 239, 0.17);
@@ -856,7 +859,7 @@ body.resources-active .lesson {
 .start-signal-map {
   position: relative;
   display: block;
-  height: clamp(225px, 27vh, 280px);
+  height: 100%;
   min-height: 0;
   overflow: hidden;
   border: 1px solid rgba(98, 215, 240, 0.22);
@@ -1301,8 +1304,8 @@ body.resources-active .lesson {
   display: grid;
   gap: 8px;
   align-content: start;
-  min-height: 148px;
-  padding: 13px;
+  min-height: 154px;
+  padding: 14px;
   overflow: hidden;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
@@ -1362,18 +1365,29 @@ body.resources-active .lesson {
 
 .start-home-guide {
   display: grid;
-  grid-template-columns: minmax(180px, 0.8fr) repeat(5, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: minmax(230px, 0.9fr) repeat(5, minmax(0, 1fr));
+  gap: 12px;
   align-items: stretch;
-  padding: 10px;
+  min-height: 0;
+  padding: 14px;
+  background:
+    linear-gradient(135deg, rgba(98, 215, 240, 0.055), transparent 42%),
+    var(--surface-soft);
 }
 
 .start-guide-heading,
 .start-home-guide > div:not(.start-guide-heading) {
   display: grid;
-  gap: 5px;
-  align-content: start;
+  gap: 6px;
+  align-content: center;
   min-width: 0;
+  padding: 8px 9px;
+  border-left: 1px solid rgba(221, 235, 239, 0.1);
+}
+
+.start-guide-heading {
+  border-left: 0;
+  align-content: center;
 }
 
 .start-guide-heading p,
@@ -1381,12 +1395,12 @@ body.resources-active .lesson {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
-  line-height: 1.35;
+  line-height: 1.42;
 }
 
 .start-home-guide strong {
   color: #eef6f7;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .start-integrity-note {
   display: grid;
