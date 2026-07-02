@@ -50,74 +50,78 @@
       </section>
 
       <main class="start-workspace view-pane active" id="startView" role="tabpanel" aria-labelledby="tabStart">
-        <section class="panel start-panel" aria-label="Start here">
-          <div class="start-hero">
+        <section class="panel start-panel start-gateway" aria-label="EBSD learning gateway">
+          <section class="start-hero-gateway" aria-label="Visual EBSD self-study">
             <div class="start-hero-copy">
-              <span class="fidelity-label">Student-first</span>
-              <h2>Choose your EBSD study path</h2>
-              <p>Pick the path that matches your task, then move into the simulator, lessons, notes, or review tools.</p>
+              <span class="fidelity-label gateway-pill">Visual EBSD self-study</span>
+              <h2>Learn EBSD by seeing the <span>pattern form</span></h2>
+              <p>A visual self-study workspace for EBSD geometry, Kikuchi bands, acquisition choices, indexing evidence, and map interpretation.</p>
               <div class="start-hero-actions" aria-label="Fast start actions">
-                <button type="button" data-start-target="learning-intro">Begin guided path</button>
+                <button type="button" data-start-target="learning-intro">Start guided path</button>
                 <button type="button" data-start-target="acquisition">Open live simulator</button>
               </div>
+              <p class="gateway-note"><strong>Note:</strong> Educational and conceptual. Not a calibrated EBSD solver, phase-identification tool, or research-grade analysis package.</p>
             </div>
-            <div class="start-signal-map" aria-label="EBSD pattern review preview">
-              <figure class="start-pattern-frame">
-                <img src="/kikuchi-patterns/ebsd-si-square.png" width="2555" height="2555" decoding="async" alt="Real EBSD Kikuchi pattern example with conceptual learning overlays" />
-                <span class="pattern-band band-cyan" aria-hidden="true"></span>
-                <span class="pattern-band band-amber" aria-hidden="true"></span>
-                <span class="pattern-band band-green" aria-hidden="true"></span>
-                <figcaption>Real Kikuchi pattern example with conceptual band and evidence overlays.</figcaption>
+
+            <aside class="detector-preview-card" aria-label="Detector pattern preview">
+              <div class="detector-preview-title">Detector pattern preview</div>
+              <figure class="detector-window">
+                <img src="/kikuchi-patterns/ebsd-si-square.png" width="2555" height="2555" decoding="async" alt="Real grayscale EBSD Kikuchi detector pattern" />
+                <span class="detector-badge badge-kikuchi">Kikuchi bands</span>
+                <span class="detector-badge badge-geometry">Geometry cue</span>
+                <span class="detector-badge badge-quality">Pattern quality</span>
+                <span class="detector-badge badge-indexing">Indexing evidence</span>
+                <span class="detector-center-marker" aria-hidden="true"></span>
               </figure>
-              <div class="start-pattern-readout" aria-label="Pattern evidence checklist">
-                <span>Pattern quality</span><strong>Sharp bands</strong>
-                <span>Indexing cue</span><strong>Geometry match</strong>
-                <span>Interpretation</span><strong>Review context</strong>
+              <div class="detector-step-chips" aria-label="Pattern learning sequence">
+                <span><b>01</b> Geometry</span>
+                <span><b>02</b> Pattern</span>
+                <span><b>03</b> Indexing</span>
+                <span><b>04</b> Review</span>
               </div>
+            </aside>
+          </section>
+
+          <section class="learning-routes" aria-label="Choose your learning route">
+            <div class="learning-routes-heading">
+              <h3>Choose your learning route</h3>
+              <p>Start from first principles, practise acquisition choices, inspect indexing evidence, and learn how to read EBSD maps critically.</p>
             </div>
-          </div>
-          <div class="start-path-grid" aria-label="Student onboarding paths">
-            <article class="start-path-card start-path-primary">
-              <small>01</small>
-              <span>New to EBSD</span>
-              <p>Start with geometry, tilt, cones, and detector bands.</p>
-              <button type="button" data-start-target="learning-intro">Start path</button>
-            </article>
-            <article class="start-path-card">
-              <small>02</small>
-              <span>Acquisition practice</span>
-              <p>Tune exposure, gain, binning, drift, and map quality.</p>
-              <button type="button" data-start-target="acquisition">Practice</button>
-            </article>
-            <article class="start-path-card">
-              <small>03</small>
-              <span>Indexing evidence</span>
-              <p>Connect bands, phase choice, calibration, and confidence-like cues.</p>
-              <button type="button" data-start-target="indexing">Indexing</button>
-            </article>
-            <article class="start-path-card">
-              <small>04</small>
-              <span>Interpret results</span>
-              <p>Review pattern quality, maps, artifacts, and troubleshooting.</p>
-              <button type="button" data-start-target="interpretation">Interpret</button>
-            </article>
-            <article class="start-path-card">
-              <small>05</small>
-              <span>Revise with quizzes</span>
-              <p>Use checkpoints, flashcards, notes, and glossary links.</p>
-              <button type="button" data-start-target="revise">Revise with quizzes</button>
-            </article>
-          </div>
-          <section class="start-home-guide" aria-label="Using EBSD Learning Studio">
-            <div class="start-guide-heading">
-              <span class="fidelity-label">Using the studio</span>
-              <p>Quick guide for self-study without a first-visit popup.</p>
+            <div class="route-card-grid">
+              <article class="route-card">
+                <div><span>New to EBSD</span><strong>01</strong></div>
+                <p>Begin with beam, tilted sample, detector, crystal planes, and band formation.</p>
+                <button type="button" data-start-target="learning-intro">Start basics -></button>
+              </article>
+              <article class="route-card">
+                <div><span>Acquisition practice</span><strong>02</strong></div>
+                <p>Tune gain, exposure, binning, drift, scan speed, and pattern quality.</p>
+                <button type="button" data-start-target="acquisition">Open controls -></button>
+              </article>
+              <article class="route-card">
+                <div><span>Indexing evidence</span><strong>03</strong></div>
+                <p>Connect visible bands, candidate solutions, calibration, and phase choice.</p>
+                <button type="button" data-start-target="indexing">Inspect evidence -></button>
+              </article>
+              <article class="route-card">
+                <div><span>Interpret maps</span><strong>04</strong></div>
+                <p>Compare IPF, quality, confidence-like, boundary, and troubleshooting views.</p>
+                <button type="button" data-start-target="interpretation">Read maps -></button>
+              </article>
+              <article class="route-card">
+                <div><span>Revise with quizzes</span><strong>05</strong></div>
+                <p>Use checkpoints, flashcards, glossary links, notes, and weak-area review.</p>
+                <button type="button" data-start-target="revise">Revise now -></button>
+              </article>
             </div>
-            <div><strong>Teaches</strong><span>Geometry, Kikuchi bands, indexing, acquisition trade-offs, pattern quality, preparation, and maps.</span></div>
-            <div><strong>Start</strong><span>Begin in Learning Path, then open linked simulator activities and checkpoints.</span></div>
-            <div><strong>Self-study</strong><span>Use notes, quizzes, glossary links, and weak-area review for revision.</span></div>
-            <div><strong>Offline</strong><span>No cloud assets are required; this is conceptual, not validated EBSD analysis software.</span></div>
-            <div><strong>Images</strong><span>Real Kikuchi examples are stored locally for teaching and comparison.</span></div>
+          </section>
+
+          <section class="workflow-strip" aria-label="EBSD learning workflow">
+            <div class="workflow-item"><b>G</b><span><strong>Geometry</strong> sample tilt + detector</span></div>
+            <div class="workflow-item"><b>P</b><span><strong>Detector pattern</strong> Kikuchi bands</span></div>
+            <div class="workflow-item"><b>A</b><span><strong>Acquisition</strong> quality choices</span></div>
+            <div class="workflow-item"><b>I</b><span><strong>Indexing</strong> candidate evidence</span></div>
+            <div class="workflow-item"><b>M</b><span><strong>Interpretation</strong> maps + limits</span></div>
           </section>
         </section>
       </main>
