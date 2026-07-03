@@ -710,10 +710,49 @@
       <main class="interpretation-workspace view-pane" id="interpretationView" role="tabpanel" aria-labelledby="tabInterpretation" aria-hidden="true">
         <section class="panel interpretation-panel" aria-label="Real EBSD interpretation and experimental understanding">
           <div class="interpretation-heading">
-            <span class="fidelity-label">Phase 3 conceptual training</span>
-            <h2>Real EBSD Interpretation & Experimental Understanding</h2>
-            <p>Bridge sample preparation, acquisition, pattern quality, confidence-like indexing evidence, maps, artefacts, and interpretation using curated conceptual examples.</p>
-            <p class="scientific-warning">This workspace is educational. It is not Oxford Aztec, EDAX OIM, Bruker ESPRIT, CHANNEL5, a crystallographic solver, or a calibrated EBSD analysis engine.</p>
+            <div class="interpretation-hero-copy">
+              <span class="fidelity-label">Phase 3 conceptual training</span>
+              <h2>Real EBSD Interpretation & Experimental Understanding</h2>
+              <p>Bridge sample preparation, acquisition, pattern quality, confidence-like indexing evidence, maps, artefacts, and interpretation using curated conceptual examples.</p>
+              <p class="scientific-warning">This workspace is educational. It is not Oxford Aztec, EDAX OIM, Bruker ESPRIT, CHANNEL5, a crystallographic solver, or a calibrated EBSD analysis engine.</p>
+            </div>
+            <aside class="interpretation-evidence-panel" aria-label="EBSD map review snapshot">
+              <div class="evidence-panel-title">
+                <span>EBSD map review snapshot</span>
+                <strong>Compare evidence layers before concluding</strong>
+              </div>
+              <div class="evidence-map-grid" aria-label="Conceptual EBSD interpretation evidence layers">
+                <article class="evidence-tile evidence-ipf">
+                  <div class="evidence-visual" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                  <strong>IPF view</strong>
+                  <p>orientation colour changes</p>
+                </article>
+                <article class="evidence-tile evidence-quality">
+                  <div class="evidence-visual" aria-hidden="true"></div>
+                  <strong>Pattern quality</strong>
+                  <p>signal, blur, damage</p>
+                </article>
+                <article class="evidence-tile evidence-indexing">
+                  <div class="evidence-visual" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <strong>Indexing evidence</strong>
+                  <p>confidence-like evidence</p>
+                </article>
+                <article class="evidence-tile evidence-boundary">
+                  <div class="evidence-visual" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <strong>Boundaries</strong>
+                  <p>misorientation checks</p>
+                </article>
+              </div>
+              <div class="evidence-checklist" aria-label="Conceptual interpretation checks">
+                <span>Surface condition</span>
+                <span>Pattern quality</span>
+                <span>Indexing evidence</span>
+                <span>Boundary consistency</span>
+                <span>Artefact check</span>
+              </div>
+              <p class="evidence-conclusion">Interpretation = map + pattern + acquisition context</p>
+              <p class="evidence-caution">Do not interpret one map alone. Compare conceptual evidence layers before drawing conclusions.</p>
+            </aside>
           </div>
           <div id="interpretationStudio"></div>
         </section>
