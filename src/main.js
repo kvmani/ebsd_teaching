@@ -1104,7 +1104,7 @@ function resourceMarkup(action) {
       title: 'Sample datasets and presets',
       body: `
         <section><h2>Local synthetic scan presets</h2><ul><li>Fast survey</li><li>Balanced</li><li>High quality slow scan</li><li>Noisy pattern</li><li>Saturated pattern</li><li>Drift-distorted map</li></ul></section>
-        <section><h2>Real Kikuchi image folder</h2><p><code>public/kikuchi-patterns</code></p><p>Add local assets there, then update <code>src/data/kikuchiPatterns.js</code>.</p></section>
+        <section><h2>Local EBSP example image folder</h2><p><code>public/kikuchi-patterns</code></p><p>Local EBSP images are visual examples only. They are not generated from the current simulated orientation, phase, or calibrated detector geometry.</p></section>
       `
     };
   }
@@ -1115,7 +1115,7 @@ function resourceMarkup(action) {
         <section><h2>Connected EBSD workflow</h2><ol>${learningPipeline.map(([title, text]) => `<li><b>${escapeHtml(title)}:</b> ${escapeHtml(text)}</li>`).join('')}</ol></section>
         <section><h2>Pattern-quality cases</h2><ul>${patternQualityCases.map((item) => `<li><b>${escapeHtml(item.title)}:</b> ${escapeHtml(item.indexingImpact)}</li>`).join('')}</ul></section>
         <section><h2>Troubleshooting prompts</h2><ul>${troubleshootingSymptoms.map((item) => `<li><b>${escapeHtml(item.label)}:</b> check acquisition, preparation, and geometry before trusting a map.</li>`).join('')}</ul></section>
-        <section><h2>Scientific honesty</h2><p>These prompts are conceptual learning aids. They are not calibrated EBSD quantification, phase identification, crystallographic refinement, or research-grade map analysis.</p></section>
+        <section><h2>Scientific honesty</h2><p>These prompts are conceptual learning aids. They are not calibrated EBSD quantification, phase identification, crystallographic refinement, grain-size measurement, phase-fraction analysis, KAM/GOS calculation, HR-EBSD strain analysis, or research-grade map analysis.</p></section>
       `
     };
   }

@@ -1,4 +1,4 @@
-﻿const commonReflectionPrompts = [
+const commonReflectionPrompts = [
   'Predict the visual change before moving a slider.',
   'Separate pattern quality from confidence-like indexing evidence.',
   'Name the simplification used in the simulator.'
@@ -108,7 +108,7 @@ export const learningModules = [
     difficulty: 'Intermediate',
     learningObjectives: ['Use Bragg law conceptually.', 'Relate wavelength to voltage.', 'Explain why cones become detector bands.'],
     topics: ['Bragg law', 'Electron wavelength', 'd-spacing', 'Diffraction cones', 'Band width'],
-    keyIdeas: ['Bragg law links wavelength, spacing, and angle.', 'Higher voltage gives shorter wavelength.', 'Real EBSD angles are small.', 'Cones are magnified for learning clarity.', 'Cone cuts explain band edges.'],
+    keyIdeas: ['Bragg law links wavelength, spacing, and angle.', 'Higher voltage gives shorter wavelength, but kV choice is still an experimental trade-off.', 'Real EBSD angles are small.', 'Cones are magnified for learning clarity.', 'Cone cuts explain band edges.'],
     explanation: 'Each lattice-plane family can be represented by a diffraction cone. The detector cuts the cone, and the cut appears as a Kikuchi band edge.',
     whyItMatters: 'This geometry explains why changing orientation moves bands and why detector calibration matters.',
     misconception: 'The large visual cones are not real physical angles; they are magnified for learning clarity.',
@@ -116,7 +116,7 @@ export const learningModules = [
     glossaryTerms: ['Bragg law', 'Bragg angle', 'interplanar spacing', 'hkl'],
     quizQuestions: [
       q('bragg-q1', 'multiple-choice', 'What does Bragg law describe?', ['Surface roughness contrast', 'Constructive diffraction from lattice planes', 'Chemical composition directly', 'Beam current calibration'], 1, 'Bragg law relates wavelength, plane spacing, and diffraction angle.'),
-      q('bragg-q2', 'true-false', 'Increasing accelerating voltage generally shortens electron wavelength.', ['True', 'False'], 0, 'Higher voltage gives faster electrons and shorter wavelength.')
+      q('bragg-q2', 'true-false', 'Increasing accelerating voltage generally shortens electron wavelength.', ['True', 'False'], 0, 'Higher voltage gives faster electrons and shorter wavelength, but the best kV still depends on material, detector, surface condition, and experiment goal.')
     ],
     miniExperiments: [{ label: 'Show cone formation', action: 'geometry-stage-4', text: 'Open cone stage and compare voltage/cone magnifier.' }],
     practiceTasks: ['Use the formula explorer to calculate theta for d = 0.120 nm at 20 kV.'],

@@ -195,9 +195,10 @@ export class RealIndexingLab {
     this.root.innerHTML = `
       <section class="real-indexing-lab indexing-lab-card">
         <div class="lab-card-heading">
-          <span class="fidelity-label">Real DA Ni data</span>
+          <span class="fidelity-label">Known-phase Ni worked example</span>
           <h3>Worked Ni EBSD Indexing Example</h3>
-          <p>Step through a real Ni pattern from raw EBSP to corrected image, Hough/Radon transform, peak selection, band projection, phase lookup, hkl assignment, and orientation matrix.</p>
+          <p>Step through a known-phase Ni pattern from raw EBSP to corrected image, Hough/Radon transform, peak selection, band projection, Ni phase lookup, hkl assignment, and orientation matrix.</p>
+          <p class="lab-note">This module demonstrates a known-phase Ni example. It is not an unconstrained phase-identification workflow.</p>
         </div>
 
         <div class="real-stage-topbar">
@@ -309,10 +310,11 @@ export class RealIndexingLab {
     return `
       <div class="stage-fact-grid">
         ${this.metric('Mean angular fit', `${this.formatNumber(solution.fit, 3)} deg`)}
-        ${this.metric('Solver confidence', this.formatNumber(solution.confidence, 3))}
+        ${this.metric('Solver-specific confidence metric', this.formatNumber(solution.confidence, 3))}
         ${this.metric('Matched bands', solution.nmatch ?? '-')}
         ${this.metric('(phi1, Phi, phi2)', this.formatEuler(solution.eulerDeg))}
       </div>
+      <p class="table-note">Confidence-like values are evidence cues, not proof of correctness. Their meaning depends on the indexing method and software.</p>
       <div class="scientific-readout">
         <strong>PC = (PCx, PCy, DD)</strong>
         <code>${this.formatPc(solution.solverPc || solution.pc || this.data.metadata.pc)}</code>

@@ -791,7 +791,7 @@ export class IndexingStudio {
     const pattern = patterns[this.reviewIndex % patterns.length];
     container.innerHTML = `
       <div class="real-pattern-frame">
-        <canvas id="realPatternReviewCanvas" width="640" height="420" aria-label="Real Kikuchi pattern review canvas"></canvas>
+        <canvas id="realPatternReviewCanvas" width="640" height="420" aria-label="Local EBSP example review canvas"></canvas>
       </div>
       <div class="real-pattern-controls">
         <label class="select-row"><span>Pattern</span><select id="realPatternSelect" aria-label="Select real Kikuchi pattern">

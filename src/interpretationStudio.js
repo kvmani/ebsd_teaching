@@ -333,7 +333,7 @@ export class InterpretationStudio {
           <div class="lab-card-heading">
             <span class="fidelity-label">Schematic map analysis</span>
             <h3>Map Interpretation Studio</h3>
-            <p>Compare IPF, phase, band contrast, boundary, and deformation views before deciding what the map means.</p>
+            <p>Compare IPF, phase-like, band contrast, boundary, and possible deformation views before deciding what the map may mean.</p>
           </div>
           <div class="map-studio-layout">
             <canvas id="mapStudioCanvas" width="760" height="470" aria-label="Conceptual EBSD map interpretation canvas"></canvas>
@@ -342,7 +342,7 @@ export class InterpretationStudio {
                 ${mapModes.map((mode) => `<option value="${mode.id}">${escapeHtml(mode.label)}</option>`).join('')}
               </select></label>
               <label class="slider-row"><span>Zoom <output id="mapZoomValue">1.0x</output></span><input id="mapZoom" type="range" min="1" max="1.8" step="0.1" value="1" aria-label="Conceptual map zoom"></label>
-              <p class="lab-note">Schematic maps only: no grain size, phase fraction, misorientation, or strain is computed.</p>
+              <p class="lab-note">These views are conceptual teaching overlays. They do not compute real grain size, phase fraction, KAM, GOS, HR-EBSD strain, or validated twin relationships.</p>
               <div class="map-activity-buttons">${mapActivities.map((activity) => `<button type="button" data-map-activity="${activity.id}">${escapeHtml(activity.label)}</button>`).join('')}</div>
               <section class="notice-panel">
                 <strong>What should I notice?</strong>
@@ -357,8 +357,8 @@ export class InterpretationStudio {
           <div class="lab-card-heading">
             <span class="fidelity-label">Simplified scoring</span>
             <h3>Confidence-like / MAD / Fit Intuition</h3>
-            <p>Compare candidate fits without treating the numbers as real confidence metrics.</p>
-            <p class="lab-note">Commercial EBSD systems define and report these metrics differently. This module teaches intuition only.</p>
+            <p>Compare candidate-strength cues without treating the numbers as proof of correctness.</p>
+            <p class="lab-note">Confidence-like values are evidence cues, not proof of correctness. Their meaning depends on the indexing method and software.</p>
           </div>
           <div class="confidence-layout">
             <canvas id="confidenceCanvas" width="520" height="320" aria-label="Conceptual confidence-like and fit comparison"></canvas>

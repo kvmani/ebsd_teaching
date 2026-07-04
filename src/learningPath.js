@@ -1261,7 +1261,7 @@ export class LearningPath {
         <span>Bragg angle theta</span>
         <b>${conceptualBandWidth.toFixed(2)}°</b>
         <span>conceptual band-width idea</span>
-        <p>Higher accelerating voltage gives shorter electron wavelength. Smaller d-spacing increases theta for the same voltage.</p>
+        <p>Higher accelerating voltage gives shorter electron wavelength, but kV choice is a trade-off. Lower kV may improve surface sensitivity or spatial locality in some conditions.</p>
       `;
     };
     [voltage, spacing, order].forEach((input) => input.addEventListener('input', update));

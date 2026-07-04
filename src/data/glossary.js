@@ -1,5 +1,5 @@
 export const glossaryTerms = [
-  { term: 'EBSD', category: 'overview', definition: 'Electron backscatter diffraction, a SEM method for mapping crystal orientation and, with suitable phase models and evidence, sometimes phase from Kikuchi patterns.', related: ['Kikuchi band', 'indexing', 'IPF map'], modules: ['intro', 'indexing'] },
+  { term: 'EBSD', category: 'overview', definition: 'Electron backscatter diffraction, a SEM method for mapping crystal orientation and, with suitable candidate phase models and supporting evidence, discriminating phases from Kikuchi patterns.', related: ['Kikuchi band', 'indexing', 'IPF map'], modules: ['intro', 'indexing'] },
   { term: 'SEM', category: 'instrument', definition: 'Scanning electron microscope. EBSD is performed inside an SEM using a tilted sample and a phosphor detector.', related: ['sample tilt', 'detector'], modules: ['geometry'] },
   { term: 'backscattered electron', category: 'scattering', definition: 'An electron scattered back out of the sample. In EBSD, useful diffraction information is dominated by electrons escaping from a shallow near-surface region.', related: ['interaction volume'], modules: ['interaction'] },
   { term: 'interaction volume', category: 'scattering', definition: 'The near-surface scattering region that contributes useful EBSD signal; its true size depends on material and microscope conditions.', related: ['backscattered electron', 'sample preparation'], modules: ['interaction'] },
@@ -16,7 +16,7 @@ export const glossaryTerms = [
   { term: 'interplanar spacing', category: 'crystal', definition: 'Distance between neighboring lattice planes in a crystal.', related: ['Miller indices', 'hkl'], modules: ['bragg'] },
   { term: 'Miller indices', category: 'crystal', definition: 'Integer labels used to describe crystal planes and directions.', related: ['hkl', 'zone axis'], modules: ['bragg', 'kikuchi'] },
   { term: 'hkl', category: 'crystal', definition: 'A compact notation for a family of lattice planes, such as (001) or (111).', related: ['Miller indices'], modules: ['bragg'] },
-  { term: 'indexing', category: 'indexing', definition: 'Matching detected Kikuchi bands to a crystal phase and orientation.', related: ['Hough transform', 'confidence index'], modules: ['indexing'] },
+  { term: 'indexing', category: 'indexing', definition: 'Matching detected Kikuchi bands against selected candidate phase models and orientations.', related: ['Hough transform', 'confidence index'], modules: ['indexing'] },
   { term: 'Hough transform', category: 'indexing', definition: 'A line-detection idea often used to locate Kikuchi bands for indexing.', related: ['indexing', 'Kikuchi band'], modules: ['indexing'] },
   { term: 'indexing confidence', category: 'indexing', definition: 'A confidence-like measure of how strongly detected bands support a candidate orientation or phase solution; definitions vary across EBSD systems.', related: ['confidence index', 'CI', 'MAD/fit'], modules: ['indexing', 'maps'] },
   { term: 'Euler angles', category: 'orientation', definition: 'Three angles commonly used to describe crystal orientation.', related: ['orientation matrix'], modules: ['indexing'] },
@@ -35,6 +35,7 @@ export const glossaryTerms = [
   { term: 'gain', category: 'acquisition', definition: 'Detector amplification. Too much gain causes clipping and can hide band contrast.', related: ['saturation'], modules: ['acquisition', 'troubleshooting'] },
   { term: 'frame averaging', category: 'acquisition', definition: 'Averaging repeated frames to reduce random noise, increasing acquisition time.', related: ['exposure time'], modules: ['acquisition'] },
   { term: 'drift', category: 'acquisition', definition: 'Motion of sample or raster during scanning, distorting EBSD maps.', related: ['scan speed'], modules: ['acquisition', 'troubleshooting'] },
+  { term: 'Phase discrimination vs phase identification', category: 'indexing', definition: 'EBSD usually compares patterns against selected candidate phases. Reliable phase discrimination requires appropriate crystallographic phase models and may need support from chemistry, such as EDS, especially when phases are structurally similar or pseudosymmetry is present.', related: ['phase selection', 'indexing'], modules: ['indexing', 'maps'] },
   { term: 'phase selection', category: 'indexing', definition: 'Choosing candidate crystal phases for indexing. Wrong phase selection can produce poor or misleading results.', related: ['indexing'], modules: ['troubleshooting'] },
   { term: 'unindexed pixel', category: 'mapping', definition: 'A scan point where the software did not accept an indexing solution.', related: ['confidence index'], modules: ['maps', 'troubleshooting'] }
 ];

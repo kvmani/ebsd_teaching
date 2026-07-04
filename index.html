@@ -66,7 +66,7 @@
             <aside class="detector-preview-card" aria-label="Detector pattern preview">
               <div class="detector-preview-title">Detector pattern preview</div>
               <figure class="detector-window">
-                <img src="/kikuchi-patterns/ebsd-si-square.png" width="2555" height="2555" decoding="async" alt="Real grayscale EBSD Kikuchi detector pattern" />
+                <img src="/kikuchi-patterns/ebsd-si-square.png" width="2555" height="2555" decoding="async" alt="Local EBSP example preview" />
                 <span class="detector-badge badge-kikuchi">Kikuchi bands</span>
                 <span class="detector-badge badge-geometry">Geometry cue</span>
                 <span class="detector-badge badge-quality">Pattern quality</span>
@@ -162,7 +162,7 @@
             </div>
           </div>
           <p class="pattern-caption" id="patternCaption"></p>
-          <p class="simulation-note"><span class="fidelity-label inline">Not physically calibrated</span> Pattern simulated for learning purposes only.</p>
+          <p class="simulation-note"><span class="fidelity-label inline">Not physically calibrated</span> Pattern simulated for learning purposes only. This is a simplified Bragg/Kossel-cone teaching construction; real EBSD patterns are observed as a gnomonic projection of Kikuchi-band intensity on the detector, not as a dynamical diffraction simulation.</p>
         </section>
 
         <aside class="panel controls" aria-label="Simulation controls">
@@ -191,7 +191,7 @@
 
           <details class="control-group" open>
             <summary>Geometry</summary>
-            <p class="control-note">Geometry controls change where diffracted directions meet the detector; they do not make the model physically validated.</p>
+            <p class="control-note">Geometry controls change where diffracted directions meet the detector; they do not make the model physically validated. Real EBSD requires calibrated detector geometry and pattern-center determination.</p>
             <label class="slider-row">
               <span>Sample tilt <output class="value" id="tiltValue">70&deg;</output></span>
               <input id="tilt" type="range" min="0" max="80" step="1" value="70" aria-label="Sample tilt in degrees" />
@@ -341,7 +341,7 @@
         <section class="panel pattern-lab" aria-label="Acquired EBSD pattern preview">
           <div class="panel-title">
             <strong>Pattern at Current Pixel</strong>
-            <span><b class="fidelity-label inline">Real pattern capable</b> Noise, clipping, and band sharpness change indexability</span>
+            <span><b class="fidelity-label inline">Illustrative EBSP examples</b> Noise, clipping, and band sharpness change indexability</span>
           </div>
           <button id="patternPauseButton" class="live-toggle-pill pattern-toggle" type="button" aria-pressed="false">Pause live scan</button>
           <canvas id="patternPreview" width="420" height="420"></canvas>
@@ -352,6 +352,7 @@
             <span>Acquisition state <b id="acquisitionState">stable scan</b></span>
           </div>
           <div class="pattern-source" id="patternSource">Pattern source: checking local image library</div>
+          <p class="control-note">Local EBSP images are used as visual examples. They are not generated from the current simulated orientation, phase, or calibrated detector geometry.</p>
           <div class="quality-bars" aria-label="Pattern quality factors">
             <label><span>Noise</span><b><i id="noiseBar"></i></b><output id="noiseValue">18%</output></label>
             <label><span>Saturation / clipping</span><b><i id="clippingBar"></i></b><output id="clippingValue">0%</output></label>
@@ -394,7 +395,7 @@
 
           <section class="control-group">
             <h3>Microscope Geometry</h3>
-            <p class="control-note">These controls are conceptual approximations for experimental reasoning, not calibrated SEM geometry calculations.</p>
+            <p class="control-note">Teaching simplification: geometry settings here influence conceptual pattern-quality cues and schematic projection only. Real EBSD requires calibrated detector geometry and pattern-center determination.</p>
             <label class="slider-row">
               <span>Accelerating voltage <output class="value" id="acqVoltageValue">20 kV</output></span>
               <input id="acqVoltage" type="range" min="5" max="30" step="1" value="20" aria-label="Acquisition accelerating voltage in kilovolts" />
@@ -480,12 +481,12 @@
 
           <section class="control-group">
             <h3>Indexing + Views</h3>
-            <p class="control-note advanced-control">Band detection and thresholds teach decision quality: stricter settings reject more doubtful pixels.</p>
+            <p class="control-note advanced-control">Band detection and thresholds teach decision quality: stricter settings reject more doubtful pixels. Dictionary-style teaching mode is conceptual; it does not perform real dictionary indexing or simulated-pattern matching.</p>
             <label class="select-row advanced-control">
               <span>Indexing mode</span>
               <select id="indexingMode">
                 <option value="hough">Hough bands</option>
-                <option value="dictionary">Dictionary match</option>
+                <option value="dictionary">Dictionary-style teaching mode</option>
                 <option value="manual">Manual review</option>
               </select>
             </label>
@@ -715,43 +716,39 @@
               <h2>Real EBSD Interpretation & Experimental Understanding</h2>
               <p>Bridge sample preparation, acquisition, pattern quality, confidence-like indexing evidence, maps, artefacts, and interpretation using curated conceptual examples.</p>
               <p class="scientific-warning">This workspace is educational. It is not Oxford Aztec, EDAX OIM, Bruker ESPRIT, CHANNEL5, a crystallographic solver, or a calibrated EBSD analysis engine.</p>
+              <div class="interpretation-flow-row" aria-label="Conceptual interpretation evidence flow">
+                <span>Surface</span><span>Pattern</span><span>Indexing</span><span>Map</span><span>Conclusion</span>
+              </div>
             </div>
-            <aside class="interpretation-evidence-panel" aria-label="EBSD map review snapshot">
+            <aside class="interpretation-evidence-panel" aria-label="Interpretation evidence review">
               <div class="evidence-panel-title">
-                <span>EBSD map review snapshot</span>
-                <strong>Compare evidence layers before concluding</strong>
+                <span>Interpretation evidence review</span>
+                <strong>Compare map layers, pattern quality, and indexing evidence before drawing conclusions.</strong>
               </div>
-              <div class="evidence-map-grid" aria-label="Conceptual EBSD interpretation evidence layers">
-                <article class="evidence-tile evidence-ipf">
-                  <div class="evidence-visual" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-                  <strong>IPF view</strong>
-                  <p>orientation colour changes</p>
+              <div class="evidence-preview-strip" aria-label="Connected EBSD evidence previews">
+                <article class="evidence-preview evidence-preview-ipf">
+                  <div class="preview-visual" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+                  <strong>IPF-like map</strong>
+                  <p>grain orientation regions</p>
                 </article>
-                <article class="evidence-tile evidence-quality">
-                  <div class="evidence-visual" aria-hidden="true"></div>
+                <article class="evidence-preview evidence-preview-pattern">
+                  <div class="preview-visual" aria-hidden="true"></div>
                   <strong>Pattern quality</strong>
-                  <p>signal, blur, damage</p>
+                  <p>Kikuchi band contrast</p>
                 </article>
-                <article class="evidence-tile evidence-indexing">
-                  <div class="evidence-visual" aria-hidden="true"><span></span><span></span><span></span></div>
-                  <strong>Indexing evidence</strong>
-                  <p>confidence-like evidence</p>
-                </article>
-                <article class="evidence-tile evidence-boundary">
-                  <div class="evidence-visual" aria-hidden="true"><span></span><span></span><span></span></div>
-                  <strong>Boundaries</strong>
-                  <p>misorientation checks</p>
+                <article class="evidence-preview evidence-preview-boundary">
+                  <div class="preview-visual" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <strong>Boundary clue</strong>
+                  <p>map consistency check</p>
                 </article>
               </div>
-              <div class="evidence-checklist" aria-label="Conceptual interpretation checks">
-                <span>Surface condition</span>
-                <span>Pattern quality</span>
-                <span>Indexing evidence</span>
-                <span>Boundary consistency</span>
-                <span>Artefact check</span>
+              <div class="evidence-review-grid" aria-label="Conceptual EBSD evidence checks">
+                <article><strong>Map layer</strong><span>compare IPF, phase, and band contrast views</span></article>
+                <article><strong>Pattern quality</strong><span>separate weak signal from real structure</span></article>
+                <article><strong>Indexing evidence</strong><span>candidate agreement, band fit, phase consistency</span></article>
+                <article><strong>Artefact check</strong><span>preparation, drift, charging, and overlap context</span></article>
               </div>
-              <p class="evidence-conclusion">Interpretation = map + pattern + acquisition context</p>
-              <p class="evidence-caution">Do not interpret one map alone. Compare conceptual evidence layers before drawing conclusions.</p>
+              <p class="evidence-conclusion">Conclusion should follow converging evidence, not one coloured map.</p>
             </aside>
           </div>
           <div id="interpretationStudio"></div>
@@ -964,12 +961,16 @@
               <p>Start with the path chooser, use guided simulator activities, answer checkpoints, and save notes for revision.</p>
             </section>
             <section>
+              <h2>What this app does and does not do</h2>
+              <p>This app teaches EBSD reasoning: geometry, pattern visibility, acquisition trade-offs, indexing evidence, and cautious map interpretation. Most browser modules are conceptual and heuristic. They do not perform calibrated EBSD indexing, dictionary indexing, phase identification, grain-size measurement, phase-fraction analysis, KAM/GOS calculation, or HR-EBSD strain analysis. Any worked real-data example should be interpreted only within its stated scope.</p>
+            </section>
+            <section>
               <h2>Offline and conceptual</h2>
               <p>No cloud services or remote assets are required. This is a conceptual learning simulator, not validated EBSD physics, phase-identification, map-analysis, or indexing software.</p>
             </section>
             <section>
-              <h2>Real Kikuchi images</h2>
-              <p>Local images are stored in the project-relative <code>public/kikuchi-patterns</code> folder. Update <code>src/data/kikuchiPatterns.js</code> after adding more files.</p>
+              <h2>Local EBSP example images</h2>
+              <p>Local EBSP/Kikuchi images are stored in the project-relative <code>public/kikuchi-patterns</code> folder as visual examples only. They are not generated from the current simulated orientation, phase, or calibrated detector geometry.</p>
             </section>
           </div>
         </form>

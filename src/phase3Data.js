@@ -1,9 +1,9 @@
 export const acquisitionParameterGuides = {
   acceleratingVoltage: {
     label: 'Accelerating voltage',
-    visual: 'Band spacing changes subtly and the interaction depth idea changes. Very low voltage can make patterns dimmer; high voltage may improve signal but can increase interaction volume.',
-    physical: 'Voltage changes electron wavelength and how deeply electrons interact with the sample. The app shows this conceptually, not as a calibrated beam-material model.',
-    tradeoff: 'Higher voltage can help signal in many materials, but surface sensitivity, resolution, sample damage, and microscope geometry still matter.'
+    visual: 'Accelerating voltage is a trade-off. Higher kV can improve signal in some conditions, while lower kV can reduce interaction volume and may improve surface sensitivity or spatial locality.',
+    physical: 'Voltage changes electron wavelength and beam-sample interaction conditions. The app shows this conceptually, not as a calibrated beam-material model.',
+    tradeoff: 'The best kV depends on material, detector, surface condition, and experiment goal; higher is not automatically better.'
   },
   beamCurrent: {
     label: 'Probe current',
@@ -62,7 +62,7 @@ export const patternQualityCases = [
     tag: 'Clear bands',
     kind: 'excellent',
     wentWrong: 'In this reference example, bands are sharp, background is controlled, and saturation is low.',
-    indexingImpact: 'Band detection has enough reliable geometry for a strong simplified match.',
+    indexingImpact: 'Band detection has enough reliable geometry for a strong fit-style cue.',
     corrections: 'Use this as a reference case. Keep acquisition stable and verify phase/calibration context.'
   },
   {
@@ -89,7 +89,7 @@ export const patternQualityCases = [
     tag: 'Too dark',
     kind: 'underexposed',
     wentWrong: 'Too few useful counts may be reaching the detector.',
-    indexingImpact: 'Bands are hard to detect and confidence-like scores drop.',
+    indexingImpact: 'Bands are hard to detect and confidence-like cues drop.',
     corrections: 'Increase exposure/current, consider binning or averaging, and confirm detector position.'
   },
   {
@@ -245,7 +245,7 @@ export const mapModes = [
   {
     id: 'deformation',
     label: 'Deformation',
-    notice: 'Orientation gradients are schematic clues, not measured strain or HR-EBSD.',
+    notice: 'Orientation gradients are schematic cues, not measured strain, KAM, GOS, or HR-EBSD.',
     prompt: 'Look for smooth color changes inside grains and noisy low-confidence-like bands.'
   }
 ];
@@ -264,17 +264,17 @@ export const mapActivities = [
   {
     id: 'deformation',
     label: 'Find deformation',
-    feedback: 'Deformation is suggested here by smooth orientation gradients and streaked quality loss, not by a real strain calculation.'
+    feedback: 'Possible deformation is suggested here by smooth orientation gradients and streaked quality loss; it is not a real strain calculation.'
   },
   {
     id: 'twins',
-    label: 'Spot possible twins',
+    label: 'Review possible twin cues',
     feedback: 'Possible twins are shown as straight, narrow internal features. Real twin identification requires crystallographic context.'
   },
   {
     id: 'bad-indexing',
     label: 'Flag bad indexing',
-    feedback: 'Bad indexing is likely where low band contrast, abrupt isolated colors, and low simplified confidence-like cues occur together.'
+    feedback: 'Bad indexing may be suspected where low band contrast, abrupt isolated colors, and low simplified confidence-like cues occur together.'
   }
 ];
 
@@ -394,7 +394,7 @@ export const learningPipeline = [
   ['Pattern Quality', 'Pattern evidence determines how many reliable bands can be used.'],
   ['Band Detection', 'Conceptual band guides turn image features into geometry.'],
   ['Indexing', 'Candidate orientations compete against the observed band geometry.'],
-  ['Confidence-like cues', 'Simplified scores indicate decision strength, not truth.'],
+  ['Confidence-like cues', 'Evidence cues suggest candidate strength; they are not proof of correctness.'],
   ['Maps', 'Pixels become orientation, phase, quality, and boundary views.'],
   ['Interpretation', 'Experienced users compare all evidence before drawing conclusions.'],
   ['Troubleshooting', 'Symptoms point back to preparation, acquisition, geometry, indexing, or interpretation checks.']
