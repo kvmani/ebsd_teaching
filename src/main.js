@@ -39,7 +39,8 @@ const learningPath = new LearningPath({
   lessonWorkspace: qs('lessonWorkspace'),
   miniGlossary: qs('miniGlossary'),
   formulaPanel: qs('formulaPanel'),
-  onExperiment: handleLearningExperiment
+  onExperiment: handleLearningExperiment,
+  onGlossaryTerm: (term) => openGlossaryModal(term)
 });
 
 let playAccum = 0;
@@ -841,6 +842,7 @@ qs('learningScenariosShortcut').addEventListener('click', () => {
 });
 qs('learningIndexingShortcut').addEventListener('click', () => setActiveView('indexing'));
 qs('learningInterpretationShortcut').addEventListener('click', () => setActiveView('interpretation'));
+qs('learningResourcesShortcut').addEventListener('click', () => setActiveView('resources'));
 qs('screenshotButton').addEventListener('click', exportCurrentScreenshot);
 qs('exportButton').addEventListener('click', () => {
   openResource(activeView === 'learning' ? 'worksheet-view' : 'self-study-view');

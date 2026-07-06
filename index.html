@@ -610,10 +610,39 @@
       <main class="indexing-workspace view-pane" id="indexingView" role="tabpanel" aria-labelledby="tabIndexing" aria-hidden="true">
         <section class="panel indexing-foundation" aria-label="How Kikuchi bands are indexed">
           <div class="indexing-heading">
-            <span class="fidelity-label">Conceptual explanation</span>
-            <h2>How Kikuchi Bands Are Indexed</h2>
-            <p>This module is a simplified indexing workflow, not a full commercial indexing engine. It shows why indexing depends on pattern quality, calibration, phase selection, band geometry, and confidence-like metrics.</p>
-            <p class="scientific-warning">This studio explains EBSD indexing logic using schematic overlays and simplified scoring. It is not a real Hough transform, crystallographic solver, or calibrated indexing engine.</p>
+            <div class="indexing-hero-copy">
+              <span class="fidelity-label">Conceptual explanation</span>
+              <h2>How Kikuchi Bands Are Indexed</h2>
+              <p>This module is a simplified indexing workflow, not a full commercial indexing engine. It shows why indexing depends on pattern quality, calibration, phase selection, band geometry, and confidence-like metrics.</p>
+              <p class="scientific-warning">This studio explains EBSD indexing logic using schematic overlays and simplified scoring. It is not a real Hough transform, crystallographic solver, or calibrated indexing engine.</p>
+              <div class="indexing-evidence-flow" aria-label="Conceptual indexing evidence flow">
+                <span>Pattern quality</span><span>Band detection</span><span>Candidate geometry</span><span>Fit-style cue</span><span>Review</span>
+              </div>
+            </div>
+            <aside class="indexing-workflow-card" aria-label="Conceptual indexing workflow snapshot">
+              <div class="indexing-card-title">
+                <span>Indexing workflow snapshot</span>
+                <strong>From visible bands to candidate orientation</strong>
+              </div>
+              <figure class="mini-ebsp-preview">
+                <img src="/kikuchi-patterns/ebsd-si-square.png" width="2555" height="2555" decoding="async" alt="Local EBSP example used as a visual indexing preview" />
+                <span class="mini-band band-a" aria-hidden="true"></span>
+                <span class="mini-band band-b" aria-hidden="true"></span>
+                <span class="mini-band band-c" aria-hidden="true"></span>
+                <figcaption><span>Observed bands</span><span>Pattern-quality cue</span></figcaption>
+              </figure>
+              <div class="indexing-flow-tiles" aria-label="Conceptual indexing steps">
+                <article><b>01</b><strong>Observed EBSP</strong><span>visible band evidence</span></article>
+                <article><b>02</b><strong>Band detection</strong><span>schematic line guides</span></article>
+                <article><b>03</b><strong>Candidate match</strong><span>phase-model comparison</span></article>
+              </div>
+              <div class="candidate-ranking" aria-label="Candidate orientation ranking">
+                <div><span>Candidate A - strongest agreement</span><b style="--rank: 92%"></b></div>
+                <div><span>Candidate B - partial agreement</span><b style="--rank: 58%"></b></div>
+                <div><span>Candidate C - weak evidence</span><b style="--rank: 28%"></b></div>
+              </div>
+              <p class="indexing-scope-note">Conceptual only: real EBSD indexing requires calibrated detector geometry, a phase model, and software-specific metrics.</p>
+            </aside>
           </div>
           <div class="indexing-mode-tabs" role="tablist" aria-label="Indexing module views">
             <button id="indexingConceptTab" class="active" type="button" role="tab" aria-controls="indexingConceptPanel" aria-selected="true">Schematic indexing</button>
@@ -756,32 +785,24 @@
       </main>
 
       <main class="learning-workspace view-pane" id="learningView" role="tabpanel" aria-labelledby="tabLearning" aria-hidden="true">
-        <aside class="panel curriculum-sidebar" aria-label="Learning path modules">
-          <div class="panel-heading">
-            <span>Study path</span>
-            <strong>EBSD from first principles to practice</strong>
-          </div>
-          <p class="sidebar-note">Choose a module. Diagrams, quizzes, formulas, reflection prompts, notes, and progress are stored locally.</p>
-          <div id="moduleList" class="module-list"></div>
-          <button id="downloadModules" class="offline-download" type="button">Download all modules for offline use</button>
-        </aside>
+        <section class="learning-path-shell" aria-label="Guided EBSD Learning Path">
+          <div id="moduleList" class="module-list course-map-root"></div>
 
-        <section class="panel lesson-workspace" aria-label="Selected lesson">
-          <div id="lessonWorkspace"></div>
-        </section>
+          <section class="panel lesson-workspace selected-module-shell" aria-label="Selected lesson">
+            <div id="lessonWorkspace"></div>
+          </section>
 
-        <aside class="panel learning-sidebar" aria-label="Glossary and study tools">
-          <section class="side-card">
-            <h2>Mini glossary</h2>
-            <div id="miniGlossary"></div>
-          </section>
-          <section class="side-card formula-panel">
-            <h2>Formula & reference</h2>
-            <div id="formulaPanel"></div>
-          </section>
-          <section class="side-card">
-            <h2>Study tools</h2>
-            <div class="tool-grid">
+          <section class="learning-support-strip" aria-label="Learning support resources">
+            <div>
+              <span class="fidelity-label inline">Need reference material?</span>
+              <strong>Glossary & Resources has formulas, worksheets, practice questions, sample datasets, and interpretation guides.</strong>
+              <p>Keep the course page focused, then open a resource only when you need it.</p>
+            </div>
+            <div class="learning-support-actions">
+              <button id="learningResourcesShortcut" type="button">Open Glossary & Resources</button>
+              <button data-resource="formula-view" type="button">Formula reference</button>
+              <button data-resource="practice-view" type="button">Practice questions</button>
+              <button id="downloadModules" type="button">Export all modules</button>
               <button id="learningNotesShortcut" type="button">Notes</button>
               <button id="learningBookmarksShortcut" type="button">Bookmarks</button>
               <button id="learningScenariosShortcut" type="button">Saved scenarios</button>
@@ -789,19 +810,13 @@
               <button id="learningInterpretationShortcut" type="button">Interpretation</button>
             </div>
           </section>
-        </aside>
 
-        <section class="offline-resources" aria-label="Offline resources">
-          <article><span>Worksheet</span><p>Printable self-study prompts stored locally.</p><button data-resource="worksheet-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="worksheet-view" type="button" title="Download worksheet HTML">Export</button></article>
-          <article><span>Lesson cards</span><p>Compact EBSD concept cards for revision.</p><button data-resource="lesson-cards-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="lesson-cards-view" type="button" title="Download lesson cards HTML">Export</button></article>
-          <article><span>Formula cheat sheet</span><p>Bragg law and wavelength reference.</p><button data-resource="formula-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="formula-view" type="button" title="Download formula sheet HTML">Export</button></article>
-          <article><span>Practice questions</span><p>Local checkpoint questions from the modules.</p><button data-resource="practice-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="practice-view" type="button" title="Download practice questions HTML">Export</button></article>
-          <article><span>Sample datasets</span><p>Local synthetic acquisition presets.</p><button data-resource="datasets-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="datasets-view" type="button" title="Download preset reference HTML">Export</button></article>
-          <article><span>Interpretation guide</span><p>Phase 3 diagnostic workflow prompts.</p><button data-resource="interpretation-guide-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="interpretation-guide-view" type="button" title="Download interpretation guide HTML">Export</button></article>
-          <article><span>Self-study guide</span><p>Suggested practice order and reflection prompts.</p><button data-resource="self-study-view" type="button">View</button><button data-resource="print" type="button">Print</button><button data-resource-export="self-study-view" type="button" title="Download self-study guide HTML">Export</button></article>
+          <div class="learning-compat-hidden" aria-hidden="true">
+            <div id="miniGlossary"></div>
+            <div id="formulaPanel"></div>
+          </div>
         </section>
       </main>
-
       <main class="euler-workspace view-pane" id="eulerView" role="tabpanel" aria-labelledby="tabEuler" aria-hidden="true">
         <div id="eulerOrientationStudio" class="euler-studio"></div>
       </main>
@@ -826,7 +841,17 @@
               <p>Printable self-study prompts for guided EBSD practice.</p>
               <div class="resource-card-actions">
                 <button data-resource="worksheet-view" type="button">View</button>
+                <button data-resource="print" type="button">Print</button>
                 <button data-resource-export="worksheet-view" type="button">Export</button>
+              </div>
+            </article>
+            <article class="resource-card">
+              <span>Lesson cards</span>
+              <p>Compact EBSD concept cards for revision.</p>
+              <div class="resource-card-actions">
+                <button data-resource="lesson-cards-view" type="button">View</button>
+                <button data-resource="print" type="button">Print</button>
+                <button data-resource-export="lesson-cards-view" type="button">Export</button>
               </div>
             </article>
             <article class="resource-card">
@@ -834,6 +859,7 @@
               <p>Local checkpoint questions gathered from the learning modules.</p>
               <div class="resource-card-actions">
                 <button data-resource="practice-view" type="button">View</button>
+                <button data-resource="print" type="button">Print</button>
                 <button data-resource-export="practice-view" type="button">Export</button>
               </div>
             </article>
@@ -842,6 +868,7 @@
               <p>Bragg law, electron wavelength, constants, and notes.</p>
               <div class="resource-card-actions">
                 <button data-resource="formula-view" type="button">View</button>
+                <button data-resource="print" type="button">Print</button>
                 <button data-resource-export="formula-view" type="button">Export</button>
               </div>
             </article>
@@ -850,6 +877,7 @@
               <p>Local synthetic acquisition presets for comparison exercises.</p>
               <div class="resource-card-actions">
                 <button data-resource="datasets-view" type="button">View</button>
+                <button data-resource="print" type="button">Print</button>
                 <button data-resource-export="datasets-view" type="button">Export</button>
               </div>
             </article>
@@ -858,6 +886,7 @@
               <p>Diagnostic workflow prompts for map and pattern review.</p>
               <div class="resource-card-actions">
                 <button data-resource="interpretation-guide-view" type="button">View</button>
+                <button data-resource="print" type="button">Print</button>
                 <button data-resource-export="interpretation-guide-view" type="button">Export</button>
               </div>
             </article>
@@ -866,6 +895,7 @@
               <p>Suggested practice order with reflection prompts for revision.</p>
               <div class="resource-card-actions">
                 <button data-resource="self-study-view" type="button">View</button>
+                <button data-resource="print" type="button">Print</button>
                 <button data-resource-export="self-study-view" type="button">Export</button>
               </div>
             </article>

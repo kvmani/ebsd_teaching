@@ -381,13 +381,36 @@ const diagnosticCases = {
   }
 };
 
+const courseStages = [
+  {
+    title: 'Foundation',
+    description: 'Set up the EBSD geometry and signal origin.',
+    ids: ['intro', 'geometry', 'interaction']
+  },
+  {
+    title: 'Diffraction and Bands',
+    description: 'Connect Bragg diffraction to Kikuchi band formation.',
+    ids: ['bragg', 'kikuchi', 'detector']
+  },
+  {
+    title: 'Indexing Workflow',
+    description: 'Move from patterns to indexed orientations and maps.',
+    ids: ['indexing', 'acquisition', 'maps']
+  },
+  {
+    title: 'Interpretation',
+    description: 'Assess quality, preparation effects, and troubleshooting.',
+    ids: ['pattern-quality', 'sample-prep', 'interpretation-studio', 'troubleshooting']
+  }
+];
 export class LearningPath {
-  constructor({ moduleList, lessonWorkspace, miniGlossary, formulaPanel, onExperiment = () => {} }) {
+  constructor({ moduleList, lessonWorkspace, miniGlossary, formulaPanel, onExperiment = () => {}, onGlossaryTerm = () => {} }) {
     this.moduleList = moduleList;
     this.lessonWorkspace = lessonWorkspace;
     this.miniGlossary = miniGlossary;
     this.formulaPanel = formulaPanel;
     this.onExperiment = onExperiment;
+    this.onGlossaryTerm = onGlossaryTerm;
     this.progress = loadLearningProgress();
     if (!['learn', 'practice', 'revise'].includes(this.progress.selectedMode)) this.progress.selectedMode = 'learn';
     this.selectedQuestionIndex = 0;
@@ -491,35 +514,44 @@ export class LearningPath {
 
   renderModuleList() {
     const percent = completionPercent(this.progress, learningModules);
+    const completed = this.progress.completedModules.length;
+    const selected = this.selectedModule();
     this.moduleList.innerHTML = `
-      <div class="learning-progress-card">
-        <div><strong>${percent}% complete</strong><span>${this.progress.completedModules.length} of ${learningModules.length} modules</span></div>
-        <div class="progress-track"><b style="width:${percent}%"></b></div>
-        <div class="learning-progress-actions">
-          <button type="button" data-learning-action="continue">Continue course</button>
-          <button type="button" data-learning-action="reset">Reset progress</button>
+      <section class="learning-hero" aria-label="Course introduction">
+        <div class="learning-hero__content">
+          <span class="fidelity-label">Guided course</span>
+          <h2>Guided EBSD Learning Path</h2>
+          <p>A step-by-step route from pattern formation to indexing and interpretation.</p>
+          <strong>${escapeHtml(this.nextRecommendedAction(selected))}</strong>
         </div>
-      </div>
-      ${learningModules.map((module, index) => {
-        const status = this.moduleStatus(module);
-        const selected = module.id === this.progress.selectedModuleId;
-        const score = this.progress.quizScores[module.id];
-        return `
-          <button class="module-card ${selected ? 'active' : ''} ${status.replace(' ', '-')}" type="button" data-module="${module.id}">
-            <span>${String(index + 1).padStart(2, '0')}</span>
-            <strong>${escapeHtml(module.shortTitle || module.title)}</strong>
-            <small>${escapeHtml(module.estimatedTime)} - ${escapeHtml(status)}${score ? ` - quiz ${score.correct}/${score.total}` : ''}</small>
-          </button>
-        `;
-      }).join('')}
+        <div class="learning-hero__stats" aria-label="Course progress summary">
+          <div><b>${percent}%</b><span>Progress</span></div>
+          <div><b>${completed}/${learningModules.length}</b><span>Completed</span></div>
+          <div><b>${this.quizAverage()}%</b><span>Quiz average</span></div>
+          <div><b>${this.notesCount()}</b><span>Notes</span></div>
+        </div>
+        <div class="learning-hero__actions">
+          <button type="button" data-learning-action="continue">Continue course</button>
+          <button class="secondary" type="button" data-learning-action="reset">Reset progress</button>
+        </div>
+      </section>
+      <section class="course-stage-section" aria-label="Course stages">
+        <div class="course-stage-heading">
+          <span class="fidelity-label inline">Course stages</span>
+          <strong>Choose where you are now, then study one module at a time.</strong>
+        </div>
+        <div class="course-stage-grid">
+          ${courseStages.map((stage, stageIndex) => this.renderCourseStage(stage, stageIndex)).join('')}
+        </div>
+      </section>
     `;
 
     this.moduleList.querySelectorAll('[data-module]').forEach((button) => {
       button.addEventListener('click', () => this.selectModule(button.dataset.module));
     });
 
-    this.moduleList.querySelector('[data-learning-action="continue"]').addEventListener('click', () => this.continueCourse());
-    this.moduleList.querySelector('[data-learning-action="reset"]').addEventListener('click', () => {
+    this.moduleList.querySelector('[data-learning-action="continue"]')?.addEventListener('click', () => this.continueCourse());
+    this.moduleList.querySelector('[data-learning-action="reset"]')?.addEventListener('click', () => {
       this.progress = resetLearningProgress();
       this.selectedQuestionIndex = 0;
       this.flashcardFlipped = false;
@@ -527,6 +559,39 @@ export class LearningPath {
     });
   }
 
+  renderCourseStage(stage, stageIndex) {
+    const modules = stage.ids.map((id) => learningModules.find((module) => module.id === id)).filter(Boolean);
+    const done = modules.filter((module) => this.progress.completedModules.includes(module.id)).length;
+    return `
+      <article class="course-stage-card">
+        <div class="course-stage-card__header">
+          <span>${String(stageIndex + 1).padStart(2, '0')}</span>
+          <div>
+            <strong>${escapeHtml(stage.title)}</strong>
+            <p>${escapeHtml(stage.description)}</p>
+          </div>
+          <small>${done}/${modules.length}</small>
+        </div>
+        <div class="stage-module-list">
+          ${modules.map((module) => this.renderStageModuleCard(module)).join('')}
+        </div>
+      </article>
+    `;
+  }
+
+  renderStageModuleCard(module) {
+    const index = this.moduleIndex(module);
+    const status = this.moduleStatus(module);
+    const score = this.progress.quizScores[module.id];
+    const selected = module.id === this.progress.selectedModuleId;
+    return `
+      <button class="stage-module-card ${selected ? 'is-active' : ''} ${status === 'complete' ? 'is-complete' : ''} ${status === 'in progress' ? 'is-progress' : ''}" type="button" data-module="${escapeHtml(module.id)}" aria-pressed="${selected ? 'true' : 'false'}">
+        <span>${String(index + 1).padStart(2, '0')}</span>
+        <strong>${escapeHtml(module.shortTitle || module.title)}</strong>
+        <small>${escapeHtml(status)} - ${escapeHtml(module.estimatedTime)}${score ? ` - quiz ${score.correct}/${score.total}` : ''}</small>
+      </button>
+    `;
+  }
   renderCourseDashboard(module) {
     const percent = completionPercent(this.progress, learningModules);
     const index = this.moduleIndex(module);
@@ -557,46 +622,113 @@ export class LearningPath {
     const module = this.selectedModule();
     const bookmarked = this.progress.bookmarks.includes(module.id);
     const note = this.progress.notes[module.id] || '';
+    const index = this.moduleIndex(module);
+    const status = this.moduleStatus(module);
+    const openTry = this.progress.selectedMode === 'practice';
+    const openCheck = this.progress.selectedMode === 'practice' || this.progress.selectedMode === 'revise';
+    const openReflect = this.progress.selectedMode === 'revise';
     this.lessonWorkspace.innerHTML = `
-      ${this.renderCourseDashboard(module)}
-      <div class="lesson-hero">
-        <div>
-          <span>${escapeHtml(module.category)} - ${escapeHtml(module.difficulty)} - ${escapeHtml(module.estimatedTime)}</span>
-          <h2>${escapeHtml(module.title)}</h2>
-          <p>${escapeHtml(module.explanation)}</p>
+      <section class="selected-module-panel" aria-label="Selected Learning Path module">
+        <header class="selected-module-header">
+          <div>
+            <span class="fidelity-label inline">Now studying</span>
+            <h2>${escapeHtml(module.title)}</h2>
+            <p>${escapeHtml(module.category)} - ${escapeHtml(module.difficulty)} - ${escapeHtml(module.estimatedTime)} - ${escapeHtml(status)}</p>
+          </div>
+          <div class="learning-mode-selector compact" role="group" aria-label="Learning mode">
+            ${['learn', 'practice', 'revise'].map((mode) => `
+              <button type="button" class="${this.progress.selectedMode === mode ? 'active' : ''}" data-learning-mode="${mode}">${mode[0].toUpperCase() + mode.slice(1)}</button>
+            `).join('')}
+          </div>
+        </header>
+
+        <p class="selected-module-next">${escapeHtml(this.nextRecommendedAction(module))}</p>
+        ${this.progress.weakReviewOpen ? this.renderWeakAreas() : ''}
+
+        <div class="learning-step-stack">
+          <details class="learning-step-card is-open" open>
+            <summary><span>Step 1</span><strong>Understand</strong><small>objectives, ideas, meaning</small></summary>
+            <div class="learning-step-content understand-grid">
+              <article class="lesson-card concept">
+                <span>Learning objectives</span>
+                <ul>${listItems(module.learningObjectives)}</ul>
+              </article>
+              <article class="lesson-card concept">
+                <span>Key ideas</span>
+                <ul>${listItems(module.keyIdeas)}</ul>
+              </article>
+              <article class="lesson-card">
+                <span>Why this matters in real EBSD</span>
+                <p>${escapeHtml(module.whyItMatters)}</p>
+              </article>
+              <article class="lesson-card misconception">
+                <span>Misconception reminder</span>
+                <p>${escapeHtml(module.misconception)}</p>
+              </article>
+              ${this.renderModuleFormulaBlock(module)}
+              <details class="learning-extra-concepts">
+                <summary>Advanced EBSD concept links</summary>
+                ${this.renderAdvancedConceptCards()}
+              </details>
+            </div>
+          </details>
+
+          <details class="learning-step-card" ${openTry ? 'open' : ''}>
+            <summary><span>Step 2</span><strong>Try</strong><small>guided simulator activity</small></summary>
+            <div class="learning-step-content single-column">
+              <section class="mode-panel practice">
+                <strong>Practice route</strong>
+                <p>Predict, run the linked simulator, observe one change, then explain what happened.</p>
+              </section>
+              ${this.renderActivityCards(module)}
+              <article class="lesson-card">
+                <span>Practice tasks</span>
+                <ul>${listItems(module.practiceTasks)}</ul>
+              </article>
+              ${this.renderSpecialModuleContent(module)}
+            </div>
+          </details>
+
+          <details class="learning-step-card" ${openCheck ? 'open' : ''}>
+            <summary><span>Step 3</span><strong>Check</strong><small>checkpoint quiz</small></summary>
+            <div class="learning-step-content single-column">
+              ${this.renderQuiz(module)}
+            </div>
+          </details>
+
+          <details class="learning-step-card" ${openReflect ? 'open' : ''}>
+            <summary><span>Step 4</span><strong>Reflect</strong><small>notes, revision, completion</small></summary>
+            <div class="learning-step-content reflect-grid">
+              <article class="lesson-card notes-card">
+                <span>Student notes</span>
+                <textarea id="moduleNotes" rows="5" placeholder="Write local notes for this module...">${escapeHtml(note)}</textarea>
+                <div class="note-actions">
+                  <button id="saveModuleNote" type="button">Save note</button>
+                  <button id="clearModuleNote" type="button">Clear note</button>
+                </div>
+              </article>
+              <article class="lesson-card topics-card">
+                <span>Glossary links</span>
+                <p>${module.glossaryTerms.map((term) => `<button class="inline-term" type="button" data-glossary-term="${escapeHtml(term)}">${escapeHtml(term)}</button>`).join('')}</p>
+              </article>
+              ${this.renderFlashcards(module)}
+              ${this.renderMistakeReview(module)}
+            </div>
+          </details>
         </div>
-        <div class="lesson-actions">
+
+        <footer class="selected-module-actions">
+          <button type="button" data-course-action="previous" ${index === 0 ? 'disabled' : ''}>Previous module</button>
+          <button type="button" data-course-action="next" ${index === learningModules.length - 1 ? 'disabled' : ''}>Next module</button>
           <button id="markModuleComplete" type="button">${this.progress.completedModules.includes(module.id) ? 'Completed' : 'Mark complete'}</button>
           <button id="bookmarkModule" type="button">${bookmarked ? 'Bookmarked' : 'Bookmark'}</button>
-        </div>
-      </div>
-      <div class="learning-mode-selector" role="group" aria-label="Learning mode">
-        ${['learn', 'practice', 'revise'].map((mode) => `
-          <button type="button" class="${this.progress.selectedMode === mode ? 'active' : ''}" data-learning-mode="${mode}">${mode[0].toUpperCase() + mode.slice(1)}</button>
-        `).join('')}
-      </div>
-      ${this.progress.weakReviewOpen ? this.renderWeakAreas() : ''}
-      ${this.renderModeContent(module)}
-      ${this.progress.selectedMode === 'learn' ? '' : this.renderSpecialModuleContent(module)}
-      <div class="lesson-grid utility-grid">
-        <article class="lesson-card notes-card">
-          <span>Student notes</span>
-          <textarea id="moduleNotes" rows="5" placeholder="Write local notes for this module...">${escapeHtml(note)}</textarea>
-          <div class="note-actions">
-            <button id="saveModuleNote" type="button">Save note</button>
-            <button id="clearModuleNote" type="button">Clear note</button>
-          </div>
-        </article>
-        <article class="lesson-card topics-card">
-          <span>Glossary links</span>
-          <p>${module.glossaryTerms.map((term) => `<button class="inline-term" type="button" data-glossary-term="${escapeHtml(term)}">${escapeHtml(term)}</button>`).join('')}</p>
-        </article>
-      </div>
+          <button type="button" data-course-action="weak">Review weak areas</button>
+        </footer>
+      </section>
     `;
 
     this.bindLessonEvents(module);
   }
-
   renderModeContent(module) {
     if (this.progress.selectedMode === 'practice') {
       return `
@@ -1050,6 +1182,7 @@ export class LearningPath {
       button.addEventListener('click', () => {
         this.glossaryQuery = button.dataset.glossaryTerm;
         this.renderGlossary();
+        this.onGlossaryTerm(button.dataset.glossaryTerm);
       });
     });
 
