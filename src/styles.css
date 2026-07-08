@@ -1634,7 +1634,7 @@ body.reduce-motion .start-path-card {
 .troubleshooting-result p,
 .troubleshooting-result li {
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 15px;
   line-height: 1.55;
 }
 
@@ -2394,7 +2394,7 @@ body.reduce-motion .start-path-card {
 .matching-candidates span,
 .weak-review-grid span {
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 15px;
   line-height: 1.55;
 }
 
@@ -2450,7 +2450,7 @@ body.reduce-motion .start-path-card {
 .indexing-explain-grid p {
   margin: 6px 0 0;
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 15px;
   line-height: 1.55;
 }
 
@@ -6434,7 +6434,7 @@ body.reduce-motion .start-hero-gateway {
 
 .interpretation-hero-copy > p:not(.scientific-warning) {
   max-width: 62ch;
-  font-size: 13.5px;
+  font-size: 15px;
   line-height: 1.38;
 }
 
@@ -7449,6 +7449,17 @@ body:has(#indexingView.active) .explain:focus-within {
   gap: 10px;
 }
 
+.understand-grid .lesson-card ul,
+.understand-grid .lesson-card ol,
+.understand-grid .lesson-card p {
+  font-size: 15px;
+  line-height: 1.58;
+}
+
+.understand-grid .lesson-card li + li {
+  margin-top: 2px;
+}
+
 .single-column {
   display: grid;
   gap: 10px;
@@ -7456,20 +7467,48 @@ body:has(#indexingView.active) .explain:focus-within {
 
 .learning-extra-concepts {
   grid-column: 1 / -1;
-  padding: 10px;
+  padding: 0;
   border: 1px solid rgba(174, 152, 232, 0.22);
   border-radius: 10px;
   background: rgba(174, 152, 232, 0.035);
+  overflow: hidden;
 }
 
 .learning-extra-concepts summary {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 14px;
   cursor: pointer;
   color: #dcd3ff;
   font-weight: 850;
 }
 
 .learning-extra-concepts .advanced-concepts {
-  margin-top: 10px;
+  margin: 0;
+  padding: 12px 14px 14px;
+  border: 0;
+  border-top: 1px solid rgba(174, 152, 232, 0.2);
+  border-radius: 0;
+  background: transparent;
+}
+
+.learning-extra-concepts .advanced-concepts > span {
+  display: none;
+}
+
+.learning-extra-concepts .advanced-concepts > div {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.learning-extra-concepts .advanced-concepts section {
+  min-height: 88px;
+}
+
+.learning-extra-concepts .advanced-concepts p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 .selected-module-actions {
@@ -7605,4 +7644,75 @@ body:has(#indexingView.active) .explain:focus-within {
 
 .learning-workspace.view-pane.active {
   display: block;
+}
+
+/* Targeted content readability pass */
+.control-intro p,
+.stage-card p,
+.control-note,
+.sidebar-note,
+.teaching-card p,
+.start-hero p,
+.start-path-card p,
+.start-integrity-note p,
+.scientific-warning,
+.indexing-heading p,
+.indexing-step-card p,
+.indexing-step-card small,
+.euler-heading p,
+.interpretation-heading p,
+.interpretation-card p,
+.interpretation-card li,
+.resources-heading p,
+.resource-card p,
+.resource-content p,
+.resource-content li,
+.lesson-card p,
+.lesson-card li,
+.side-card p,
+.glossary-definition,
+.formula-panel li,
+.mode-panel p,
+.mode-panel li,
+.quiz-feedback,
+.quiz-hint,
+.parameter-story,
+.quality-checklist p,
+.diagnose-result p,
+.real-stage-readout p,
+.stage-math-note,
+.real-stage-readout li,
+.real-indexing-explain-grid p,
+.real-indexing-explain-grid li,
+.learning-support-strip p,
+.selected-module-next,
+.activity-sheet p,
+.activity-sheet li,
+.review-mistakes p,
+.review-mistakes li,
+.weak-areas-panel li,
+.flashcard small {
+  font-size: 15px;
+  line-height: 1.58;
+}
+
+.lesson-card li + li,
+.interpretation-card li + li,
+.resource-content li + li,
+.activity-sheet li + li,
+.real-indexing-explain-grid li + li {
+  margin-top: 2px;
+}
+
+.stage-card-top span,
+.teaching-card span,
+.lesson-card span,
+.side-card h2,
+.offline-resources span,
+.dashboard-main span,
+.formula-note,
+.resource-card span,
+.modal-heading span,
+.resource-content h2 {
+  letter-spacing: 0;
 }
