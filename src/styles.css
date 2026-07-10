@@ -982,7 +982,7 @@ body.resources-active .lesson {
   display: grid;
   grid-template-columns: minmax(320px, 1fr) minmax(260px, 420px);
   gap: 18px;
-  align-items: end;
+  align-items: center;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--line);
 }
@@ -1540,9 +1540,10 @@ body.reduce-motion .start-path-card {
 }
 
 .resource-quick-actions {
+  align-self: center;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
   align-items: stretch;
 }
 
@@ -1554,15 +1555,15 @@ body.reduce-motion .start-path-card {
 
 .resource-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .resource-card {
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 8px;
-  min-height: 156px;
+  grid-template-rows: auto minmax(54px, 1fr) auto;
+  gap: 10px;
+  min-height: 166px;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1571,8 +1572,9 @@ body.reduce-motion .start-path-card {
 
 .resource-card span {
   color: #f8ffff;
-  font-size: 14px;
-  font-weight: 850;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.25;
 }
 
 .resource-card p {
@@ -1583,12 +1585,17 @@ body.reduce-motion .start-path-card {
 
 .resource-card-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
 .resource-card-actions button {
-  min-height: 34px;
+  min-height: 36px;
+  padding: 0 8px;
+}
+.resource-card-featured {
+  border-color: rgba(230, 181, 90, 0.32);
+  background: linear-gradient(135deg, rgba(230, 181, 90, 0.075), rgba(98, 215, 240, 0.04));
 }
 
 .interpretation-grid {
@@ -6260,27 +6267,42 @@ body.reduce-motion .start-hero-gateway {
 
 .evidence-preview-ipf .preview-visual {
   background:
-    linear-gradient(128deg, transparent 0 28%, rgba(7, 11, 15, 0.32) 29% 30%, transparent 31%),
-    linear-gradient(38deg, transparent 0 40%, rgba(7, 11, 15, 0.3) 41% 42%, transparent 43%),
-    radial-gradient(circle at 20% 24%, rgba(98, 215, 240, 0.84), transparent 25%),
-    radial-gradient(circle at 70% 18%, rgba(146, 212, 111, 0.72), transparent 28%),
-    radial-gradient(circle at 86% 74%, rgba(230, 181, 90, 0.72), transparent 32%),
-    radial-gradient(circle at 30% 82%, rgba(174, 152, 232, 0.66), transparent 30%),
-    linear-gradient(135deg, rgba(28, 68, 87, 0.9), rgba(18, 32, 42, 0.9));
+    radial-gradient(circle at 20% 22%, rgba(255, 255, 255, 0.08), transparent 18%),
+    radial-gradient(circle at 82% 76%, rgba(255, 255, 255, 0.06), transparent 22%),
+    #071015;
 }
 
 .evidence-preview-ipf .preview-visual span {
   position: absolute;
-  border: 1px solid rgba(5, 10, 14, 0.42);
+  inset: 0;
   background: rgba(255, 255, 255, 0.05);
-  clip-path: polygon(12% 0, 100% 8%, 88% 100%, 0 78%);
+  filter: drop-shadow(0 0 0.9px rgba(5, 10, 14, 0.9));
 }
 
-.evidence-preview-ipf .preview-visual span:nth-child(1) { left: -4%; top: 4%; width: 44%; height: 54%; background: rgba(98, 215, 240, 0.42); }
-.evidence-preview-ipf .preview-visual span:nth-child(2) { left: 35%; top: -8%; width: 38%; height: 58%; background: rgba(146, 212, 111, 0.36); transform: rotate(8deg); }
-.evidence-preview-ipf .preview-visual span:nth-child(3) { right: -7%; top: 18%; width: 42%; height: 50%; background: rgba(230, 181, 90, 0.34); transform: rotate(-10deg); }
-.evidence-preview-ipf .preview-visual span:nth-child(4) { left: 14%; bottom: -10%; width: 48%; height: 55%; background: rgba(174, 152, 232, 0.34); transform: rotate(-6deg); }
-.evidence-preview-ipf .preview-visual span:nth-child(5) { right: 8%; bottom: -5%; width: 36%; height: 44%; background: rgba(238, 96, 116, 0.24); transform: rotate(12deg); }
+.evidence-preview-ipf .preview-visual span:nth-child(1) {
+  background: linear-gradient(135deg, rgba(98, 215, 240, 0.66), rgba(66, 172, 196, 0.52));
+  clip-path: polygon(0 0, 31% 0, 38% 39%, 25% 58%, 0 52%);
+}
+
+.evidence-preview-ipf .preview-visual span:nth-child(2) {
+  background: linear-gradient(145deg, rgba(146, 212, 111, 0.64), rgba(96, 166, 95, 0.5));
+  clip-path: polygon(31% 0, 68% 0, 64% 40%, 38% 39%);
+}
+
+.evidence-preview-ipf .preview-visual span:nth-child(3) {
+  background: linear-gradient(145deg, rgba(230, 181, 90, 0.62), rgba(189, 126, 71, 0.5));
+  clip-path: polygon(68% 0, 100% 0, 100% 56%, 64% 40%);
+}
+
+.evidence-preview-ipf .preview-visual span:nth-child(4) {
+  background: linear-gradient(135deg, rgba(174, 152, 232, 0.62), rgba(113, 111, 190, 0.5));
+  clip-path: polygon(0 52%, 25% 58%, 46% 100%, 0 100%);
+}
+
+.evidence-preview-ipf .preview-visual span:nth-child(5) {
+  background: linear-gradient(135deg, rgba(238, 96, 116, 0.55), rgba(120, 185, 158, 0.46));
+  clip-path: polygon(25% 58%, 38% 39%, 64% 40%, 100% 56%, 100% 100%, 46% 100%);
+}
 
 .evidence-preview-pattern .preview-visual {
   background:
