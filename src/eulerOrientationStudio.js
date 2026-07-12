@@ -348,7 +348,7 @@ export class EulerOrientationStudio {
             </figure>
             <figure class="euler-card">
               <canvas id="ipfCanvas" width="520" height="360" aria-label="Inverse pole figure"></canvas>
-              <figcaption>Inverse pole figure point for the selected sample direction.</figcaption>
+              <figcaption>Inverse pole figure point for the selected sample direction. Hexagonal mode uses a schematic teaching reduction, not full symmetry-reduced IPF analysis.</figcaption>
             </figure>
           </div>
         </div>

@@ -63,7 +63,7 @@ export const stages = [
   },
   {
     title: '4. Bragg diffraction cones',
-    text: 'Each active plane family emits a schematic Bragg/Kossel cone system from the impact point. The cone angles are magnified so students can see geometry that is physically only a few degrees wide.'
+    text: 'Each active plane family is shown as a schematic Bragg/Kossel cone construction from the impact point. The Bragg angle and resulting band-edge separation are small in real EBSD, so this app enlarges the cone geometry for visibility.'
   },
   {
     title: '5. Cone intersection with detector',
