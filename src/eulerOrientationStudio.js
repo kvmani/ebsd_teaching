@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+﻿import * as THREE from 'three';
 
 const DEG = Math.PI / 180;
 
@@ -169,6 +169,28 @@ function stereographic(vector) {
   };
 }
 
+function reduceCubicToIpf(vector) {
+  const sorted = vector.map((value) => Math.abs(value)).sort((a, b) => a - b);
+  return normalize(sorted);
+}
+
+function reduceHexagonalToIpf(vector) {
+  const z = Math.abs(vector[2]);
+  const basalRadius = Math.hypot(vector[0], vector[1]);
+  if (basalRadius < 1e-8) return [0, 0, 1];
+  const sixty = Math.PI / 3;
+  const thirty = Math.PI / 6;
+  let phi = Math.atan2(vector[1], vector[0]);
+  phi = ((phi % sixty) + sixty) % sixty;
+  if (phi > thirty) phi = sixty - phi;
+  return normalize([basalRadius * Math.cos(phi), basalRadius * Math.sin(phi), z]);
+}
+
+function reduceDirectionToIpf(system, vector) {
+  return system === 'cubic'
+    ? { vector: reduceCubicToIpf(vector), label: 'cubic-reduced' }
+    : { vector: reduceHexagonalToIpf(vector), label: 'hex-reduced' };
+}
 function projectionPointOnEquator(vector) {
   const v = normalize(vector);
   const denominator = 1 + v[2];
@@ -302,6 +324,7 @@ export class EulerOrientationStudio {
       <section class="panel euler-panel" aria-label="Euler angle orientation studio">
         <div class="euler-heading">
           <span class="fidelity-label">Bunge ZXZ orientation</span>
+          <span class="scope-badge">Scientific scope: orientation geometry</span>
           <h2>Euler Angles, Unit Cells, Pole Figures, and IPF</h2>
           <p>Change phi1, Phi, and phi2 to rotate a crystal unit cell, then watch the selected pole family move through the unit sphere, pole figure, and inverse pole figure.</p>
         </div>
@@ -348,7 +371,7 @@ export class EulerOrientationStudio {
             </figure>
             <figure class="euler-card">
               <canvas id="ipfCanvas" width="520" height="360" aria-label="Inverse pole figure"></canvas>
-              <figcaption>Inverse pole figure point for the selected sample direction. Hexagonal mode uses a schematic teaching reduction, not full symmetry-reduced IPF analysis.</figcaption>
+              <figcaption>Inverse pole figure point for the selected sample direction. Cubic uses a teaching symmetry reduction; hexagonal remains schematic until full crystallographic symmetry reduction is implemented.</figcaption>
             </figure>
           </div>
         </div>
@@ -630,34 +653,36 @@ export class EulerOrientationStudio {
     const plot = drawCirclePlot(ctx, `IPF ${this.state.sampleDirection}`);
     const g = bungeMatrix(this.state.phi1, this.state.Phi, this.state.phi2);
     const crystalDirection = normalize(matVec(transpose(g), SAMPLE_DIRECTIONS[this.state.sampleDirection]));
-    const reduced = this.state.system === 'cubic'
-      ? normalize(crystalDirection.map(Math.abs).sort((a, b) => b - a))
-      : normalize([Math.abs(crystalDirection[0]), Math.abs(crystalDirection[1]), Math.abs(crystalDirection[2])]);
+    const reduction = reduceDirectionToIpf(this.state.system, crystalDirection);
+    const reduced = reduction.vector;
     const point = stereographic(reduced);
+    ctx.strokeStyle = 'rgba(146,212,111,0.75)';
+    ctx.fillStyle = 'rgba(146,212,111,0.055)';
+    ctx.beginPath();
     if (this.state.system === 'cubic') {
       const corners = [[0, 0, 1], normalize([1, 0, 1]), normalize([1, 1, 1])].map(stereographic);
-      ctx.strokeStyle = 'rgba(146,212,111,0.75)';
-      ctx.beginPath();
       corners.forEach((corner, index) => {
         const x = plot.cx + corner.x * plot.r;
         const y = plot.cy - corner.y * plot.r;
         if (index === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       });
-      ctx.closePath();
-      ctx.stroke();
     } else {
-      ctx.strokeStyle = 'rgba(146,212,111,0.75)';
-      ctx.beginPath();
-      ctx.moveTo(plot.cx, plot.cy);
-      ctx.lineTo(plot.cx + 0.48 * plot.r, plot.cy);
-      ctx.arc(plot.cx, plot.cy, 0.48 * plot.r, 0, -30 * DEG, true);
-      ctx.closePath();
-      ctx.stroke();
+      const center = stereographic([0, 0, 1]);
+      const basalA = stereographic([1, 0, 0]);
+      const basalB = stereographic([Math.cos(30 * DEG), Math.sin(30 * DEG), 0]);
+      ctx.moveTo(plot.cx + center.x * plot.r, plot.cy - center.y * plot.r);
+      ctx.lineTo(plot.cx + basalA.x * plot.r, plot.cy - basalA.y * plot.r);
+      ctx.arc(plot.cx, plot.cy, plot.r, 0, -30 * DEG, true);
+      ctx.lineTo(plot.cx + center.x * plot.r, plot.cy - center.y * plot.r);
     }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
     drawPoint(ctx, plot, point, '#92d46f', 'IPF');
     ctx.fillStyle = '#a9b9bd';
     ctx.font = '12px Segoe UI, Arial';
-    ctx.fillText(`dir [${crystalDirection.map((v) => v.toFixed(3)).join(', ')}]`, 12, canvas.height - 16);
+    ctx.fillText(`dir [${crystalDirection.map((v) => v.toFixed(3)).join(', ')}]`, 12, canvas.height - 32);
+    ctx.fillText(`${reduction.label} [${reduced.map((v) => v.toFixed(3)).join(', ')}]`, 12, canvas.height - 14);
   }
 }

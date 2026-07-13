@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -130,7 +130,7 @@
         <section class="panel scene-panel" aria-label="SEM and EBSD geometry">
           <div class="panel-title">
             <strong>SEM / EBSD Geometry</strong>
-            <span><b class="fidelity-label inline">Schematic</b> Drag to orbit, scroll to zoom</span>
+            <span><b class="fidelity-label inline">Schematic</b><b class="scope-badge">Scientific scope</b> Drag to orbit, scroll to zoom</span>
           </div>
           <div class="annotation numbered-label" id="annColumn"><b>1</b> SEM column</div>
           <div class="annotation numbered-label" id="annBeam"><b>2</b> Incident electron beam</div>
@@ -145,7 +145,7 @@
         <section class="panel detector-panel" aria-label="Live detector pattern">
           <div class="panel-title">
             <strong>Live Detector Pattern</strong>
-            <span><b class="fidelity-label inline">Simplified</b> Kikuchi bands from cone intersections</span>
+            <span><b class="fidelity-label inline">Simplified</b><b class="scope-badge">Scientific scope</b> Kikuchi bands from cone intersections</span>
           </div>
           <div class="detector-toolbar">
             <label>
@@ -310,7 +310,7 @@
         <section class="panel scan-panel" aria-label="Live EBSD scan acquisition">
           <div class="panel-title">
             <strong>Live EBSD Scan Acquisition</strong>
-            <span><b class="fidelity-label inline">Schematic</b> Raster scan: each pixel needs a usable diffraction pattern</span>
+            <span><b class="fidelity-label inline">Schematic</b><b class="scope-badge">Scientific scope</b> Raster scan: each pixel needs a usable diffraction pattern</span>
           </div>
           <button id="scanPauseButton" class="live-toggle-pill" type="button" aria-pressed="false">Pause live scan</button>
           <div class="scan-status-strip" aria-label="Live scan state">
@@ -341,7 +341,7 @@
         <section class="panel pattern-lab" aria-label="Acquired EBSD pattern preview">
           <div class="panel-title">
             <strong>Pattern at Current Pixel</strong>
-            <span><b class="fidelity-label inline">Illustrative EBSP examples</b> Noise, clipping, and band sharpness change indexability</span>
+            <span><b class="fidelity-label inline">Illustrative EBSP examples</b><b class="scope-badge">Scientific scope</b> Noise, clipping, and band sharpness change indexability</span>
           </div>
           <button id="patternPauseButton" class="live-toggle-pill pattern-toggle" type="button" aria-pressed="false">Pause live scan</button>
           <canvas id="patternPreview" width="420" height="420"></canvas>
@@ -612,6 +612,7 @@
           <div class="indexing-heading">
             <div class="indexing-hero-copy">
               <span class="fidelity-label">Conceptual explanation</span>
+              <span class="scope-badge">Scientific scope: simplified indexing</span>
               <h2>How Kikuchi Bands Are Indexed</h2>
               <p>This module is a simplified indexing workflow, not a full commercial indexing engine. It shows why indexing depends on pattern quality, calibration, phase selection, band geometry, and confidence-like metrics.</p>
               <p class="scientific-warning">This studio explains EBSD indexing logic using schematic overlays and simplified scoring. It is not a real Hough transform, crystallographic solver, or calibrated indexing engine.</p>
@@ -742,6 +743,7 @@
           <div class="interpretation-heading">
             <div class="interpretation-hero-copy">
               <span class="fidelity-label">Phase 3 conceptual training</span>
+              <span class="scope-badge">Scientific scope: interpretation aid</span>
               <h2>Real EBSD Interpretation & Experimental Understanding</h2>
               <p>Bridge sample preparation, acquisition, pattern quality, confidence-like indexing evidence, maps, artefacts, and interpretation using curated conceptual examples.</p>
               <p class="scientific-warning">This workspace is educational. It is not Oxford Aztec, EDAX OIM, Bruker ESPRIT, CHANNEL5, a crystallographic solver, or a calibrated EBSD analysis engine.</p>

@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #0b1117;
   --bg-2: #10161c;
   --surface: rgba(20, 27, 33, 0.94);
@@ -303,10 +303,10 @@ select {
 #annColumn { top: 58px; left: 46%; }
 #annBeam { top: 116px; left: 43%; }
 #annInteraction { bottom: 138px; left: 33%; }
-#annPlanes { bottom: 92px; left: 25px; }
+#annPlanes { bottom: 112px; left: 25px; }
 #annCones { top: 42%; left: 54%; }
 #annDetector { right: 24px; top: 36%; }
-#annSample { bottom: 56px; left: 25px; }
+#annSample { bottom: 54px; left: 25px; max-width: 170px; }
 
 .detector-panel {
   display: grid;
@@ -749,6 +749,25 @@ body.resources-active .lesson {
   font-size: 11px;
   font-weight: 850;
   text-transform: uppercase;
+}
+
+
+.scope-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 20px;
+  margin-right: 6px;
+  padding: 2px 7px;
+  border: 1px solid rgba(98, 215, 240, 0.42);
+  border-radius: 999px;
+  background: rgba(98, 215, 240, 0.085);
+  color: #c9f7ff;
+  font-size: 10.5px;
+  font-weight: 850;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .fidelity-label.inline {
@@ -2811,9 +2830,11 @@ body.reduce-motion *::after {
 .pattern-lab {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  grid-template-rows: auto auto auto auto auto auto;
+  align-content: start;
   gap: 10px;
   padding: 12px;
+  overflow: hidden auto;
   background:
     radial-gradient(circle at 50% 36%, rgba(231, 132, 186, 0.12), transparent 44%),
     rgba(16, 21, 25, 0.95);
@@ -2833,9 +2854,10 @@ body.reduce-motion *::after {
 
 #patternPreview {
   grid-column: 1 / -1;
-  align-self: center;
+  align-self: start;
   justify-self: center;
-  width: min(88%, 420px);
+  width: min(100%, clamp(240px, 30vh, 330px));
+  max-width: 100%;
   aspect-ratio: 1 / 1;
   cursor: pointer;
 }
